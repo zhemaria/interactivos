@@ -1,1 +1,1250 @@
+<!DOCTYPE html>
+<html lang="es"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>3-U10-L11: Interactivo - Figuras compuestas</title> 
+  <style>
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 600px;
+        margin: 0 auto;
+      }
 
+      h1 {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin: 15px 0;
+        text-align: center;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 600px;
+        max-height: 700px;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+
+      .canvas-container {
+        width: 100%;
+        height: 300px;
+        position: relative;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+      .datos {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #f5f5f5;
+      }
+
+      .datos h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: #3498db;
+      }
+
+      .controles {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        justify-content: space-between;
+      }
+
+      button {
+        background-color: #00FFFF;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      /* Estilos para ventana modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-contenido {
+        background-color: white;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 500px;
+        max-height: 80%;
+        overflow-y: auto;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+      }
+
+      .cerrar-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #666;
+      }
+
+      .cerrar-modal:hover {
+        color: #000;
+      }
+
+      .solucion h3 {
+        margin-top: 0;
+        color: #27ae60;
+        padding-right: 30px;
+      }
+
+      .formula {
+        font-style: italic;
+        margin: 5px 0;
+        color: #7f8c8d;
+      }
+
+      .calculo {
+        margin: 5px 0;
+      }
+
+      .leyenda-color {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 5px;
+      }
+
+      .color-item {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+      }
+
+      .color-muestra {
+        width: 15px;
+        height: 15px;
+        display: inline-block;
+        margin-right: 5px;
+      }
+    </style> 
+ </head><body><div class="container">
+<div class="canvas-container"><canvas id="lienzo"></canvas></div>
+<div class="datos" id="datos-container">
+<h1 style="color: #000000;">Datos de la figura</h1>
+<div id="datos"></div>
+<div class="leyenda-color" id="leyenda-color"></div>
+</div>
+<div class="controles" style="color: #000000;"><button id="nueva-figura" style="color: #000000;">Nueva Figura</button> <button id="mostrar-solucion" style="color: #000000;">Ver Solución</button> <button id="alternar-colores" style="color: #000000;">Alternar Colores</button></div>
+<div id="modal-solucion" class="modal">
+<div class="modal-contenido"><span class="cerrar-modal" id="cerrar-modal">×</span>
+<h3>Solución</h3>
+<div id="solucion"></div>
+</div>
+</div>
+</div>
+<p><script>
+      // Constantes y variables globales
+      const canvas = document.getElementById("lienzo");
+      const ctx = canvas.getContext("2d");
+      const PI = 3.14;
+      let figuraActual = null;
+      let datosActuales = {};
+      // Iniciar con un solo color en vez de colores diferenciados
+      let mostrarColores = false;
+
+      // Función para alternar entre mostrar colores o un solo color
+      function alternarColores() {
+        mostrarColores = !mostrarColores;
+        if (figuraActual && datosActuales) {
+          figuraActual.dibujar(datosActuales);
+          mostrarDatos(datosActuales);
+        }
+      }
+
+      // Esperar a que el DOM esté completamente cargado
+      document.addEventListener("DOMContentLoaded", function () {
+        // Configurar canvas
+        setupCanvas();
+
+        // Generar la primera figura
+        generarNuevaFigura();
+
+        // Eventos de botones
+        document
+          .getElementById("nueva-figura")
+          .addEventListener("click", generarNuevaFigura);
+        document
+          .getElementById("mostrar-solucion")
+          .addEventListener("click", mostrarSolucion);
+        document
+          .getElementById("cerrar-modal")
+          .addEventListener("click", cerrarModal);
+        document
+          .getElementById("alternar-colores")
+          .addEventListener("click", alternarColores);
+
+        // Cerrar modal al hacer clic fuera del contenido
+        window.addEventListener("click", function (event) {
+          const modal = document.getElementById("modal-solucion");
+          if (event.target === modal) {
+            cerrarModal();
+          }
+        });
+      });
+
+      // Configurar canvas para alta resolución
+      function setupCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+      }
+
+      // Generador de números aleatorios
+      function aleatorio(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      // Colores para las figuras
+      const colores = [
+        { nombre: "Rojo", valor: "#e74c3c" },
+        { nombre: "Azul", valor: "#3498db" },
+        { nombre: "Verde", valor: "#2ecc71" },
+        { nombre: "Naranja", valor: "#e67e22" },
+        { nombre: "Morado", valor: "#9b59b6" },
+      ];
+
+      // Seleccionar colores únicos para la figura actual
+      function seleccionarColores(cantidad) {
+        let colorsCopy = [...colores];
+        let seleccionados = [];
+
+        for (let i = 0; i < cantidad; i++) {
+          if (colorsCopy.length > 0) {
+            const index = aleatorio(0, colorsCopy.length - 1);
+            seleccionados.push(colorsCopy[index]);
+            colorsCopy.splice(index, 1);
+          }
+        }
+
+        return seleccionados;
+      }
+
+      // Definición de tipos de figuras compuestas
+      const tiposFiguras = [
+        {
+          nombre: "Rectángulo con Semicírculo (Suma)",
+          dibujar: dibujarRectanguloSemicirculo,
+          datos: generarDatosRectanguloSemicirculo,
+          calcular: calcularAreaRectanguloSemicirculo,
+        },
+        {
+          nombre: "Cuadrado con Círculo (Resta)",
+          dibujar: dibujarCuadradoCirculo,
+          datos: generarDatosCuadradoCirculo,
+          calcular: calcularAreaCuadradoCirculo,
+        },
+        {
+          nombre: "Rectángulo con Semicírculo Lateral (Suma)",
+          dibujar: dibujarRectanguloSemicirculoLateral,
+          datos: generarDatosRectanguloSemicirculoLateral,
+          calcular: calcularAreaRectanguloSemicirculoLateral,
+        },
+        {
+          nombre: "Trapecio con Triángulo (Suma)",
+          dibujar: dibujarTrapecioTriangulo,
+          datos: generarDatosTrapecioTriangulo,
+          calcular: calcularAreaTrapecioTriangulo,
+        },
+        {
+          nombre: "Cuadrado con Triángulo (Resta)",
+          dibujar: dibujarCuadradoTriangulo,
+          datos: generarDatosCuadradoTriangulo,
+          calcular: calcularAreaCuadradoTriangulo,
+        },
+        {
+          nombre: "Segmento Circular (Resta)",
+          dibujar: dibujarSegmentoCircular,
+          datos: generarDatosSegmentoCircular,
+          calcular: calcularAreaSegmentoCircular,
+        },
+      ];
+
+      // ==============================================
+      // Funciones para cada tipo de figura compuesta
+      // ==============================================
+
+      // 2. Cuadrado con Círculo (Resta)
+      function generarDatosCuadradoCirculo() {
+        const ladoCuadrado = aleatorio(80, 150);
+        const radioCirculo = aleatorio(20, ladoCuadrado / 2 - 5);
+
+        const coloresSeleccionados = seleccionarColores(2);
+
+        return {
+          tipo: "Cuadrado con Círculo (Resta)",
+          cuadrado: {
+            lado: ladoCuadrado,
+            color: coloresSeleccionados[0],
+          },
+          círculo: {
+            radio: radioCirculo,
+            color: coloresSeleccionados[1],
+          },
+          colorBase: coloresSeleccionados[0].valor,
+          offsetX: 0,
+          offsetY: 0,
+        };
+      }
+      function dibujarCuadradoCirculo(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Dibujar cuadrado
+        ctx.fillStyle = mostrarColores
+          ? datos.cuadrado.color.valor
+          : datos.colorBase;
+        ctx.fillRect(
+          offsetX,
+          offsetY,
+          datos.cuadrado.lado,
+          datos.cuadrado.lado
+        );
+
+        // Dibujar círculo (para restar)
+        const centroX = offsetX + datos.cuadrado.lado / 2;
+        const centroY = offsetY + datos.cuadrado.lado / 2;
+
+        if (mostrarColores) {
+          // Cuando mostramos colores diferenciados
+          ctx.fillStyle = datos.círculo.color.valor;
+        } else {
+          // Cuando mostramos un solo color, hacer el círculo "vacío" o blanco
+          ctx.fillStyle = "#FFFFFF"; // blanco o color de fondo
+        }
+
+        ctx.beginPath();
+        ctx.arc(centroX, centroY, datos.círculo.radio, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+
+      function calcularAreaCuadradoCirculo(datos) {
+        const areaCuadrado = datos.cuadrado.lado * datos.cuadrado.lado;
+        const areaCirculo = PI * datos.círculo.radio * datos.círculo.radio;
+        const areaTotal = areaCuadrado - areaCirculo;
+
+        return {
+          explicacion: [
+            {
+              texto: `Paso 1: Calculamos el área del cuadrado ${
+                mostrarColores ? datos.cuadrado.color.nombre : ""
+              }.`,
+              formula: "Área del cuadrado = lado × lado",
+              calculo: `Área del cuadrado = ${datos.cuadrado.lado} × ${datos.cuadrado.lado} = ${{areaCuadrado}} unidades²`,
+            },
+            {
+              texto: `Paso 2: Calculamos el área del círculo ${
+                mostrarColores ? datos.círculo.color.nombre : ""
+              } que se resta.`,
+              formula: "Área del círculo = π × radio²",
+              calculo: `Área del círculo = ${{PI}} × ${
+                datos.círculo.radio
+              }² = ${{PI}} × ${
+                datos.círculo.radio * datos.círculo.radio
+              } = ${areaCirculo.toFixed(2)} unidades²`,
+            },
+            {
+              texto:
+                "Paso 3: Restamos el área del círculo del área del cuadrado para obtener el área total.",
+              formula: "Área total = Área del cuadrado - Área del círculo",
+              calculo: `Área total = ${{areaCuadrado}} - ${areaCirculo.toFixed(
+                2
+              )} = ${areaTotal.toFixed(2)} unidades²`,
+            },
+          ],
+          areaTotal: areaTotal,
+        };
+      }
+
+      // 3. Rectángulo con Semicírculo (Suma)
+      function generarDatosRectanguloSemicirculo() {
+        const anchoRect = aleatorio(60, 150);
+        const altoRect = aleatorio(40, 100);
+        const radioSemi = anchoRect / 2;
+
+        const coloresSeleccionados = seleccionarColores(2);
+
+        return {
+          tipo: "Rectángulo con Semicírculo (Suma)",
+          rectángulo: {
+            ancho: anchoRect,
+            alto: altoRect,
+            color: coloresSeleccionados[0],
+          },
+          semicírculo: {
+            radio: radioSemi,
+            color: coloresSeleccionados[1],
+          },
+          colorBase: coloresSeleccionados[0].valor,
+          offsetX: 0,
+          offsetY: 0,
+        };
+      }
+
+      function dibujarRectanguloSemicirculo(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Color base para toda la figura si no se muestran colores
+        const colorBase = mostrarColores ? null : datos.colorBase;
+
+        // Dibujar rectángulo
+        ctx.fillStyle = mostrarColores
+          ? datos.rectángulo.color.valor
+          : colorBase;
+        ctx.fillRect(
+          offsetX,
+          offsetY,
+          datos.rectángulo.ancho,
+          datos.rectángulo.alto
+        );
+
+        // Dibujar semicírculo
+        const centroX = offsetX + datos.rectángulo.ancho / 2;
+        const centroY = offsetY;
+
+        ctx.fillStyle = mostrarColores
+          ? datos.semicírculo.color.valor
+          : colorBase;
+        ctx.beginPath();
+        ctx.arc(
+          centroX,
+          centroY,
+          datos.semicírculo.radio,
+          Math.PI,
+          2 * Math.PI
+        );
+        ctx.fill();
+      }
+
+      function calcularAreaRectanguloSemicirculo(datos) {
+        const areaRectangulo = datos.rectángulo.ancho * datos.rectángulo.alto;
+        const areaSemicirculo =
+          (PI * datos.semicírculo.radio * datos.semicírculo.radio) / 2;
+        const areaTotal = areaRectangulo + areaSemicirculo;
+
+        return {
+          explicacion: [
+            {
+              texto: `Paso 1: Calculamos el área del rectángulo ${
+                mostrarColores ? datos.rectángulo.color.nombre : ""
+              }.`,
+              formula: "Área del rectángulo = base × altura",
+              calculo: `Área del rectángulo = ${datos.rectángulo.ancho} × ${datos.rectángulo.alto} = ${{areaRectangulo}} unidades²`,
+            },
+            {
+              texto: `Paso 2: Calculamos el área del semicírculo ${
+                mostrarColores ? datos.semicírculo.color.nombre : ""
+              }.`,
+              formula: "Área del semicírculo = (π × radio²) ÷ 2",
+              calculo: `Área del semicírculo = (${{PI}} × ${
+                datos.semicírculo.radio
+              }²) ÷ 2 = (${{PI}} × ${
+                datos.semicírculo.radio * datos.semicírculo.radio
+              }) ÷ 2 = ${areaSemicirculo.toFixed(2)} unidades²`,
+            },
+            {
+              texto:
+                "Paso 3: Sumamos las áreas para obtener el área total de la figura compuesta.",
+              formula:
+                "Área total = Área del rectángulo + Área del semicírculo",
+              calculo: `Área total = ${{areaRectangulo}} + ${areaSemicirculo.toFixed(
+                2
+              )} = ${areaTotal.toFixed(2)} unidades²`,
+            },
+          ],
+          areaTotal: areaTotal,
+        };
+      }
+
+      // 3. Rectángulo con Semicírculo Lateral (Suma)
+      function generarDatosRectanguloSemicirculoLateral() {
+        const anchoRect = aleatorio(60, 120);
+        const altoRect = aleatorio(40, 100);
+        const radioSemi = altoRect / 2;
+
+        const coloresSeleccionados = seleccionarColores(2);
+
+        return {
+          tipo: "Rectángulo con Semicírculo Lateral (Suma)",
+          rectángulo: {
+            ancho: anchoRect,
+            alto: altoRect,
+            color: coloresSeleccionados[0],
+          },
+          semicírculo: {
+            radio: radioSemi,
+            color: coloresSeleccionados[1],
+          },
+          colorBase: coloresSeleccionados[0].valor,
+          offsetX: 0,
+          offsetY: 0,
+        };
+      }
+
+      function dibujarRectanguloSemicirculoLateral(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Color base para toda la figura si no se muestran colores
+        const colorBase = mostrarColores ? null : datos.colorBase;
+
+        // Dibujar rectángulo
+        ctx.fillStyle = mostrarColores
+          ? datos.rectángulo.color.valor
+          : colorBase;
+        ctx.fillRect(
+          offsetX,
+          offsetY,
+          datos.rectángulo.ancho,
+          datos.rectángulo.alto
+        );
+
+        // Dibujar semicírculo a la derecha
+        const centroX = offsetX + datos.rectángulo.ancho;
+        const centroY = offsetY + datos.rectángulo.alto / 2;
+
+        ctx.fillStyle = mostrarColores
+          ? datos.semicírculo.color.valor
+          : colorBase;
+        ctx.beginPath();
+        ctx.arc(
+          centroX,
+          centroY,
+          datos.semicírculo.radio,
+          -Math.PI / 2,
+          Math.PI / 2,
+          false
+        );
+        ctx.lineTo(centroX, centroY + datos.semicírculo.radio);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function calcularAreaRectanguloSemicirculoLateral(datos) {
+        const areaRectangulo = datos.rectángulo.ancho * datos.rectángulo.alto;
+        const areaSemicirculo =
+          (PI * datos.semicírculo.radio * datos.semicírculo.radio) / 2;
+        const areaTotal = areaRectangulo + areaSemicirculo;
+
+        return {
+          explicacion: [
+            {
+              texto: `Paso 1: Calculamos el área del rectángulo ${
+                mostrarColores ? datos.rectángulo.color.nombre : ""
+              }.`,
+              formula: "Área del rectángulo = base × altura",
+              calculo: `Área del rectángulo = ${datos.rectángulo.ancho} × ${datos.rectángulo.alto} = ${{areaRectangulo}} unidades²`,
+            },
+            {
+              texto: `Paso 2: Calculamos el área del semicírculo lateral ${
+                mostrarColores ? datos.semicírculo.color.nombre : ""
+              }.`,
+              formula: "Área del semicírculo = (π × radio²) ÷ 2",
+              calculo: `Área del semicírculo = (${{PI}} × ${
+                datos.semicírculo.radio
+              }²) ÷ 2 = (${{PI}} × ${
+                datos.semicírculo.radio * datos.semicírculo.radio
+              }) ÷ 2 = ${areaSemicirculo.toFixed(2)} unidades²`,
+            },
+            {
+              texto:
+                "Paso 3: Sumamos las áreas para obtener el área total de la figura compuesta.",
+              formula:
+                "Área total = Área del rectángulo + Área del semicírculo",
+              calculo: `Área total = ${{areaRectangulo}} + ${areaSemicirculo.toFixed(
+                2
+              )} = ${areaTotal.toFixed(2)} unidades²`,
+            },
+          ],
+          areaTotal: areaTotal,
+        };
+      }
+
+      // 4. Trapecio con Triángulo (Suma)
+      function generarDatosTrapecioTriangulo() {
+        const baseMayorTrapecio = aleatorio(80, 150);
+        const baseMenorTrapecio = aleatorio(40, baseMayorTrapecio - 20);
+        const alturaTrapecio = aleatorio(40, 100);
+
+        const baseTriangulo = baseMayorTrapecio;
+        const alturaTriangulo = aleatorio(30, 80);
+
+        const coloresSeleccionados = seleccionarColores(2);
+
+        return {
+          tipo: "Trapecio con Triángulo (Suma)",
+          trapecio: {
+            baseMayor: baseMayorTrapecio,
+            baseMenor: baseMenorTrapecio,
+            altura: alturaTrapecio,
+            color: coloresSeleccionados[0],
+          },
+          triángulo: {
+            base: baseTriangulo,
+            altura: alturaTriangulo,
+            color: coloresSeleccionados[1],
+          },
+          colorBase: coloresSeleccionados[0].valor,
+          offsetX: 0,
+          offsetY: 0,
+        };
+      }
+
+      function dibujarTrapecioTriangulo(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Color base para toda la figura si no se muestran colores
+        const colorBase = mostrarColores ? null : datos.colorBase;
+
+        // Dibujar trapecio
+        const diferencia =
+          (datos.trapecio.baseMayor - datos.trapecio.baseMenor) / 2;
+
+        ctx.fillStyle = mostrarColores ? datos.trapecio.color.valor : colorBase;
+        ctx.beginPath();
+        ctx.moveTo(offsetX, offsetY + datos.trapecio.altura);
+        ctx.lineTo(
+          offsetX + datos.trapecio.baseMayor,
+          offsetY + datos.trapecio.altura
+        );
+        ctx.lineTo(offsetX + datos.trapecio.baseMayor - diferencia, offsetY);
+        ctx.lineTo(offsetX + diferencia, offsetY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Dibujar triángulo encima del trapecio
+        ctx.fillStyle = mostrarColores
+          ? datos.triángulo.color.valor
+          : colorBase;
+        ctx.beginPath();
+        ctx.moveTo(
+          offsetX + datos.trapecio.baseMayor / 2,
+          offsetY - datos.triángulo.altura
+        );
+        ctx.lineTo(offsetX, offsetY);
+        ctx.lineTo(offsetX + datos.trapecio.baseMayor, offsetY);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function calcularAreaTrapecioTriangulo(datos) {
+        const areaTrapecio =
+          ((datos.trapecio.baseMayor + datos.trapecio.baseMenor) / 2) *
+          datos.trapecio.altura;
+        const areaTriangulo =
+          0.5 * datos.triángulo.base * datos.triángulo.altura;
+        const areaTotal = areaTrapecio + areaTriangulo;
+
+        return {
+          explicacion: [
+            {
+              texto: `Paso 1: Calculamos el área del trapecio ${
+                mostrarColores ? datos.trapecio.color.nombre : ""
+              }.`,
+              formula:
+                "Área del trapecio = ((base mayor + base menor) ÷ 2) × altura",
+              calculo: `Área del trapecio = ((${datos.trapecio.baseMayor} + ${datos.trapecio.baseMenor}) ÷ 2) × ${datos.trapecio.altura} = ${{areaTrapecio}} unidades²`,
+            },
+            {
+              texto: `Paso 2: Calculamos el área del triángulo ${
+                mostrarColores ? datos.triángulo.color.nombre : ""
+              }.`,
+              formula: "Área del triángulo = (base × altura) ÷ 2",
+              calculo: `Área del triángulo = (${datos.triángulo.base} × ${datos.triángulo.altura}) ÷ 2 = ${{areaTriangulo}} unidades²`,
+            },
+            {
+              texto:
+                "Paso 3: Sumamos las áreas para obtener el área total de la figura compuesta.",
+              formula: "Área total = Área del trapecio + Área del triángulo",
+              calculo: `Área total = ${{areaTrapecio}} + ${{areaTriangulo}} = ${{areaTotal}} unidades²`,
+            },
+          ],
+          areaTotal: areaTotal,
+        };
+      }
+
+      // 5. Cuadrado con Triángulo (Resta)
+      function generarDatosCuadradoTriangulo() {
+        const ladoCuadrado = aleatorio(80, 150);
+        const baseTriangulo = ladoCuadrado;
+        const alturaTriangulo = aleatorio(20, ladoCuadrado - 10);
+
+        const coloresSeleccionados = seleccionarColores(2);
+
+        return {
+          tipo: "Cuadrado con Triángulo (Resta)",
+          cuadrado: {
+            lado: ladoCuadrado,
+            color: coloresSeleccionados[0],
+          },
+          triángulo: {
+            base: baseTriangulo,
+            altura: alturaTriangulo,
+            color: coloresSeleccionados[1],
+          },
+          colorBase: coloresSeleccionados[0].valor,
+          offsetX: 0,
+          offsetY: 0,
+        };
+      }
+
+      // Para Cuadrado con Triángulo (Resta)
+      function dibujarCuadradoTriangulo(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Dibujar cuadrado
+        ctx.fillStyle = mostrarColores
+          ? datos.cuadrado.color.valor
+          : datos.colorBase;
+        ctx.fillRect(
+          offsetX,
+          offsetY,
+          datos.cuadrado.lado,
+          datos.cuadrado.lado
+        );
+
+        // Dibujar triángulo (para restar) en la esquina superior derecha
+        if (mostrarColores) {
+          // Cuando mostramos colores diferenciados
+          ctx.fillStyle = datos.triángulo.color.valor;
+        } else {
+          // Cuando mostramos un solo color, hacer el triángulo "vacío" o blanco
+          ctx.fillStyle = "#FFFFFF"; // blanco o color de fondo
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(offsetX + datos.cuadrado.lado, offsetY);
+        ctx.lineTo(
+          offsetX + datos.cuadrado.lado - datos.triángulo.base,
+          offsetY
+        );
+        ctx.lineTo(
+          offsetX + datos.cuadrado.lado,
+          offsetY + datos.triángulo.altura
+        );
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function calcularAreaCuadradoTriangulo(datos) {
+        const areaCuadrado = datos.cuadrado.lado * datos.cuadrado.lado;
+        const areaTriangulo =
+          0.5 * datos.triángulo.base * datos.triángulo.altura;
+        const areaTotal = areaCuadrado - areaTriangulo;
+
+        return {
+          explicacion: [
+            {
+              texto: `Paso 1: Calculamos el área del cuadrado ${
+                mostrarColores ? datos.cuadrado.color.nombre : ""
+              }.`,
+              formula: "Área del cuadrado = lado × lado",
+              calculo: `Área del cuadrado = ${datos.cuadrado.lado} × ${datos.cuadrado.lado} = ${{areaCuadrado}} unidades²`,
+            },
+            {
+              texto: `Paso 2: Calculamos el área del triángulo ${
+                mostrarColores ? datos.triángulo.color.nombre : ""
+              } que se resta.`,
+              formula: "Área del triángulo = (base × altura) ÷ 2",
+              calculo: `Área del triángulo = (${datos.triángulo.base} × ${datos.triángulo.altura}) ÷ 2 = ${{areaTriangulo}} unidades²`,
+            },
+            {
+              texto:
+                "Paso 3: Restamos el área del triángulo del área del cuadrado para obtener el área total.",
+              formula: "Área total = Área del cuadrado - Área del triángulo",
+              calculo: `Área total = ${{areaCuadrado}} - ${{areaTriangulo}} = ${{areaTotal}} unidades²`,
+            },
+          ],
+          areaTotal: areaTotal,
+        };
+      }
+
+      // 6. Segmento Circular (Resta)
+
+      function generarDatosSegmentoCircular() {
+        // 6. Segmento Circular (Resta)
+        const radioCirculo = aleatorio(60, 120);
+        const alturaSegmento = aleatorio(
+          radioCirculo / 3,
+          (radioCirculo * 2) / 3
+        );
+
+        const coloresSeleccionados = seleccionarColores(2);
+
+        return {
+          tipo: "Segmento Circular (Resta)",
+          círculo: {
+            radio: radioCirculo,
+            color: coloresSeleccionados[0],
+          },
+          segmento: {
+            altura: alturaSegmento,
+            color: coloresSeleccionados[1],
+          },
+          colorBase: coloresSeleccionados[0].valor,
+          offsetX: 0,
+          offsetY: 0,
+        };
+      }
+
+      // Para Segmento Circular (Resta)
+      function dibujarSegmentoCircular(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const centroX = offsetX + datos.círculo.radio;
+        const centroY = offsetY + datos.círculo.radio;
+
+        // Calcular el ángulo del segmento
+        const h = datos.segmento.altura;
+        const r = datos.círculo.radio;
+        const cuerda = 2 * Math.sqrt(2 * r * h - h * h);
+        const anguloMitad = Math.asin(cuerda / (2 * r));
+
+        // Dibujar círculo completo
+        ctx.fillStyle = mostrarColores
+          ? datos.círculo.color.valor
+          : datos.colorBase;
+        ctx.beginPath();
+        ctx.arc(centroX, centroY, datos.círculo.radio, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Dibujar segmento a restar (parte inferior)
+        if (mostrarColores) {
+          // Cuando mostramos colores diferenciados
+          ctx.fillStyle = datos.segmento.color.valor;
+        } else {
+          // Cuando mostramos un solo color, hacer el segmento "vacío" o blanco
+          ctx.fillStyle = "#FFFFFF"; // blanco o color de fondo
+        }
+
+        ctx.beginPath();
+        ctx.arc(
+          centroX,
+          centroY,
+          datos.círculo.radio,
+          Math.PI - anguloMitad,
+          Math.PI + anguloMitad
+        );
+        ctx.lineTo(centroX, centroY);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function calcularAreaSegmentoCircular(datos) {
+        const areaCirculo = PI * datos.círculo.radio * datos.círculo.radio;
+
+        // Cálculo del área del segmento
+        const h = datos.segmento.altura;
+        const r = datos.círculo.radio;
+        const cuerda = 2 * Math.sqrt(2 * r * h - h * h);
+        const anguloMitad = Math.asin(cuerda / (2 * r));
+        const angulo = 2 * anguloMitad;
+
+        // Área del sector circular
+        const areaSector = (angulo / (2 * Math.PI)) * areaCirculo;
+
+        // Área del triángulo dentro del sector
+        const areaTriangulo = 0.5 * cuerda * (r - h);
+
+        // Área del segmento circular
+        const areaSegmento = areaSector - areaTriangulo;
+
+        // Área total después de restar
+        const areaTotal = areaCirculo - areaSegmento;
+
+        return {
+          explicacion: [
+            {
+              texto: `Paso 1: Calculamos el área del círculo completo ${
+                mostrarColores ? datos.círculo.color.nombre : ""
+              }.`,
+              formula: "Área del círculo = π × radio²",
+              calculo: `Área del círculo = ${{PI}} × ${
+                datos.círculo.radio
+              }² = ${{PI}} × ${
+                datos.círculo.radio * datos.círculo.radio
+              } = ${areaCirculo.toFixed(2)} unidades²`,
+            },
+            {
+              texto: `Paso 2: Calculamos el área del segmento ${
+                mostrarColores ? datos.segmento.color.nombre : ""
+              } que se resta.`,
+              formula:
+                "Área del segmento circular = área del sector - área del triángulo",
+              calculo: `Área del segmento = ${areaSector.toFixed(
+                2
+              )} - ${areaTriangulo.toFixed(2)} = ${areaSegmento.toFixed(
+                2
+              )} unidades²`,
+            },
+            {
+              texto:
+                "Paso 3: Restamos el área del segmento del área del círculo para obtener el área total.",
+              formula: "Área total = Área del círculo - Área del segmento",
+              calculo: `Área total = ${areaCirculo.toFixed(
+                2
+              )} - ${areaSegmento.toFixed(2)} = ${areaTotal.toFixed(
+                2
+              )} unidades²`,
+            },
+          ],
+          areaTotal: areaTotal,
+        };
+      }
+
+      // Función para calcular el desplazamiento (offset) para centrar las figuras
+      function calcularOffset(datos) {
+        let anchura = 0;
+        let altura = 0;
+
+        // Determinar las dimensiones según el tipo de figura
+        switch (datos.tipo) {
+          case "Rectángulo con Semicírculo (Suma)":
+            anchura = datos.rectángulo.ancho;
+            altura = datos.rectángulo.alto + datos.semicírculo.radio;
+            break;
+          case "Cuadrado con Círculo (Resta)":
+            anchura = datos.cuadrado.lado;
+            altura = datos.cuadrado.lado;
+            break;
+          case "Rectángulo con Semicírculo Lateral (Suma)":
+            anchura = datos.rectángulo.ancho + datos.semicírculo.radio;
+            altura = datos.rectángulo.alto;
+            break;
+          case "Trapecio con Triángulo (Suma)":
+            anchura = datos.trapecio.baseMayor;
+            altura = datos.trapecio.altura + datos.triángulo.altura;
+            break;
+          case "Cuadrado con Triángulo (Resta)":
+            anchura = datos.cuadrado.lado;
+            altura = datos.cuadrado.lado;
+            break;
+          case "Segmento Circular (Resta)":
+            anchura = 2 * datos.círculo.radio;
+            altura = 2 * datos.círculo.radio;
+            break;
+        }
+
+        // Calcular centrado
+        const rect = canvas.getBoundingClientRect();
+        const canvasAncho = rect.width;
+        const canvasAlto = rect.height;
+
+        const offsetX = (canvasAncho - anchura) / 2;
+        const offsetY = (canvasAlto - altura) / 2;
+
+        return { offsetX, offsetY };
+      }
+
+      // Función para generar una nueva figura aleatoria
+      function generarNuevaFigura() {
+        // Restablecer a un solo color cada vez que se genera una nueva figura
+        mostrarColores = false;
+
+        const tipoIndice = aleatorio(0, tiposFiguras.length - 1);
+        const tipoFigura = tiposFiguras[tipoIndice];
+
+        figuraActual = tipoFigura;
+        datosActuales = tipoFigura.datos();
+
+        // Dibujar la figura
+        tipoFigura.dibujar(datosActuales);
+
+        // Mostrar datos
+        mostrarDatos(datosActuales);
+
+        // Ocultar modal de solución
+        document.getElementById("modal-solucion").style.display = "none";
+      }
+      // Función para mostrar los datos de la figura
+      function mostrarDatos(datos) {
+        const datosContainer = document.getElementById("datos");
+        const leyendaContainer = document.getElementById("leyenda-color");
+
+        // Limpiar contenedores
+        datosContainer.innerHTML = "";
+        leyendaContainer.innerHTML = "";
+
+        // Añadir título del tipo de figura
+        const titulo = document.createElement("p");
+        titulo.innerHTML = `<strong>${datos.tipo}</strong>`;
+        datosContainer.appendChild(titulo);
+
+        // Añadir datos específicos según el tipo de figura
+        let datosHTML = "";
+
+        switch (datos.tipo) {
+          case "Rectángulo con Semicírculo (Suma)":
+            datosHTML = `
+                        <p>Rectángulo: Ancho = ${datos.rectángulo.ancho} unidades, Alto = ${datos.rectángulo.alto} unidades</p>
+                        <p>Semicírculo: Radio = ${datos.semicírculo.radio} unidades</p>
+                    `;
+            if (mostrarColores) {
+              mostrarLeyendaColores([
+                {
+                  nombre: `Rectángulo ${datos.rectángulo.color.nombre}`,
+                  color: datos.rectángulo.color.valor,
+                },
+                {
+                  nombre: `Semicírculo ${datos.semicírculo.color.nombre}`,
+                  color: datos.semicírculo.color.valor,
+                },
+              ]);
+            }
+            break;
+          case "Cuadrado con Círculo (Resta)":
+            datosHTML = `
+                        <p>Cuadrado: Lado = ${datos.cuadrado.lado} unidades</p>
+                        <p>Círculo: Radio = ${datos.círculo.radio} unidades</p>
+                        <p>Nota: El área del círculo se resta del área del cuadrado.</p>
+                    `;
+            if (mostrarColores) {
+              mostrarLeyendaColores([
+                {
+                  nombre: `Cuadrado ${datos.cuadrado.color.nombre}`,
+                  color: datos.cuadrado.color.valor,
+                },
+                {
+                  nombre: `Círculo ${datos.círculo.color.nombre} (se resta)`,
+                  color: datos.círculo.color.valor,
+                },
+              ]);
+            }
+            break;
+          case "Rectángulo con Semicírculo Lateral (Suma)":
+            datosHTML = `
+                        <p>Rectángulo: Ancho = ${datos.rectángulo.ancho} unidades, Alto = ${datos.rectángulo.alto} unidades</p>
+                        <p>Semicírculo: Radio = ${datos.semicírculo.radio} unidades</p>
+                    `;
+            if (mostrarColores) {
+              mostrarLeyendaColores([
+                {
+                  nombre: `Rectángulo ${datos.rectángulo.color.nombre}`,
+                  color: datos.rectángulo.color.valor,
+                },
+                {
+                  nombre: `Semicírculo ${datos.semicírculo.color.nombre}`,
+                  color: datos.semicírculo.color.valor,
+                },
+              ]);
+            }
+            break;
+          case "Trapecio con Triángulo (Suma)":
+            datosHTML = `
+                        <p>Trapecio: Base mayor = ${datos.trapecio.baseMayor} unidades, Base menor = ${datos.trapecio.baseMenor} unidades, Altura = ${datos.trapecio.altura} unidades</p>
+                        <p>Triángulo: Base = ${datos.triángulo.base} unidades, Altura = ${datos.triángulo.altura} unidades</p>
+                    `;
+            if (mostrarColores) {
+              mostrarLeyendaColores([
+                {
+                  nombre: `Trapecio ${datos.trapecio.color.nombre}`,
+                  color: datos.trapecio.color.valor,
+                },
+                {
+                  nombre: `Triángulo ${datos.triángulo.color.nombre}`,
+                  color: datos.triángulo.color.valor,
+                },
+              ]);
+            }
+            break;
+          case "Cuadrado con Triángulo (Resta)":
+            datosHTML = `
+                        <p>Cuadrado: Lado = ${datos.cuadrado.lado} unidades</p>
+                        <p>Triángulo: Base = ${datos.triángulo.base} unidades, Altura = ${datos.triángulo.altura} unidades</p>
+                        <p>Nota: El área del triángulo se resta del área del cuadrado.</p>
+                    `;
+            if (mostrarColores) {
+              mostrarLeyendaColores([
+                {
+                  nombre: `Cuadrado ${datos.cuadrado.color.nombre}`,
+                  color: datos.cuadrado.color.valor,
+                },
+                {
+                  nombre: `Triángulo ${datos.triángulo.color.nombre} (se resta)`,
+                  color: datos.triángulo.color.valor,
+                },
+              ]);
+            }
+            break;
+          case "Segmento Circular (Resta)":
+            datosHTML = `
+                        <p>Círculo: Radio = ${datos.círculo.radio} unidades</p>
+                        <p>Segmento: Altura = ${datos.segmento.altura} unidades</p>
+                        <p>Nota: El área del segmento circular se resta del área del círculo.</p>
+                    `;
+            if (mostrarColores) {
+              mostrarLeyendaColores([
+                {
+                  nombre: `Círculo ${datos.círculo.color.nombre}`,
+                  color: datos.círculo.color.valor,
+                },
+                {
+                  nombre: `Segmento ${datos.segmento.color.nombre} (se resta)`,
+                  color: datos.segmento.color.valor,
+                },
+              ]);
+            }
+            break;
+        }
+
+        datosContainer.innerHTML += datosHTML;
+      }
+
+      // Función para mostrar la leyenda de colores
+      function mostrarLeyendaColores(items) {
+        const leyendaContainer = document.getElementById("leyenda-color");
+
+        items.forEach((item) => {
+          const colorItem = document.createElement("div");
+          colorItem.className = "color-item";
+
+          const colorMuestra = document.createElement("div");
+          colorMuestra.className = "color-muestra";
+          colorMuestra.style.backgroundColor = item.color;
+
+          const colorTexto = document.createElement("span");
+          colorTexto.textContent = item.nombre;
+
+          colorItem.appendChild(colorMuestra);
+          colorItem.appendChild(colorTexto);
+
+          leyendaContainer.appendChild(colorItem);
+        });
+      }
+
+      // Función para mostrar la solución en una ventana modal
+      function mostrarSolucion() {
+        const modalSolucion = document.getElementById("modal-solucion");
+        const solucionContenido = document.getElementById("solucion");
+
+        if (figuraActual && datosActuales) {
+          const resultadoCalculo = figuraActual.calcular(datosActuales);
+
+          // Generar el HTML de la solución
+          let solucionHTML = "";
+
+          resultadoCalculo.explicacion.forEach((paso) => {
+            solucionHTML += `
+                        <p><strong>${paso.texto}</strong></p>
+                        <p class="formula">${paso.formula}</p>
+                        <p class="calculo">${paso.calculo}</p>
+                    `;
+          });
+
+          // Añadir resultado final
+          solucionHTML += `
+                    <p><strong>Resultado final:</strong></p>
+                    <p>El área total de la figura compuesta es: ${resultadoCalculo.areaTotal.toFixed(
+                      2
+                    )} unidades²</p>
+                `;
+
+          solucionContenido.innerHTML = solucionHTML;
+          modalSolucion.style.display = "block";
+        }
+      }
+
+      // Función para cerrar la ventana modal
+      function cerrarModal() {
+        document.getElementById("modal-solucion").style.display = "none";
+      }
+
+      // Inicialización
+      document.addEventListener("DOMContentLoaded", function () {
+        // Configurar canvas
+        setupCanvas();
+
+        // Generar la primera figura
+        generarNuevaFigura();
+
+        // Eventos de botones
+        document
+          .getElementById("nueva-figura")
+          .addEventListener("click", generarNuevaFigura);
+        document
+          .getElementById("mostrar-solucion")
+          .addEventListener("click", mostrarSolucion);
+        document
+          .getElementById("cerrar-modal")
+          .addEventListener("click", cerrarModal);
+        document
+          .getElementById("alternar-colores")
+          .addEventListener("click", alternarColores);
+
+        // Cerrar modal al hacer clic fuera del contenido
+        window.addEventListener("click", function (event) {
+          const modal = document.getElementById("modal-solucion");
+          if (event.target === modal) {
+            cerrarModal();
+          }
+        });
+
+        // Manejar redimensionamiento
+        window.addEventListener("resize", function () {
+          setupCanvas();
+          if (figuraActual && datosActuales) {
+            figuraActual.dibujar(datosActuales);
+          }
+        });
+      });
+    </script></p></body></html>

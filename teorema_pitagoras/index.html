@@ -1,1 +1,1967 @@
+<!DOCTYPE html>
+<html lang="es"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>3-U10-L9: Interactivo - Teorema de Pitágoras</title> 
+  <style>
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 600px;
+        margin: 0 auto;
+      }
 
+      h1 {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin: 15px 0;
+        text-align: center;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 600px;
+        max-height: 800px;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+
+      .canvas-container {
+        width: 100%;
+        height: 300px;
+        position: relative;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+      .datos {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #f5f5f5;
+      }
+
+      .datos h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: #3498db;
+      }
+
+      .controles {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        justify-content: space-between;
+      }
+
+      button {
+        background-color: #00FFFF;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      /* Estilos para ventana modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-contenido {
+        background-color: white;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 500px;
+        max-height: 80%;
+        overflow-y: auto;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+      }
+
+      .cerrar-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #666;
+      }
+
+      .cerrar-modal:hover {
+        color: #000;
+      }
+
+      .solucion h3 {
+        margin-top: 0;
+        color: #27ae60;
+        padding-right: 30px;
+      }
+
+      .formula {
+        font-style: italic;
+        margin: 5px 0;
+        color: #7f8c8d;
+      }
+
+      .calculo {
+        margin: 5px 0;
+      }
+
+      .leyenda-color {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 5px;
+      }
+
+      .color-item {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+      }
+
+      .color-muestra {
+        width: 15px;
+        height: 15px;
+        display: inline-block;
+        margin-right: 5px;
+      }
+    </style> 
+ </head><body><div class="container">
+<div class="canvas-container"><canvas id="lienzo"></canvas></div>
+<div class="datos" id="datos-container">
+<h1>Problema</h1>
+<div id="enunciado"></div>
+<div id="datos"></div>
+<div class="leyenda-color" id="leyenda-color"></div>
+</div>
+<div class="controles" style="color: #000000;"><button id="nuevo-problema" style="color: #000000;">Nuevo Problema</button> <button id="mostrar-solucion" style="color: #000000;">Ver Solución</button> <button id="alternar-colores" style="color: #000000;">Mostrar Triángulo</button></div>
+<div id="modal-solucion" class="modal">
+<div class="modal-contenido"><span class="cerrar-modal" id="cerrar-modal">×</span>
+<h3>Solución</h3>
+<div id="solucion"></div>
+</div>
+</div>
+</div>
+<!-- DSDE AQUI  -->
+<p><script>
+  // Constantes y variables globales
+  const canvas = document.getElementById('lienzo');
+  const ctx = canvas.getContext('2d');
+  let escenarioActual = null;
+  let datosActuales = {};
+  // Iniciar sin mostrar el triángulo resaltado
+  let mostrarTriangulo = false;
+  
+  // Función para alternar entre mostrar o no el triángulo con colores
+  function alternarTriangulo() {
+      mostrarTriangulo = !mostrarTriangulo;
+      if (escenarioActual && datosActuales) {
+          escenarioActual.dibujar(datosActuales);
+          mostrarDatos(datosActuales);
+      }
+  }
+  
+  // Configurar canvas para alta resolución
+  function setupCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+  }
+
+  // Generador de números aleatorios
+  function aleatorio(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  
+  // Redondear a un decimal
+  function redondear(numero) {
+      return Math.round(numero * 10) / 10;
+  }
+
+  // Colores para resaltar el triángulo
+  const colores = {
+      cateto1: '#e74c3c', // Rojo
+      cateto2: '#3498db', // Azul
+      hipotenusa: '#2ecc71', // Verde
+      fondo: '#f5f5f5',
+      elementos: '#34495e' // Color principal para los elementos cuando no se muestra el triángulo
+  };
+
+  // Definición de tipos de escenarios
+  const tiposEscenarios = [
+      {
+          nombre: "Escalera apoyada en pared",
+          dibujar: dibujarEscaleraPared,
+          datos: generarDatosEscaleraPared,
+          calcular: calcularEscaleraPared,
+          describir: describirEscaleraPared
+      },
+      {
+          nombre: "Barco cruzando río",
+          dibujar: dibujarBarcoRio,
+          datos: generarDatosBarcoRio,
+          calcular: calcularBarcoRio,
+          describir: describirBarcoRio
+      },
+      {
+          nombre: "Torre con cable tensor",
+          dibujar: dibujarTorreCable,
+          datos: generarDatosTorreCable,
+          calcular: calcularTorreCable,
+          describir: describirTorreCable
+      },
+      {
+          nombre: "Rampa de acceso",
+          dibujar: dibujarRampa,
+          datos: generarDatosRampa,
+          calcular: calcularRampa,
+          describir: describirRampa
+      },
+      {
+          nombre: "Techo de casa",
+          dibujar: dibujarTechoCasa,
+          datos: generarDatosTechoCasa,
+          calcular: calcularTechoCasa,
+          describir: describirTechoCasa
+      }
+  ];
+
+  // ==============================================
+  // Funciones para cada tipo de escenario
+  // ==============================================
+  
+  // 1. Escalera apoyada en pared
+  function generarDatosEscaleraPared() {
+      // Decidir qué valor calcular: altura, distancia base o longitud escalera
+      const tipoProblema = aleatorio(0, 2);
+      
+      let altura, distanciaBase, longitudEscalera;
+      
+      // Generar dimensiones razonables
+      if (tipoProblema === 0) { // Calcular altura
+          distanciaBase = aleatorio(30, 100) / 10; // 3.0 a 10.0 metros
+          longitudEscalera = aleatorio(Math.round(distanciaBase * 13), Math.round(distanciaBase * 17)) / 10; // Relación sensata
+          altura = Math.sqrt(longitudEscalera * longitudEscalera - distanciaBase * distanciaBase);
+          altura = redondear(altura);
+      } else if (tipoProblema === 1) { // Calcular distancia base
+          altura = aleatorio(30, 100) / 10; // 3.0 a 10.0 metros
+          longitudEscalera = aleatorio(Math.round(altura * 13), Math.round(altura * 17)) / 10; // Relación sensata
+          distanciaBase = Math.sqrt(longitudEscalera * longitudEscalera - altura * altura);
+          distanciaBase = redondear(distanciaBase);
+      } else { // Calcular longitud escalera
+          altura = aleatorio(30, 100) / 10; // 3.0 a 10.0 metros
+          distanciaBase = aleatorio(30, 100) / 10; // 3.0 a 10.0 metros
+          longitudEscalera = Math.sqrt(altura * altura + distanciaBase * distanciaBase);
+          longitudEscalera = redondear(longitudEscalera);
+      }
+      
+      return {
+          tipo: "Escalera apoyada en pared",
+          tipoProblema: tipoProblema, // 0: altura, 1: distancia base, 2: longitud escalera
+          altura: altura,
+          distanciaBase: distanciaBase,
+          longitudEscalera: longitudEscalera,
+          offsetX: 0,
+          offsetY: 0
+      };
+  }
+  
+  function dibujarEscaleraPared(datos) {
+      const { offsetX, offsetY } = calcularOffset(datos);
+      datos.offsetX = offsetX;
+      datos.offsetY = offsetY;
+      
+      const anchoCanvas = canvas.width;
+      const altoCanvas = canvas.height;
+      
+      // Escalamos los valores para que quepan bien en el canvas
+      const escala = Math.min(anchoCanvas / 450, altoCanvas / 350);
+      
+      // Posición de la esquina inferior izquierda de la pared (origen del sistema)
+      const origenX = offsetX + 100;
+      const origenY = offsetY + 250;
+      
+      // Altura escalada
+      const alturaEscalada = datos.altura * 20 * escala;
+      // Distancia base escalada
+      const distanciaBaseEscalada = datos.distanciaBase * 20 * escala;
+      
+      ctx.clearRect(0, 0, anchoCanvas, altoCanvas);
+      
+      // Dibujar suelo
+      ctx.strokeStyle = colores.elementos;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(origenX - 50, origenY);
+      ctx.lineTo(origenX + 250, origenY);
+      ctx.stroke();
+      
+      // Dibujar pared
+      ctx.beginPath();
+      ctx.moveTo(origenX, origenY);
+      ctx.lineTo(origenX, origenY - 200);
+      ctx.stroke();
+      
+      // Dibujar escalera
+      if (mostrarTriangulo) {
+          // Cateto 1 (altura)
+          ctx.strokeStyle = colores.cateto1;
+          ctx.beginPath();
+          ctx.moveTo(origenX, origenY);
+          ctx.lineTo(origenX, origenY - alturaEscalada);
+          ctx.stroke();
+          
+          // Cateto 2 (distancia base)
+          ctx.strokeStyle = colores.cateto2;
+          ctx.beginPath();
+          ctx.moveTo(origenX, origenY);
+          ctx.lineTo(origenX + distanciaBaseEscalada, origenY);
+          ctx.stroke();
+          
+          // Hipotenusa (escalera)
+          ctx.strokeStyle = colores.hipotenusa;
+          ctx.lineWidth = 3;
+      } else {
+          ctx.strokeStyle = colores.elementos;
+          ctx.lineWidth = 3;
+      }
+      
+      ctx.beginPath();
+      ctx.moveTo(origenX, origenY - alturaEscalada);
+      ctx.lineTo(origenX + distanciaBaseEscalada, origenY);
+      ctx.stroke();
+      
+      // Añadir los peldaños de la escalera
+      const numPeldanos = 8;
+      const longitudEscalera = Math.sqrt(alturaEscalada * alturaEscalada + distanciaBaseEscalada * distanciaBaseEscalada);
+      const peldanoEspaciado = longitudEscalera / (numPeldanos + 1);
+      const angulo = Math.atan2(alturaEscalada, distanciaBaseEscalada);
+      
+      ctx.strokeStyle = colores.elementos;
+      ctx.lineWidth = 1;
+      
+      for (let i = 1; i <= numPeldanos; i++) {
+          const distancia = i * peldanoEspaciado;
+          const x1 = origenX + distanciaBaseEscalada - (distancia * Math.cos(angulo));
+          const y1 = origenY - (distancia * Math.sin(angulo));
+          
+          const x2 = x1 + 10 * Math.sin(angulo);
+          const y2 = y1 + 10 * Math.cos(angulo);
+          
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+      }
+      
+      // Dibujar punto de apoyo en la pared
+      ctx.fillStyle = '#e74c3c';
+      ctx.beginPath();
+      ctx.arc(origenX, origenY - alturaEscalada, 3, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // Dibujar punto de apoyo en el suelo
+      ctx.fillStyle = '#3498db';
+      ctx.beginPath();
+      ctx.arc(origenX + distanciaBaseEscalada, origenY, 3, 0, 2 * Math.PI);
+      ctx.fill();
+  }
+  
+  function calcularEscaleraPared(datos) {
+      let explicacion = [];
+      let valorCalculado = 0;
+      
+      // Teorema de Pitágoras: a² + b² = c²
+      if (datos.tipoProblema === 0) { // Calcular altura
+          valorCalculado = datos.altura;
+          
+          explicacion = [
+              {
+                  texto: "Paso 1: Identificamos los valores conocidos.",
+                  formula: "",
+                  calculo: `Longitud de la escalera (hipotenusa) = ${datos.longitudEscalera} m`
+                      + `<br>Distancia de la base de la escalera a la pared (cateto) = ${datos.distanciaBase} m`
+              },
+              {
+                  texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la altura.",
+                  formula: "altura² = longitud escalera² - distancia base²",
+                  calculo: `altura² = ${datos.longitudEscalera}² - ${datos.distanciaBase}²`
+                      + `<br>altura² = ${(datos.longitudEscalera * datos.longitudEscalera).toFixed(1)} - ${(datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                      + `<br>altura² = ${(datos.longitudEscalera * datos.longitudEscalera - datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+              },
+              {
+                  texto: "Paso 3: Calculamos la raíz cuadrada para obtener la altura.",
+                  formula: "altura = √(longitud escalera² - distancia base²)",
+                  calculo: `altura = √${(datos.longitudEscalera * datos.longitudEscalera - datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                      + `<br>altura = ${{valorCalculado}} m`
+              }
+          ];
+          
+      } else if (datos.tipoProblema === 1) { // Calcular distancia base
+          valorCalculado = datos.distanciaBase;
+          
+          explicacion = [
+              {
+                  texto: "Paso 1: Identificamos los valores conocidos.",
+                  formula: "",
+                  calculo: `Longitud de la escalera (hipotenusa) = ${datos.longitudEscalera} m`
+                      + `<br>Altura a la que llega la escalera (cateto) = ${datos.altura} m`
+              },
+              {
+                  texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la distancia base.",
+                  formula: "distancia base² = longitud escalera² - altura²",
+                  calculo: `distancia base² = ${datos.longitudEscalera}² - ${datos.altura}²`
+                      + `<br>distancia base² = ${(datos.longitudEscalera * datos.longitudEscalera).toFixed(1)} - ${(datos.altura * datos.altura).toFixed(1)}`
+                      + `<br>distancia base² = ${(datos.longitudEscalera * datos.longitudEscalera - datos.altura * datos.altura).toFixed(1)}`
+              },
+              {
+                  texto: "Paso 3: Calculamos la raíz cuadrada para obtener la distancia base.",
+                  formula: "distancia base = √(longitud escalera² - altura²)",
+                  calculo: `distancia base = √${(datos.longitudEscalera * datos.longitudEscalera - datos.altura * datos.altura).toFixed(1)}`
+                      + `<br>distancia base = ${{valorCalculado}} m`
+              }
+          ];
+          
+      } else { // Calcular longitud escalera
+          valorCalculado = datos.longitudEscalera;
+          
+          explicacion = [
+              {
+                  texto: "Paso 1: Identificamos los valores conocidos.",
+                  formula: "",
+                  calculo: `Altura a la que llega la escalera (cateto) = ${datos.altura} m`
+                      + `<br>Distancia de la base de la escalera a la pared (cateto) = ${datos.distanciaBase} m`
+              },
+              {
+                  texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la longitud de la escalera.",
+                  formula: "longitud escalera² = altura² + distancia base²",
+                  calculo: `longitud escalera² = ${datos.altura}² + ${datos.distanciaBase}²`
+                      + `<br>longitud escalera² = ${(datos.altura * datos.altura).toFixed(1)} + ${(datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                      + `<br>longitud escalera² = ${(datos.altura * datos.altura + datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+              },
+              {
+                  texto: "Paso 3: Calculamos la raíz cuadrada para obtener la longitud de la escalera.",
+                  formula: "longitud escalera = √(altura² + distancia base²)",
+                  calculo: `longitud escalera = √${(datos.altura * datos.altura + datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                      + `<br>longitud escalera = ${{valorCalculado}} m`
+              }
+          ];
+      }
+      
+      return {
+          explicacion: explicacion,
+          valorCalculado: valorCalculado
+      };
+  }
+  
+  function describirEscaleraPared(datos) {
+      let enunciado = "";
+      let datosProblema = "";
+      
+      if (datos.tipoProblema === 0) { // Calcular altura
+          enunciado = "Una escalera está apoyada contra una pared. Calcula la altura a la que llega la escalera en la pared.";
+          datosProblema = `
+              <p>Longitud de la escalera: ${datos.longitudEscalera} m</p>
+              <p>Distancia de la base de la escalera a la pared: ${datos.distanciaBase} m</p>
+              <p>Altura: ? m</p>
+          `;
+      } else if (datos.tipoProblema === 1) { // Calcular distancia base
+          enunciado = "Una escalera está apoyada contra una pared. Calcula a qué distancia de la pared está apoyada la base de la escalera.";
+          datosProblema = `
+              <p>Longitud de la escalera: ${datos.longitudEscalera} m</p>
+              <p>Altura a la que llega la escalera: ${datos.altura} m</p>
+              <p>Distancia de la base a la pared: ? m</p>
+          `;
+      } else { // Calcular longitud escalera
+          enunciado = "Una escalera está apoyada contra una pared. Calcula la longitud de la escalera.";
+          datosProblema = `
+              <p>Altura a la que llega la escalera: ${datos.altura} m</p>
+              <p>Distancia de la base de la escalera a la pared: ${datos.distanciaBase} m</p>
+              <p>Longitud de la escalera: ? m</p>
+          `;
+      }
+      
+      return {
+          enunciado: enunciado,
+          datos: datosProblema
+      };
+  }
+  
+  // 2. Barco cruzando río
+  function generarDatosBarcoRio() {
+      // Decidir qué valor calcular: ancho del río, desplazamiento corriente o distancia diagonal
+      const tipoProblema = aleatorio(0, 2);
+      
+      let anchoRio, desplazamientoCorriente, distanciaDiagonal;
+      
+      // Generar dimensiones razonables
+      if (tipoProblema === 0) { // Calcular ancho del río
+          desplazamientoCorriente = aleatorio(50, 150) / 10; // 5.0 a 15.0 metros
+          distanciaDiagonal = aleatorio(Math.round(desplazamientoCorriente * 12), Math.round(desplazamientoCorriente * 18)) / 10;
+          anchoRio = Math.sqrt(distanciaDiagonal * distanciaDiagonal - desplazamientoCorriente * desplazamientoCorriente);
+          anchoRio = redondear(anchoRio);
+      } else if (tipoProblema === 1) { // Calcular desplazamiento por corriente
+          anchoRio = aleatorio(80, 200) / 10; // 8.0 a 20.0 metros
+          distanciaDiagonal = aleatorio(Math.round(anchoRio * 12), Math.round(anchoRio * 15)) / 10;
+          desplazamientoCorriente = Math.sqrt(distanciaDiagonal * distanciaDiagonal - anchoRio * anchoRio);
+          desplazamientoCorriente = redondear(desplazamientoCorriente);
+      } else { // Calcular distancia diagonal recorrida
+          anchoRio = aleatorio(80, 200) / 10; // 8.0 a 20.0 metros
+          desplazamientoCorriente = aleatorio(50, 150) / 10; // 5.0 a 15.0 metros
+          distanciaDiagonal = Math.sqrt(anchoRio * anchoRio + desplazamientoCorriente * desplazamientoCorriente);
+          distanciaDiagonal = redondear(distanciaDiagonal);
+      }
+      
+      return {
+          tipo: "Barco cruzando río",
+          tipoProblema: tipoProblema, // 0: ancho río, 1: desplazamiento corriente, 2: distancia diagonal
+          anchoRio: anchoRio,
+          desplazamientoCorriente: desplazamientoCorriente,
+          distanciaDiagonal: distanciaDiagonal,
+          offsetX: 0,
+          offsetY: 0
+      };
+  }
+  
+  function dibujarBarcoRio(datos) {
+      const { offsetX, offsetY } = calcularOffset(datos);
+      datos.offsetX = offsetX;
+      datos.offsetY = offsetY;
+      
+      const anchoCanvas = canvas.width;
+      const altoCanvas = canvas.height;
+      
+      // Escalamos los valores para que quepan bien en el canvas
+      const escala = Math.min(anchoCanvas / 450, altoCanvas / 350);
+      
+      // Posición de la orilla inicial del río (origen del sistema)
+      const origenX = offsetX + 100;
+      const origenY = offsetY + 150;
+      
+      // Dimensiones escaladas
+      const anchoRioEscalado = datos.anchoRio * 10 * escala;
+      const desplazamientoEscalado = datos.desplazamientoCorriente * 10 * escala;
+      
+      ctx.clearRect(0, 0, anchoCanvas, altoCanvas);
+      
+      // Dibujar río
+      ctx.fillStyle = '#3498db'; // Azul claro
+      ctx.fillRect(origenX, origenY - 50, 250, 150);
+      
+      // Dibujar orillas
+      ctx.fillStyle = '#2ecc71'; // Verde
+      ctx.fillRect(origenX - 50, origenY - 50, 50, 150);
+      ctx.fillRect(origenX + 250, origenY - 50, 50, 150);
+      
+      // Dibujar líneas de trayecto
+      if (mostrarTriangulo) {
+          // Cateto 1 (ancho río)
+          ctx.strokeStyle = colores.cateto1;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(origenX, origenY);
+          ctx.lineTo(origenX + anchoRioEscalado, origenY);
+          ctx.stroke();
+          
+          // Cateto 2 (desplazamiento corriente)
+          ctx.strokeStyle = colores.cateto2;
+          ctx.beginPath();
+          ctx.moveTo(origenX + anchoRioEscalado, origenY);
+          ctx.lineTo(origenX + anchoRioEscalado, origenY + desplazamientoEscalado);
+          ctx.stroke();
+          
+          // Hipotenusa (trayecto diagonal)
+          ctx.strokeStyle = colores.hipotenusa;
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 3]);
+          ctx.beginPath();
+          ctx.moveTo(origenX, origenY);
+          ctx.lineTo(origenX + anchoRioEscalado, origenY + desplazamientoEscalado);
+          ctx.stroke();
+          ctx.setLineDash([]);
+      } else {
+          // Solo trayecto diagonal
+          ctx.strokeStyle = colores.elementos;
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 3]);
+          ctx.beginPath();
+          ctx.moveTo(origenX, origenY);
+          ctx.lineTo(origenX + anchoRioEscalado, origenY + desplazamientoEscalado);
+          ctx.stroke();
+          ctx.setLineDash([]);
+      }
+      
+      // Dibujar barco en posición inicial
+      dibujarBarco(origenX, origenY, 10);
+      
+      // Dibujar barco en posición final
+      dibujarBarco(origenX + anchoRioEscalado, origenY + desplazamientoEscalado, 10);
+      
+      // Dibujar flechas indicando la corriente
+      const numFlechas = 5;
+      const espacioEntreFlechas = 150 / numFlechas;
+      
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      
+      for (let i = 0; i < numFlechas; i++) {
+          const y = origenY - 25 + i * espacioEntreFlechas;
+          ctx.beginPath();
+          ctx.moveTo(origenX + 50, y);
+          ctx.lineTo(origenX + 70, y);
+          ctx.lineTo(origenX + 65, y - 5);
+          ctx.moveTo(origenX + 70, y);
+          ctx.lineTo(origenX + 65, y + 5);
+          ctx.stroke();
+          
+          ctx.beginPath();
+          ctx.moveTo(origenX + 150, y);
+          ctx.lineTo(origenX + 170, y);
+          ctx.lineTo(origenX + 165, y - 5);
+          ctx.moveTo(origenX + 170, y);
+          ctx.lineTo(origenX + 165, y + 5);
+          ctx.stroke();
+      }
+  }
+  
+  function dibujarBarco(x, y, tamano) {
+      ctx.fillStyle = '#e74c3c'; // Rojo
+      
+      // Casco del barco
+      ctx.beginPath();
+      ctx.moveTo(x - tamano, y);
+      ctx.lineTo(x + tamano, y);
+      ctx.lineTo(x + tamano/2, y - tamano/2);
+      ctx.lineTo(x - tamano/2, y - tamano/2);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Mástil
+      ctx.fillStyle = '#7f8c8d';
+      ctx.fillRect(x - tamano/8, y - tamano/2, tamano/4, -tamano);
+      
+      // Bandera
+      ctx.fillStyle = '#f1c40f';
+      ctx.beginPath();
+      ctx.moveTo(x - tamano/8, y - tamano/2 - tamano);
+      ctx.lineTo(x - tamano/8 + tamano/2, y - tamano/2 - tamano*0.75);
+      ctx.lineTo(x - tamano/8, y - tamano/2 - tamano*0.5);
+      ctx.closePath();
+      ctx.fill();
+  }
+  
+  function calcularBarcoRio(datos) {
+      let explicacion = [];
+      let valorCalculado = 0;
+      
+      // Teorema de Pitágoras: a² + b² = c²
+      if (datos.tipoProblema === 0) { // Calcular ancho del río
+          valorCalculado = datos.anchoRio;
+          
+          explicacion = [
+              {
+                  texto: "Paso 1: Identificamos los valores conocidos.",
+                  formula: "",
+                  calculo: `Distancia recorrida en diagonal (hipotenusa) = ${datos.distanciaDiagonal} m`
+                      + `<br>Desplazamiento por la corriente (cateto) = ${datos.desplazamientoCorriente} m`
+              },
+              {
+                  texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular el ancho del río.",
+                  formula: "ancho río² = distancia diagonal² - desplazamiento corriente²",
+                  calculo: `ancho río² = ${datos.distanciaDiagonal}² - ${datos.desplazamientoCorriente}²`
+                      + `<br>ancho río² = ${(datos.distanciaDiagonal * datos.distanciaDiagonal).toFixed(1)} - ${(datos.desplazamientoCorriente * datos.desplazamientoCorriente).toFixed(1)}`
+                      + `<br>ancho río² = ${(datos.distanciaDiagonal * datos.distanciaDiagonal - datos.desplazamientoCorriente * datos.desplazamientoCorriente).toFixed(1)}`
+              },
+              {
+                  texto: "Paso 3: Calculamos la raíz cuadrada para obtener el ancho del río.",
+                  formula: "ancho río = √(distancia diagonal² - desplazamiento corriente²)",
+                  calculo: `ancho río = √${(datos.distanciaDiagonal * datos.distanciaDiagonal - datos.desplazamientoCorriente * datos.desplazamientoCorriente).toFixed(1)}`
+                      + `<br>ancho río = ${{valorCalculado}} m`
+              }
+          ];
+          
+      } else if (datos.tipoProblema === 1) { // Calcular desplazamiento por corriente
+          valorCalculado = datos.desplazamientoCorriente;
+          
+          explicacion = [
+              {
+                  texto: "Paso 1: Identificamos los valores conocidos.",
+                  formula: "",
+                  calculo: `Distancia recorrida en diagonal (hipotenusa) = ${datos.distanciaDiagonal} m`
+                      + `<br>Ancho del río (cateto) = ${datos.anchoRio} m`
+              },
+              {
+                  texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular el desplazamiento por la corriente.",
+                  formula: "desplazamiento corriente² = distancia diagonal² - ancho río²",
+                  calculo: `desplazamiento corriente² = ${datos.distanciaDiagonal}² - ${datos.anchoRio}²`
+                      + `<br>desplazamiento corriente² = ${(datos.distanciaDiagonal * datos.distanciaDiagonal).toFixed(1)} - ${(datos.anchoRio * datos.anchoRio).toFixed(1)}`
+                      + `<br>desplazamiento corriente² = ${(datos.distanciaDiagonal * datos.distanciaDiagonal - datos.anchoRio * datos.anchoRio).toFixed(1)}`
+              },
+              {
+                  texto: "Paso 3: Calculamos la raíz cuadrada para obtener el desplazamiento por la corriente.",
+                  formula: "desplazamiento corriente = √(distancia diagonal² - ancho río²)",
+                  calculo: `desplazamiento corriente = √${(datos.distanciaDiagonal * datos.distanciaDiagonal - datos.anchoRio * datos.anchoRio).toFixed(1)}`
+                      + `<br>desplazamiento corriente = ${{valorCalculado}} m`
+              }
+          ];
+          
+      } else { // Calcular distancia diagonal recorrida
+          valorCalculado = datos.distanciaDiagonal;
+          
+          explicacion = [
+          {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Ancho del río (cateto) = ${datos.anchoRio} m`
+                        + `<br>Desplazamiento por la corriente (cateto) = ${datos.desplazamientoCorriente} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la distancia diagonal recorrida.",
+                    formula: "distancia diagonal² = ancho río² + desplazamiento corriente²",
+                    calculo: `distancia diagonal² = ${datos.anchoRio}² + ${datos.desplazamientoCorriente}²`
+                        + `<br>distancia diagonal² = ${(datos.anchoRio * datos.anchoRio).toFixed(1)} + ${(datos.desplazamientoCorriente * datos.desplazamientoCorriente).toFixed(1)}`
+                        + `<br>distancia diagonal² = ${(datos.anchoRio * datos.anchoRio + datos.desplazamientoCorriente * datos.desplazamientoCorriente).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la distancia diagonal recorrida.",
+                    formula: "distancia diagonal = √(ancho río² + desplazamiento corriente²)",
+                    calculo: `distancia diagonal = √${(datos.anchoRio * datos.anchoRio + datos.desplazamientoCorriente * datos.desplazamientoCorriente).toFixed(1)}`
+                        + `<br>distancia diagonal = ${{valorCalculado}} m`
+                }
+            ];
+        }
+        
+        return {
+            explicacion: explicacion,
+            valorCalculado: valorCalculado
+        };
+    }
+    
+    function describirBarcoRio(datos) {
+        let enunciado = "";
+        let datosProblema = "";
+        
+        if (datos.tipoProblema === 0) { // Calcular ancho río
+            enunciado = "Un barco cruza un río con corriente. Calcula el ancho del río.";
+            datosProblema = `
+                <p>Distancia recorrida en diagonal: ${datos.distanciaDiagonal} m</p>
+                <p>Desplazamiento causado por la corriente: ${datos.desplazamientoCorriente} m</p>
+                <p>Ancho del río: ? m</p>
+            `;
+        } else if (datos.tipoProblema === 1) { // Calcular desplazamiento corriente
+            enunciado = "Un barco cruza un río con corriente. Calcula cuánto le desvía la corriente.";
+            datosProblema = `
+                <p>Distancia recorrida en diagonal: ${datos.distanciaDiagonal} m</p>
+                <p>Ancho del río: ${datos.anchoRio} m</p>
+                <p>Desplazamiento causado por la corriente: ? m</p>
+            `;
+        } else { // Calcular distancia diagonal
+            enunciado = "Un barco cruza un río con corriente. Calcula la distancia real recorrida por el barco.";
+            datosProblema = `
+                <p>Ancho del río: ${datos.anchoRio} m</p>
+                <p>Desplazamiento causado por la corriente: ${datos.desplazamientoCorriente} m</p>
+                <p>Distancia recorrida por el barco: ? m</p>
+            `;
+        }
+        
+        return {
+            enunciado: enunciado,
+            datos: datosProblema
+        };
+    }
+    
+    // 3. Torre con cable tensor
+    function generarDatosTorreCable() {
+        // Decidir qué valor calcular: altura torre, distancia anclaje o longitud cable
+        const tipoProblema = aleatorio(0, 2);
+        
+        let alturaTorre, distanciaAnclaje, longitudCable;
+        
+        // Generar dimensiones razonables
+        if (tipoProblema === 0) { // Calcular altura torre
+            distanciaAnclaje = aleatorio(60, 150) / 10; // 6.0 a 15.0 metros
+            longitudCable = aleatorio(Math.round(distanciaAnclaje * 12), Math.round(distanciaAnclaje * 16)) / 10;
+            alturaTorre = Math.sqrt(longitudCable * longitudCable - distanciaAnclaje * distanciaAnclaje);
+            alturaTorre = redondear(alturaTorre);
+        } else if (tipoProblema === 1) { // Calcular distancia anclaje
+            alturaTorre = aleatorio(100, 200) / 10; // 10.0 a 20.0 metros
+            longitudCable = aleatorio(Math.round(alturaTorre * 12), Math.round(alturaTorre * 16)) / 10;
+            distanciaAnclaje = Math.sqrt(longitudCable * longitudCable - alturaTorre * alturaTorre);
+            distanciaAnclaje = redondear(distanciaAnclaje);
+        } else { // Calcular longitud cable
+            alturaTorre = aleatorio(100, 200) / 10; // 10.0 a 20.0 metros
+            distanciaAnclaje = aleatorio(60, 150) / 10; // 6.0 a 15.0 metros
+            longitudCable = Math.sqrt(alturaTorre * alturaTorre + distanciaAnclaje * distanciaAnclaje);
+            longitudCable = redondear(longitudCable);
+        }
+        
+        return {
+            tipo: "Torre con cable tensor",
+            tipoProblema: tipoProblema, // 0: altura torre, 1: distancia anclaje, 2: longitud cable
+            alturaTorre: alturaTorre,
+            distanciaAnclaje: distanciaAnclaje,
+            longitudCable: longitudCable,
+            offsetX: 0,
+            offsetY: 0
+        };
+    }
+    
+    function dibujarTorreCable(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+        
+        const anchoCanvas = canvas.width;
+        const altoCanvas = canvas.height;
+        
+        // Escalamos los valores para que quepan bien en el canvas
+        const escala = Math.min(anchoCanvas / 450, altoCanvas / 350);
+        
+        // Posición de la base de la torre (origen del sistema)
+        const origenX = offsetX + 180;
+        const origenY = offsetY + 250;
+        
+        // Dimensiones escaladas
+        const alturaEscalada = datos.alturaTorre * 10 * escala;
+        const distanciaEscalada = datos.distanciaAnclaje * 10 * escala;
+        
+        ctx.clearRect(0, 0, anchoCanvas, altoCanvas);
+        
+        // Dibujar suelo
+        ctx.strokeStyle = colores.elementos;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(origenX - 150, origenY);
+        ctx.lineTo(origenX + 150, origenY);
+        ctx.stroke();
+        
+        // Dibujar torre
+        if (mostrarTriangulo) {
+            // Cateto 1 (altura torre)
+            ctx.strokeStyle = colores.cateto1;
+            ctx.lineWidth = 3;
+        } else {
+            ctx.strokeStyle = colores.elementos;
+            ctx.lineWidth = 3;
+        }
+        ctx.beginPath();
+        ctx.moveTo(origenX, origenY);
+        ctx.lineTo(origenX, origenY - alturaEscalada);
+        ctx.stroke();
+        
+        // Detalles de la torre (estructura)
+        ctx.strokeStyle = colores.elementos;
+        ctx.lineWidth = 1;
+        
+        // Cruz 1
+        ctx.beginPath();
+        ctx.moveTo(origenX - 10, origenY - alturaEscalada/4);
+        ctx.lineTo(origenX + 10, origenY - alturaEscalada/2);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(origenX - 10, origenY - alturaEscalada/2);
+        ctx.lineTo(origenX + 10, origenY - alturaEscalada/4);
+        ctx.stroke();
+        
+        // Cruz 2
+        ctx.beginPath();
+        ctx.moveTo(origenX - 10, origenY - 3*alturaEscalada/4);
+        ctx.lineTo(origenX + 10, origenY - alturaEscalada);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(origenX - 10, origenY - alturaEscalada);
+        ctx.lineTo(origenX + 10, origenY - 3*alturaEscalada/4);
+        ctx.stroke();
+        
+        // Dibujar anclaje del cable en el suelo
+        if (mostrarTriangulo) {
+            // Cateto 2 (distancia anclaje)
+            ctx.strokeStyle = colores.cateto2;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY);
+            ctx.lineTo(origenX - distanciaEscalada, origenY);
+            ctx.stroke();
+        }
+        
+        // Dibujar cable tensor
+        if (mostrarTriangulo) {
+            // Hipotenusa (cable)
+            ctx.strokeStyle = colores.hipotenusa;
+            ctx.lineWidth = 2;
+        } else {
+            ctx.strokeStyle = colores.elementos;
+            ctx.lineWidth = 2;
+        }
+        ctx.beginPath();
+        ctx.moveTo(origenX, origenY - alturaEscalada);
+        ctx.lineTo(origenX - distanciaEscalada, origenY);
+        ctx.stroke();
+        
+        // Dibujar anclaje en suelo
+        ctx.fillStyle = '#e74c3c';
+        ctx.beginPath();
+        ctx.moveTo(origenX - distanciaEscalada, origenY);
+        ctx.lineTo(origenX - distanciaEscalada - 5, origenY + 5);
+        ctx.lineTo(origenX - distanciaEscalada + 5, origenY + 5);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function calcularTorreCable(datos) {
+        let explicacion = [];
+        let valorCalculado = 0;
+        
+        // Teorema de Pitágoras: a² + b² = c²
+        if (datos.tipoProblema === 0) { // Calcular altura torre
+            valorCalculado = datos.alturaTorre;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Longitud del cable tensor (hipotenusa) = ${datos.longitudCable} m`
+                        + `<br>Distancia del anclaje a la base de la torre (cateto) = ${datos.distanciaAnclaje} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la altura de la torre.",
+                    formula: "altura torre² = longitud cable² - distancia anclaje²",
+                    calculo: `altura torre² = ${datos.longitudCable}² - ${datos.distanciaAnclaje}²`
+                        + `<br>altura torre² = ${(datos.longitudCable * datos.longitudCable).toFixed(1)} - ${(datos.distanciaAnclaje * datos.distanciaAnclaje).toFixed(1)}`
+                        + `<br>altura torre² = ${(datos.longitudCable * datos.longitudCable - datos.distanciaAnclaje * datos.distanciaAnclaje).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la altura de la torre.",
+                    formula: "altura torre = √(longitud cable² - distancia anclaje²)",
+                    calculo: `altura torre = √${(datos.longitudCable * datos.longitudCable - datos.distanciaAnclaje * datos.distanciaAnclaje).toFixed(1)}`
+                        + `<br>altura torre = ${{valorCalculado}} m`
+                }
+            ];
+            
+        } else if (datos.tipoProblema === 1) { // Calcular distancia anclaje
+            valorCalculado = datos.distanciaAnclaje;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Longitud del cable tensor (hipotenusa) = ${datos.longitudCable} m`
+                        + `<br>Altura de la torre (cateto) = ${datos.alturaTorre} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la distancia del anclaje.",
+                    formula: "distancia anclaje² = longitud cable² - altura torre²",
+                    calculo: `distancia anclaje² = ${datos.longitudCable}² - ${datos.alturaTorre}²`
+                        + `<br>distancia anclaje² = ${(datos.longitudCable * datos.longitudCable).toFixed(1)} - ${(datos.alturaTorre * datos.alturaTorre).toFixed(1)}`
+                        + `<br>distancia anclaje² = ${(datos.longitudCable * datos.longitudCable - datos.alturaTorre * datos.alturaTorre).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la distancia del anclaje.",
+                    formula: "distancia anclaje = √(longitud cable² - altura torre²)",
+                    calculo: `distancia anclaje = √${(datos.longitudCable * datos.longitudCable - datos.alturaTorre * datos.alturaTorre).toFixed(1)}`
+                        + `<br>distancia anclaje = ${{valorCalculado}} m`
+                }
+            ];
+            
+        } else { // Calcular longitud cable
+            valorCalculado = datos.longitudCable;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Altura de la torre (cateto) = ${datos.alturaTorre} m`
+                        + `<br>Distancia del anclaje a la base de la torre (cateto) = ${datos.distanciaAnclaje} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la longitud del cable tensor.",
+                    formula: "longitud cable² = altura torre² + distancia anclaje²",
+                    calculo: `longitud cable² = ${datos.alturaTorre}² + ${datos.distanciaAnclaje}²`
+                        + `<br>longitud cable² = ${(datos.alturaTorre * datos.alturaTorre).toFixed(1)} + ${(datos.distanciaAnclaje * datos.distanciaAnclaje).toFixed(1)}`
+                        + `<br>longitud cable² = ${(datos.alturaTorre * datos.alturaTorre + datos.distanciaAnclaje * datos.distanciaAnclaje).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la longitud del cable tensor.",
+                    formula: "longitud cable = √(altura torre² + distancia anclaje²)",
+                    calculo: `longitud cable = √${(datos.alturaTorre * datos.alturaTorre + datos.distanciaAnclaje * datos.distanciaAnclaje).toFixed(1)}`
+                        + `<br>longitud cable = ${{valorCalculado}} m`
+                }
+            ];
+        }
+        
+        return {
+            explicacion: explicacion,
+            valorCalculado: valorCalculado
+        };
+    }
+    
+    function describirTorreCable(datos) {
+        let enunciado = "";
+        let datosProblema = "";
+        
+        if (datos.tipoProblema === 0) { // Calcular altura torre
+            enunciado = "Una torre de comunicaciones está sujeta por un cable tensor anclado al suelo. Calcula la altura de la torre.";
+            datosProblema = `
+                <p>Longitud del cable tensor: ${datos.longitudCable} m</p>
+                <p>Distancia desde la base de la torre hasta el punto de anclaje: ${datos.distanciaAnclaje} m</p>
+                <p>Altura de la torre: ? m</p>
+            `;
+        } else if (datos.tipoProblema === 1) { // Calcular distancia anclaje
+            enunciado = "Una torre de comunicaciones está sujeta por un cable tensor anclado al suelo. Calcula a qué distancia de la base de la torre está el punto de anclaje.";
+            datosProblema = `
+                <p>Longitud del cable tensor: ${datos.longitudCable} m</p>
+                <p>Altura de la torre: ${datos.alturaTorre} m</p>
+                <p>Distancia desde la base de la torre hasta el punto de anclaje: ? m</p>
+            `;
+        } else { // Calcular longitud cable
+            enunciado = "Una torre de comunicaciones está sujeta por un cable tensor anclado al suelo. Calcula la longitud del cable tensor.";
+            datosProblema = `
+                <p>Altura de la torre: ${datos.alturaTorre} m</p>
+                <p>Distancia desde la base de la torre hasta el punto de anclaje: ${datos.distanciaAnclaje} m</p>
+                <p>Longitud del cable tensor: ? m</p>
+            `;
+        }
+        
+        return {
+            enunciado: enunciado,
+            datos: datosProblema
+        };
+    }
+    
+    // 4. Rampa de acceso
+    function generarDatosRampa() {
+        // Decidir qué valor calcular: longitud rampa, altura o distancia horizontal
+        const tipoProblema = aleatorio(0, 2);
+        
+        let longitudRampa, altura, distanciaBase;
+        
+        // Generar dimensiones razonables
+        if (tipoProblema === 0) { // Calcular longitud rampa
+            altura = aleatorio(20, 60) / 10; // 2.0 a 6.0 metros
+            distanciaBase = aleatorio(80, 180) / 10; // 8.0 a 18.0 metros
+            longitudRampa = Math.sqrt(altura * altura + distanciaBase * distanciaBase);
+            longitudRampa = redondear(longitudRampa);
+        } else if (tipoProblema === 1) { // Calcular altura
+            longitudRampa = aleatorio(100, 200) / 10; // 10.0 a 20.0 metros
+            distanciaBase = aleatorio(80, 180) / 10; // 8.0 a 18.0 metros
+            altura = Math.sqrt(longitudRampa * longitudRampa - distanciaBase * distanciaBase);
+            altura = redondear(altura);
+        } else { // Calcular distancia base
+            longitudRampa = aleatorio(100, 200) / 10; // 10.0 a 20.0 metros
+            altura = aleatorio(20, 60) / 10; // 2.0 a 6.0 metros
+            distanciaBase = Math.sqrt(longitudRampa * longitudRampa - altura * altura);
+            distanciaBase = redondear(distanciaBase);
+        }
+        
+        return {
+            tipo: "Rampa de acceso",
+            tipoProblema: tipoProblema, // 0: longitud rampa, 1: altura, 2: distancia base
+            longitudRampa: longitudRampa,
+            altura: altura,
+            distanciaBase: distanciaBase,
+            offsetX: 0,
+            offsetY: 0
+        };
+    }
+    function dibujarRampa(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+        
+        const anchoCanvas = canvas.width;
+        const altoCanvas = canvas.height;
+        
+        // Escalamos los valores para que quepan bien en el canvas
+        const escala = Math.min(anchoCanvas / 450, altoCanvas / 350);
+        
+        // Posición de la esquina inferior izquierda de la rampa (origen del sistema)
+        const origenX = offsetX + 100;
+        const origenY = offsetY + 250;
+        
+        // Dimensiones escaladas
+        const alturaEscalada = datos.altura * 30 * escala;
+        const distanciaEscalada = datos.distanciaBase * 10 * escala;
+        
+        ctx.clearRect(0, 0, anchoCanvas, altoCanvas);
+        
+        // Dibujar plataforma elevada
+        ctx.fillStyle = '#95a5a6';
+        ctx.fillRect(origenX + distanciaEscalada, origenY - alturaEscalada, 100, alturaEscalada + 5);
+        
+        // Dibujar suelo
+        ctx.fillStyle = '#95a5a6';
+        ctx.fillRect(origenX - 50, origenY, distanciaEscalada + 150, 5);
+        
+        // Dibujar líneas del triángulo
+        if (mostrarTriangulo) {
+            // Cateto 1 (altura)
+            ctx.strokeStyle = colores.cateto1;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(origenX + distanciaEscalada, origenY);
+            ctx.lineTo(origenX + distanciaEscalada, origenY - alturaEscalada);
+            ctx.stroke();
+            
+            // Cateto 2 (distancia base)
+            ctx.strokeStyle = colores.cateto2;
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY);
+            ctx.lineTo(origenX + distanciaEscalada, origenY);
+            ctx.stroke();
+            
+            // Hipotenusa (rampa)
+            ctx.strokeStyle = colores.hipotenusa;
+            ctx.lineWidth = 4;
+        } else {
+            ctx.strokeStyle = colores.elementos;
+            ctx.lineWidth = 4;
+        }
+        
+        // Dibujar rampa
+        ctx.beginPath();
+        ctx.moveTo(origenX, origenY);
+        ctx.lineTo(origenX + distanciaEscalada, origenY - alturaEscalada);
+        ctx.stroke();
+        
+        // Dibujar barandilla de la rampa
+        ctx.strokeStyle = colores.elementos;
+        ctx.lineWidth = 1.5;
+        
+        // Barandilla superior
+        ctx.beginPath();
+        ctx.moveTo(origenX, origenY - 10);
+        ctx.lineTo(origenX + distanciaEscalada, origenY - alturaEscalada - 10);
+        ctx.stroke();
+        
+        // Soportes barandilla
+        const numSoportes = 5;
+        const longitudRampa = Math.sqrt(distanciaEscalada * distanciaEscalada + alturaEscalada * alturaEscalada);
+        const espacioEntreSoportes = longitudRampa / (numSoportes + 1);
+        const anguloRampa = Math.atan2(alturaEscalada, distanciaEscalada);
+        
+        for (let i = 1; i <= numSoportes; i++) {
+            const distancia = i * espacioEntreSoportes;
+            const dx = distancia * Math.cos(anguloRampa);
+            const dy = distancia * Math.sin(anguloRampa);
+            
+            ctx.beginPath();
+            ctx.moveTo(origenX + dx, origenY - dy);
+            ctx.lineTo(origenX + dx, origenY - dy - 10);
+            ctx.stroke();
+        }
+        
+        // Dibujar persona en silla de ruedas (esquemática)
+        const personaX = origenX + distanciaEscalada / 2;
+        const personaY = origenY - alturaEscalada / 2;
+        
+        // Silla de ruedas (círculo y líneas)
+        ctx.fillStyle = '#3498db';
+        
+        // Ruedas
+        ctx.beginPath();
+        ctx.arc(personaX - 5, personaY + 5, 4, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(personaX + 5, personaY + 5, 4, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Persona
+        ctx.fillStyle = '#2c3e50';
+        ctx.beginPath();
+        ctx.arc(personaX, personaY - 5, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Silla (respaldo)
+        ctx.beginPath();
+        ctx.moveTo(personaX - 5, personaY + 2);
+        ctx.lineTo(personaX - 5, personaY - 8);
+        ctx.lineTo(personaX + 5, personaY - 8);
+        ctx.lineTo(personaX + 5, personaY + 2);
+        ctx.stroke();
+    }
+    
+    function calcularRampa(datos) {
+        let explicacion = [];
+        let valorCalculado = 0;
+        
+        // Teorema de Pitágoras: a² + b² = c²
+        if (datos.tipoProblema === 0) { // Calcular longitud rampa
+            valorCalculado = datos.longitudRampa;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Altura de la rampa (cateto) = ${datos.altura} m`
+                        + `<br>Distancia horizontal de la rampa (cateto) = ${datos.distanciaBase} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la longitud de la rampa.",
+                    formula: "longitud rampa² = altura² + distancia base²",
+                    calculo: `longitud rampa² = ${datos.altura}² + ${datos.distanciaBase}²`
+                        + `<br>longitud rampa² = ${(datos.altura * datos.altura).toFixed(1)} + ${(datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                        + `<br>longitud rampa² = ${(datos.altura * datos.altura + datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la longitud de la rampa.",
+                    formula: "longitud rampa = √(altura² + distancia base²)",
+                    calculo: `longitud rampa = √${(datos.altura * datos.altura + datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                        + `<br>longitud rampa = ${{valorCalculado}} m`
+                }
+            ];
+            
+        } else if (datos.tipoProblema === 1) { // Calcular altura
+            valorCalculado = datos.altura;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Longitud de la rampa (hipotenusa) = ${datos.longitudRampa} m`
+                        + `<br>Distancia horizontal de la rampa (cateto) = ${datos.distanciaBase} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la altura de la rampa.",
+                    formula: "altura² = longitud rampa² - distancia base²",
+                    calculo: `altura² = ${datos.longitudRampa}² - ${datos.distanciaBase}²`
+                        + `<br>altura² = ${(datos.longitudRampa * datos.longitudRampa).toFixed(1)} - ${(datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                        + `<br>altura² = ${(datos.longitudRampa * datos.longitudRampa - datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la altura de la rampa.",
+                    formula: "altura = √(longitud rampa² - distancia base²)",
+                    calculo: `altura = √${(datos.longitudRampa * datos.longitudRampa - datos.distanciaBase * datos.distanciaBase).toFixed(1)}`
+                        + `<br>altura = ${{valorCalculado}} m`
+                }
+            ];
+            
+        } else { // Calcular distancia base
+            valorCalculado = datos.distanciaBase;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Longitud de la rampa (hipotenusa) = ${datos.longitudRampa} m`
+                        + `<br>Altura de la rampa (cateto) = ${datos.altura} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la distancia horizontal de la rampa.",
+                    formula: "distancia base² = longitud rampa² - altura²",
+                    calculo: `distancia base² = ${datos.longitudRampa}² - ${datos.altura}²`
+                        + `<br>distancia base² = ${(datos.longitudRampa * datos.longitudRampa).toFixed(1)} - ${(datos.altura * datos.altura).toFixed(1)}`
+                        + `<br>distancia base² = ${(datos.longitudRampa * datos.longitudRampa - datos.altura * datos.altura).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la distancia horizontal de la rampa.",
+                    formula: "distancia base = √(longitud rampa² - altura²)",
+                    calculo: `distancia base = √${(datos.longitudRampa * datos.longitudRampa - datos.altura * datos.altura).toFixed(1)}`
+                        + `<br>distancia base = ${{valorCalculado}} m`
+                }
+            ];
+        }
+        
+        return {
+            explicacion: explicacion,
+            valorCalculado: valorCalculado
+        };
+    }
+    function describirRampa(datos) {
+        let enunciado = "";
+        let datosProblema = "";
+        
+        if (datos.tipoProblema === 0) { // Calcular longitud rampa
+            enunciado = "Se va a construir una rampa de acceso para personas con movilidad reducida. Calcula la longitud de la rampa.";
+            datosProblema = `
+                <p>Altura de la rampa: ${datos.altura} m</p>
+                <p>Distancia horizontal que cubre la rampa: ${datos.distanciaBase} m</p>
+                <p>Longitud de la rampa: ? m</p>
+            `;
+        } else if (datos.tipoProblema === 1) { // Calcular altura
+            enunciado = "Se va a construir una rampa de acceso para personas con movilidad reducida. Calcula la altura que alcanzará la rampa.";
+            datosProblema = `
+                <p>Longitud de la rampa: ${datos.longitudRampa} m</p>
+                <p>Distancia horizontal que cubre la rampa: ${datos.distanciaBase} m</p>
+                <p>Altura de la rampa: ? m</p>
+            `;
+        } else { // Calcular distancia base
+            enunciado = "Se va a construir una rampa de acceso para personas con movilidad reducida. Calcula la distancia horizontal que ocupará la rampa.";
+            datosProblema = `
+                <p>Longitud de la rampa: ${datos.longitudRampa} m</p>
+                <p>Altura de la rampa: ${datos.altura} m</p>
+                <p>Distancia horizontal que cubre la rampa: ? m</p>
+            `;
+        }
+        
+        return {
+            enunciado: enunciado,
+            datos: datosProblema
+        };
+    }
+    
+    // 5. Techo de casa
+    function generarDatosTechoCasa() {
+        // Decidir qué valor calcular: altura techo, ancho casa o longitud del techo
+        const tipoProblema = aleatorio(0, 2);
+        
+        let alturaTecho, anchoCasa, longitudTecho;
+        
+        // Generar dimensiones razonables
+        // La anchoCasa se refiere al ancho de media casa (desde el centro a un lado)
+        if (tipoProblema === 0) { // Calcular altura techo
+            anchoCasa = aleatorio(30, 60) / 10; // 3.0 a 6.0 metros (medio ancho)
+            longitudTecho = aleatorio(Math.round(anchoCasa * 12), Math.round(anchoCasa * 15)) / 10;
+            alturaTecho = Math.sqrt(longitudTecho * longitudTecho - anchoCasa * anchoCasa);
+            alturaTecho = redondear(alturaTecho);
+        } else if (tipoProblema === 1) { // Calcular ancho casa
+            alturaTecho = aleatorio(20, 40) / 10; // 2.0 a 4.0 metros
+            longitudTecho = aleatorio(Math.round(alturaTecho * 12), Math.round(alturaTecho * 15)) / 10;
+            anchoCasa = Math.sqrt(longitudTecho * longitudTecho - alturaTecho * alturaTecho);
+            anchoCasa = redondear(anchoCasa);
+        } else { // Calcular longitud del techo
+            alturaTecho = aleatorio(20, 40) / 10; // 2.0 a 4.0 metros
+            anchoCasa = aleatorio(30, 60) / 10; // 3.0 a 6.0 metros (medio ancho)
+            longitudTecho = Math.sqrt(alturaTecho * alturaTecho + anchoCasa * anchoCasa);
+            longitudTecho = redondear(longitudTecho);
+        }
+        
+        return {
+            tipo: "Techo de casa",
+            tipoProblema: tipoProblema, // 0: altura techo, 1: ancho casa, 2: longitud techo
+            alturaTecho: alturaTecho,
+            anchoCasa: anchoCasa,
+            longitudTecho: longitudTecho,
+            offsetX: 0,
+            offsetY: 0
+        };
+    }
+    
+    function dibujarTechoCasa(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+        
+        const anchoCanvas = canvas.width;
+        const altoCanvas = canvas.height;
+        
+        // Escalamos los valores para que quepan bien en el canvas
+        const escala = Math.min(anchoCanvas / 450, altoCanvas / 350);
+        
+        // Posición del centro de la casa
+        const origenX = offsetX + 200;
+        const origenY = offsetY + 250;
+        
+        // Dimensiones escaladas
+        const alturaEscalada = datos.alturaTecho * 20 * escala;
+        const anchoEscalado = datos.anchoCasa * 20 * escala;
+        
+        ctx.clearRect(0, 0, anchoCanvas, altoCanvas);
+        
+        // Dibujar casa base
+        ctx.fillStyle = '#ecf0f1';
+        ctx.fillRect(origenX - anchoEscalado * 2, origenY - 100, anchoEscalado * 4, 100);
+        
+        // Dibujar líneas del triángulo del techo
+        if (mostrarTriangulo) {
+            // Cateto 1 (altura)
+            ctx.strokeStyle = colores.cateto1;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY - 100);
+            ctx.lineTo(origenX, origenY - 100 - alturaEscalada);
+            ctx.stroke();
+            
+            // Cateto 2 (medio ancho)
+            ctx.strokeStyle = colores.cateto2;
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY - 100);
+            ctx.lineTo(origenX + anchoEscalado, origenY - 100);
+            ctx.stroke();
+            
+            // Hipotenusa (techo derecho)
+            ctx.strokeStyle = colores.hipotenusa;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY - 100 - alturaEscalada);
+            ctx.lineTo(origenX + anchoEscalado, origenY - 100);
+            ctx.stroke();
+            
+            // Lado izquierdo del techo
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY - 100 - alturaEscalada);
+            ctx.lineTo(origenX - anchoEscalado, origenY - 100);
+            ctx.stroke();
+        } else {
+            // Techo completo sin resaltar triángulo
+            ctx.strokeStyle = colores.elementos;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(origenX - anchoEscalado, origenY - 100);
+            ctx.lineTo(origenX, origenY - 100 - alturaEscalada);
+            ctx.lineTo(origenX + anchoEscalado, origenY - 100);
+            ctx.stroke();
+        }
+        
+        // Dibujar techo (lado delantero)
+        ctx.fillStyle = '#e74c3c'; // Rojo teja
+        ctx.beginPath();
+        ctx.moveTo(origenX - anchoEscalado, origenY - 100);
+        ctx.lineTo(origenX, origenY - 100 - alturaEscalada);
+        ctx.lineTo(origenX + anchoEscalado, origenY - 100);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Dibujar puerta
+        ctx.fillStyle = '#7f8c8d';
+        ctx.fillRect(origenX - 15, origenY - 60, 30, 60);
+        
+        // Dibujar ventanas
+        ctx.fillStyle = '#3498db';
+        ctx.fillRect(origenX - anchoEscalado * 1.5, origenY - 80, 25, 25);
+        ctx.fillRect(origenX + anchoEscalado * 1.5 - 25, origenY - 80, 25, 25);
+    }
+    
+    function calcularTechoCasa(datos) {
+        let explicacion = [];
+        let valorCalculado = 0;
+        
+        // Teorema de Pitágoras: a² + b² = c²
+        if (datos.tipoProblema === 0) { // Calcular altura techo
+            valorCalculado = datos.alturaTecho;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Longitud del techo (hipotenusa) = ${datos.longitudTecho} m`
+                        + `<br>Mitad del ancho de la casa (cateto) = ${datos.anchoCasa} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la altura del techo.",
+                    formula: "altura techo² = longitud techo² - (mitad ancho casa)²",
+                    calculo: `altura techo² = ${datos.longitudTecho}² - ${datos.anchoCasa}²`
+                        + `<br>altura techo² = ${(datos.longitudTecho * datos.longitudTecho).toFixed(1)} - ${(datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                        + `<br>altura techo² = ${(datos.longitudTecho * datos.longitudTecho - datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la altura del techo.",
+                    formula: "altura techo = √(longitud techo² - (mitad ancho casa)²)",
+                    calculo: `altura techo = √${(datos.longitudTecho * datos.longitudTecho - datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                        + `<br>altura techo = ${{valorCalculado}} m`
+                }
+            ];
+            
+        } else if (datos.tipoProblema === 1) { // Calcular ancho casa
+            valorCalculado = datos.anchoCasa * 2; // Multiplicamos por 2 para obtener el ancho total
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Longitud del techo (hipotenusa) = ${datos.longitudTecho} m`
+                        + `<br>Altura del techo (cateto) = ${datos.alturaTecho} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la mitad del ancho de la casa.",
+                    formula: "(mitad ancho casa)² = longitud techo² - altura techo²",
+                    calculo: `(mitad ancho casa)² = ${datos.longitudTecho}² - ${datos.alturaTecho}²`
+                        + `<br>(mitad ancho casa)² = ${(datos.longitudTecho * datos.longitudTecho).toFixed(1)} - ${(datos.alturaTecho * datos.alturaTecho).toFixed(1)}`
+                        + `<br>(mitad ancho casa)² = ${(datos.longitudTecho * datos.longitudTecho - datos.alturaTecho * datos.alturaTecho).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la mitad del ancho de la casa.",
+                    formula: "mitad ancho casa = √(longitud techo² - altura techo²)",
+                    calculo: `mitad ancho casa = √${(datos.longitudTecho * datos.longitudTecho - datos.alturaTecho * datos.alturaTecho).toFixed(1)}`
+                        + `<br>mitad ancho casa = ${datos.anchoCasa} m`
+                },
+                {
+                    texto: "Paso 4: Multiplicamos por 2 para obtener el ancho total de la casa.",
+                    formula: "ancho total casa = 2 × mitad ancho casa",
+                    calculo: `ancho total casa = 2 × ${datos.anchoCasa} = ${{valorCalculado}} m`
+                }
+            ];
+            
+        } else { // Calcular longitud del techo
+            valorCalculado = datos.longitudTecho;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Altura del techo (cateto) = ${datos.alturaTecho} m`
+                        + `<br>Mitad del ancho de la casa (cateto) = ${datos.anchoCasa} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la longitud del techo.",
+                    formula: "longitud techo² = altura techo² + (mitad ancho casa)²",
+                    calculo: `longitud techo² = ${datos.alturaTecho}² + ${datos.anchoCasa}²`
+                        + `<br>longitud techo² = ${(datos.alturaTecho * datos.alturaTecho).toFixed(1)} + ${(datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                        + `<br>longitud techo² = ${(datos.alturaTecho * datos.alturaTecho + datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la longitud del techo.",
+                    formula: "longitud techo = √(altura techo² + (mitad ancho casa)²)",
+                    calculo: `longitud techo = √${(datos.alturaTecho * datos.alturaTecho + datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                        + `<br>longitud techo = ${{valorCalculado}} m`
+                }
+            ];
+        }
+        
+        return {
+            explicacion: explicacion,
+            valorCalculado: valorCalculado
+        };
+    }
+    function describirRampa(datos) {
+        let enunciado = "";
+        let datosProblema = "";
+        
+        if (datos.tipoProblema === 0) { // Calcular longitud rampa
+            enunciado = "Se va a construir una rampa de acceso para personas con movilidad reducida. Calcula la longitud de la rampa.";
+            datosProblema = `
+                <p>Altura de la rampa: ${datos.altura} m</p>
+                <p>Distancia horizontal que cubre la rampa: ${datos.distanciaBase} m</p>
+                <p>Longitud de la rampa: ? m</p>
+            `;
+        } else if (datos.tipoProblema === 1) { // Calcular altura
+            enunciado = "Se va a construir una rampa de acceso para personas con movilidad reducida. Calcula la altura que alcanzará la rampa.";
+            datosProblema = `
+                <p>Longitud de la rampa: ${datos.longitudRampa} m</p>
+                <p>Distancia horizontal que cubre la rampa: ${datos.distanciaBase} m</p>
+                <p>Altura de la rampa: ? m</p>
+            `;
+        } else { // Calcular distancia base
+            enunciado = "Se va a construir una rampa de acceso para personas con movilidad reducida. Calcula la distancia horizontal que ocupará la rampa.";
+            datosProblema = `
+                <p>Longitud de la rampa: ${datos.longitudRampa} m</p>
+                <p>Altura de la rampa: ${datos.altura} m</p>
+                <p>Distancia horizontal que cubre la rampa: ? m</p>
+            `;
+        }
+        
+        return {
+            enunciado: enunciado,
+            datos: datosProblema
+        };
+    }
+    
+    // 5. Techo de casa
+    function generarDatosTechoCasa() {
+        // Decidir qué valor calcular: altura techo, ancho casa o longitud del techo
+        const tipoProblema = aleatorio(0, 2);
+        
+        let alturaTecho, anchoCasa, longitudTecho;
+        
+        // Generar dimensiones razonables
+        // La anchoCasa se refiere al ancho de media casa (desde el centro a un lado)
+        if (tipoProblema === 0) { // Calcular altura techo
+            anchoCasa = aleatorio(30, 60) / 10; // 3.0 a 6.0 metros (medio ancho)
+            longitudTecho = aleatorio(Math.round(anchoCasa * 12), Math.round(anchoCasa * 15)) / 10;
+            alturaTecho = Math.sqrt(longitudTecho * longitudTecho - anchoCasa * anchoCasa);
+            alturaTecho = redondear(alturaTecho);
+        } else if (tipoProblema === 1) { // Calcular ancho casa
+            alturaTecho = aleatorio(20, 40) / 10; // 2.0 a 4.0 metros
+            longitudTecho = aleatorio(Math.round(alturaTecho * 12), Math.round(alturaTecho * 15)) / 10;
+            anchoCasa = Math.sqrt(longitudTecho * longitudTecho - alturaTecho * alturaTecho);
+            anchoCasa = redondear(anchoCasa);
+        } else { // Calcular longitud del techo
+            alturaTecho = aleatorio(20, 40) / 10; // 2.0 a 4.0 metros
+            anchoCasa = aleatorio(30, 60) / 10; // 3.0 a 6.0 metros (medio ancho)
+            longitudTecho = Math.sqrt(alturaTecho * alturaTecho + anchoCasa * anchoCasa);
+            longitudTecho = redondear(longitudTecho);
+        }
+        
+        return {
+            tipo: "Techo de casa",
+            tipoProblema: tipoProblema, // 0: altura techo, 1: ancho casa, 2: longitud techo
+            alturaTecho: alturaTecho,
+            anchoCasa: anchoCasa,
+            longitudTecho: longitudTecho,
+            offsetX: 0,
+            offsetY: 0
+        };
+    }
+    
+    function dibujarTechoCasa(datos) {
+        const { offsetX, offsetY } = calcularOffset(datos);
+        datos.offsetX = offsetX;
+        datos.offsetY = offsetY;
+        
+        const anchoCanvas = canvas.width;
+        const altoCanvas = canvas.height;
+        
+        // Escalamos los valores para que quepan bien en el canvas
+        const escala = Math.min(anchoCanvas / 450, altoCanvas / 350);
+        
+        // Posición del centro de la casa
+        const origenX = offsetX + 200;
+        const origenY = offsetY + 250;
+        
+        // Dimensiones escaladas
+        const alturaEscalada = datos.alturaTecho * 20 * escala;
+        const anchoEscalado = datos.anchoCasa * 20 * escala;
+        
+        ctx.clearRect(0, 0, anchoCanvas, altoCanvas);
+        
+        // Dibujar casa base
+        ctx.fillStyle = '#ecf0f1';
+        ctx.fillRect(origenX - anchoEscalado * 2, origenY - 100, anchoEscalado * 4, 100);
+        
+        // Dibujar líneas del triángulo del techo
+        if (mostrarTriangulo) {
+            // Cateto 1 (altura)
+            ctx.strokeStyle = colores.cateto1;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY - 100);
+            ctx.lineTo(origenX, origenY - 100 - alturaEscalada);
+            ctx.stroke();
+            
+            // Cateto 2 (medio ancho)
+            ctx.strokeStyle = colores.cateto2;
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY - 100);
+            ctx.lineTo(origenX + anchoEscalado, origenY - 100);
+            ctx.stroke();
+            
+            // Hipotenusa (techo derecho)
+            ctx.strokeStyle = colores.hipotenusa;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY - 100 - alturaEscalada);
+            ctx.lineTo(origenX + anchoEscalado, origenY - 100);
+            ctx.stroke();
+            
+            // Lado izquierdo del techo
+            ctx.beginPath();
+            ctx.moveTo(origenX, origenY - 100 - alturaEscalada);
+            ctx.lineTo(origenX - anchoEscalado, origenY - 100);
+            ctx.stroke();
+        } else {
+            // Techo completo sin resaltar triángulo
+            ctx.strokeStyle = colores.elementos;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(origenX - anchoEscalado, origenY - 100);
+            ctx.lineTo(origenX, origenY - 100 - alturaEscalada);
+            ctx.lineTo(origenX + anchoEscalado, origenY - 100);
+            ctx.stroke();
+        }
+        
+        // Dibujar techo (lado delantero)
+        ctx.fillStyle = '#e74c3c'; // Rojo teja
+        ctx.beginPath();
+        ctx.moveTo(origenX - anchoEscalado, origenY - 100);
+        ctx.lineTo(origenX, origenY - 100 - alturaEscalada);
+        ctx.lineTo(origenX + anchoEscalado, origenY - 100);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Dibujar puerta
+        ctx.fillStyle = '#7f8c8d';
+        ctx.fillRect(origenX - 15, origenY - 60, 30, 60);
+        
+        // Dibujar ventanas
+        ctx.fillStyle = '#3498db';
+        ctx.fillRect(origenX - anchoEscalado * 1.5, origenY - 80, 25, 25);
+        ctx.fillRect(origenX + anchoEscalado * 1.5 - 25, origenY - 80, 25, 25);
+    }
+    
+    function calcularTechoCasa(datos) {
+        let explicacion = [];
+        let valorCalculado = 0;
+        
+        // Teorema de Pitágoras: a² + b² = c²
+        if (datos.tipoProblema === 0) { // Calcular altura techo
+            valorCalculado = datos.alturaTecho;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Longitud del techo (hipotenusa) = ${datos.longitudTecho} m`
+                        + `<br>Mitad del ancho de la casa (cateto) = ${datos.anchoCasa} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la altura del techo.",
+                    formula: "altura techo² = longitud techo² - (mitad ancho casa)²",
+                    calculo: `altura techo² = ${datos.longitudTecho}² - ${datos.anchoCasa}²`
+                        + `<br>altura techo² = ${(datos.longitudTecho * datos.longitudTecho).toFixed(1)} - ${(datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                        + `<br>altura techo² = ${(datos.longitudTecho * datos.longitudTecho - datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la altura del techo.",
+                    formula: "altura techo = √(longitud techo² - (mitad ancho casa)²)",
+                    calculo: `altura techo = √${(datos.longitudTecho * datos.longitudTecho - datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                        + `<br>altura techo = ${{valorCalculado}} m`
+                }
+            ];
+            
+        } else if (datos.tipoProblema === 1) { // Calcular ancho casa
+            valorCalculado = datos.anchoCasa * 2; // Multiplicamos por 2 para obtener el ancho total
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Longitud del techo (hipotenusa) = ${datos.longitudTecho} m`
+                        + `<br>Altura del techo (cateto) = ${datos.alturaTecho} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la mitad del ancho de la casa.",
+                    formula: "(mitad ancho casa)² = longitud techo² - altura techo²",
+                    calculo: `(mitad ancho casa)² = ${datos.longitudTecho}² - ${datos.alturaTecho}²`
+                        + `<br>(mitad ancho casa)² = ${(datos.longitudTecho * datos.longitudTecho).toFixed(1)} - ${(datos.alturaTecho * datos.alturaTecho).toFixed(1)}`
+                        + `<br>(mitad ancho casa)² = ${(datos.longitudTecho * datos.longitudTecho - datos.alturaTecho * datos.alturaTecho).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la mitad del ancho de la casa.",
+                    formula: "mitad ancho casa = √(longitud techo² - altura techo²)",
+                    calculo: `mitad ancho casa = √${(datos.longitudTecho * datos.longitudTecho - datos.alturaTecho * datos.alturaTecho).toFixed(1)}`
+                        + `<br>mitad ancho casa = ${datos.anchoCasa} m`
+                },
+                {
+                    texto: "Paso 4: Multiplicamos por 2 para obtener el ancho total de la casa.",
+                    formula: "ancho total casa = 2 × mitad ancho casa",
+                    calculo: `ancho total casa = 2 × ${datos.anchoCasa} = ${{valorCalculado}} m`
+                }
+            ];
+            
+        } else { // Calcular longitud del techo
+            valorCalculado = datos.longitudTecho;
+            
+            explicacion = [
+                {
+                    texto: "Paso 1: Identificamos los valores conocidos.",
+                    formula: "",
+                    calculo: `Altura del techo (cateto) = ${datos.alturaTecho} m`
+                        + `<br>Mitad del ancho de la casa (cateto) = ${datos.anchoCasa} m`
+                },
+                {
+                    texto: "Paso 2: Aplicamos el teorema de Pitágoras para calcular la longitud del techo.",
+                    formula: "longitud techo² = altura techo² + (mitad ancho casa)²",
+                    calculo: `longitud techo² = ${datos.alturaTecho}² + ${datos.anchoCasa}²`
+                        + `<br>longitud techo² = ${(datos.alturaTecho * datos.alturaTecho).toFixed(1)} + ${(datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                        + `<br>longitud techo² = ${(datos.alturaTecho * datos.alturaTecho + datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                },
+                {
+                    texto: "Paso 3: Calculamos la raíz cuadrada para obtener la longitud del techo.",
+                    formula: "longitud techo = √(altura techo² + (mitad ancho casa)²)",
+                    calculo: `longitud techo = √${(datos.alturaTecho * datos.alturaTecho + datos.anchoCasa * datos.anchoCasa).toFixed(1)}`
+                        + `<br>longitud techo = ${{valorCalculado}} m`
+                }
+            ];
+        }
+        
+        return {
+            explicacion: explicacion,
+            valorCalculado: valorCalculado
+        };
+    }
+    function describirTechoCasa(datos) {
+        let enunciado = "";
+        let datosProblema = "";
+        
+        if (datos.tipoProblema === 0) { // Calcular altura techo
+            enunciado = "Una casa tiene techo a dos aguas. Calcula la altura del techo desde su cumbrera hasta la base.";
+            datosProblema = `
+                <p>Longitud del techo (de la base a la cumbrera): ${datos.longitudTecho} m</p>
+                <p>Mitad del ancho de la casa: ${datos.anchoCasa} m</p>
+                <p>Altura del techo: ? m</p>
+            `;
+        } else if (datos.tipoProblema === 1) { // Calcular ancho casa
+            enunciado = "Una casa tiene techo a dos aguas. Calcula el ancho total de la casa.";
+            datosProblema = `
+                <p>Longitud del techo (de la base a la cumbrera): ${datos.longitudTecho} m</p>
+                <p>Altura del techo: ${datos.alturaTecho} m</p>
+                <p>Ancho total de la casa: ? m</p>
+            `;
+        } else { // Calcular longitud techo
+            enunciado = "Una casa tiene techo a dos aguas. Calcula la longitud del techo desde su base hasta la cumbrera.";
+            datosProblema = `
+                <p>Altura del techo: ${datos.alturaTecho} m</p>
+                <p>Mitad del ancho de la casa: ${datos.anchoCasa} m</p>
+                <p>Longitud del techo: ? m</p>
+            `;
+        }
+        
+        return {
+            enunciado: enunciado,
+            datos: datosProblema
+        };
+    }
+    
+    // Función para calcular el desplazamiento (offset) para centrar las figuras
+    function calcularOffset(datos) {
+        // Posicionamos centradamente en el canvas
+        const rect = canvas.getBoundingClientRect();
+        const canvasAncho = rect.width;
+        const canvasAlto = rect.height;
+        
+        const offsetX = 0;
+        const offsetY = 0;
+        
+        return { offsetX, offsetY };
+    }
+    
+    // Función para generar un nuevo problema aleatorio
+    function generarNuevoProblema() {
+        // Restablecer visualización a un solo color
+        mostrarTriangulo = false;
+        
+        const tipoIndice = aleatorio(0, tiposEscenarios.length - 1);
+        const tipoEscenario = tiposEscenarios[tipoIndice];
+        
+        escenarioActual = tipoEscenario;
+        datosActuales = tipoEscenario.datos();
+        
+        // Dibujar el escenario
+        tipoEscenario.dibujar(datosActuales);
+        
+        // Mostrar datos
+        mostrarDatos(datosActuales);
+        
+        // Ocultar modal de solución
+        document.getElementById('modal-solucion').style.display = 'none';
+    }
+    
+    // Función para mostrar los datos del problema
+    function mostrarDatos(datos) {
+        const descripcion = escenarioActual.describir(datos);
+        
+        document.getElementById('enunciado').innerHTML = descripcion.enunciado;
+        document.getElementById('datos').innerHTML = descripcion.datos;
+        
+        // Actualizar leyenda de colores si se está mostrando el triángulo
+        if (mostrarTriangulo) {
+            const leyendaContainer = document.getElementById('leyenda-color');
+            leyendaContainer.innerHTML = '';
+            
+            // Añadir leyenda para los catetos e hipotenusa
+            const colorItems = [
+                { nombre: 'Cateto 1', color: colores.cateto1 },
+                { nombre: 'Cateto 2', color: colores.cateto2 },
+                { nombre: 'Hipotenusa', color: colores.hipotenusa }
+            ];
+            
+            colorItems.forEach(item => {
+                const colorItem = document.createElement('div');
+                colorItem.className = 'color-item';
+                
+                const colorMuestra = document.createElement('div');
+                colorMuestra.className = 'color-muestra';
+                colorMuestra.style.backgroundColor = item.color;
+                
+                const colorTexto = document.createElement('span');
+                colorTexto.textContent = item.nombre;
+                
+                colorItem.appendChild(colorMuestra);
+                colorItem.appendChild(colorTexto);
+                
+                leyendaContainer.appendChild(colorItem);
+            });
+        } else {
+            document.getElementById('leyenda-color').innerHTML = '';
+        }
+    }
+    
+    // Función para mostrar la solución en una ventana modal
+    function mostrarSolucion() {
+        const modalSolucion = document.getElementById('modal-solucion');
+        const solucionContenido = document.getElementById('solucion');
+        
+        if (escenarioActual && datosActuales) {
+            const resultadoCalculo = escenarioActual.calcular(datosActuales);
+            
+            // Generar el HTML de la solución
+            let solucionHTML = '';
+            
+            resultadoCalculo.explicacion.forEach(paso => {
+                solucionHTML += `
+                    <p><strong>${paso.texto}</strong></p>
+                    ${paso.formula ? `<p class="formula">${paso.formula}</p>` : ''}
+                    <p class="calculo">${paso.calculo}</p>
+                `;
+            });
+            
+            // Añadir resultado final
+            solucionHTML += `
+                <p><strong>Resultado final:</strong></p>
+                <p>El valor buscado es: ${resultadoCalculo.valorCalculado} m</p>
+            `;
+            
+            solucionContenido.innerHTML = solucionHTML;
+            modalSolucion.style.display = 'block';
+        }
+    }
+    
+    // Función para cerrar la ventana modal
+    function cerrarModal() {
+        document.getElementById('modal-solucion').style.display = 'none';
+    }
+    
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar canvas
+        setupCanvas();
+        
+        // Generar el primer problema
+        generarNuevoProblema();
+        
+        // Eventos de botones
+        document.getElementById('nuevo-problema').addEventListener('click', generarNuevoProblema);
+        document.getElementById('mostrar-solucion').addEventListener('click', mostrarSolucion);
+        document.getElementById('alternar-colores').addEventListener('click', alternarTriangulo);
+        document.getElementById('cerrar-modal').addEventListener('click', cerrarModal);
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('modal-solucion');
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        });
+        
+        // Manejar redimensionamiento
+        window.addEventListener('resize', function() {
+            setupCanvas();
+            if (escenarioActual && datosActuales) {
+                escenarioActual.dibujar(datosActuales);
+            }
+        });
+    });
+</script></p>
+<!-- HASTA AQUI  --></body></html>

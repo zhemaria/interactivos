@@ -1,1 +1,504 @@
-
+<!DOCTYPE html>
+<html lang="es"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>3-U7-Lección 8b: INTERACTIVO - Teorema de Tales de Mileto</title> 
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            width: 600px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .canvas-container {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            height: 420px; /* Ajustar la altura del contenedor */
+        }
+        
+        canvas {
+            background-color: #fafafa;
+            cursor: pointer;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        label {
+            width: 150px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="range"] {
+            flex-grow: 1;
+        }
+        
+        .measurements {
+            padding: 10px;
+            background-color: #f0f7ff;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        .measurements h3 {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            color: #0066cc;
+            font-size: 14px;
+        }
+        
+        .measurements-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        
+        .ratio {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            max-width: 120px;
+        }
+        
+        .ratio-label {
+            font-weight: bold;
+        }
+        
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.3s;
+          width: 600px;
+        }
+        
+        button:hover {
+            background-color: #0052a3;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-content h2 {
+            color: #0066cc;
+            margin-top: 0;
+        }
+        
+        .close {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .instruction {
+            margin-bottom: 15px;
+        }
+        
+        .instruction-number {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            background-color: #0066cc;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 25px;
+            margin-right: 10px;
+        }
+    </style> 
+</head><body><div class="container">
+<h1>Teorema de Tales</h1>
+<p><button id="instructionsBtn">Ver Instrucciones</button></p>
+<p class="subtitle">Aplicado a Triángulos Semejantes</p>
+<div class="canvas-container"><canvas id="canvas"></canvas></div>
+<div class="controls">
+<div class="slider-container"><label for="linePosition">Posición de línea:</label> <input type="range" id="linePosition" min="20" max="80" value="40"></div>
+<div style="text-align: center; margin-top: 3px; color: #0066cc; font-size: 13px;"></div>
+</div>
+<div class="measurements">
+<h2>Proporcionalidad y Ángulos</h2>
+<div class="measurements-grid"><!-- Primera columna: proporciones -->
+<div>
+<div class="ratio"><span class="ratio-label">AB/A'B':</span> <span id="ratio1">2.00</span></div>
+<div class="ratio"><span class="ratio-label">AC/A'C':</span> <span id="ratio2">2.00</span></div>
+<div class="ratio"><span class="ratio-label">BC/B'C':</span> <span id="ratio3">2.00</span></div>
+</div>
+<!-- Segunda columna: primeros ángulos -->
+<div>
+<div class="ratio"><span class="ratio-label">∠BAC:</span> <span id="angle1">45.0°</span></div>
+<div class="ratio"><span class="ratio-label">∠B'A'C:</span> <span id="angle1prime">45.0°</span></div>
+</div>
+<!-- Tercera columna: segundos ángulos -->
+<div>
+<div class="ratio"><span class="ratio-label">∠ABC:</span> <span id="angle2">60.0°</span></div>
+<div class="ratio"><span class="ratio-label">∠A'B'C:</span> <span id="angle2prime">60.0°</span></div>
+</div>
+<!-- Cuarta columna: tercer ángulo -->
+<div>
+<div class="ratio"><span class="ratio-label">∠BCA:</span> <span id="angle3">75.0°</span></div>
+</div>
+</div>
+</div>
+</div>
+<div id="instructionsModal" class="modal">
+<div class="modal-content"><span class="close">×</span>
+<h2>Instrucciones</h2>
+<div class="instruction"><span class="instruction-number">1</span> <strong>El Teorema de Tales:</strong> Si tres o más líneas paralelas son cortadas por dos líneas transversales, entonces los segmentos determinados en las transversales son proporcionales.</div>
+<div class="instruction"><span class="instruction-number">2</span> <strong>¿Qué puedes hacer?</strong> Mueve el deslizador "Posición de línea" para cambiar la ubicación de la línea paralela que divide el triángulo original. También puedes arrastrar el vértice C para modificar la forma del triángulo.</div>
+<div class="instruction"><span class="instruction-number">3</span> <strong>Observa las proporciones:</strong> Al mover la línea, notarás que las proporciones entre los lados correspondientes de los triángulos se mantienen constantes. Esto es una demostración directa del Teorema de Tales.</div>
+<div class="instruction"><span class="instruction-number">4</span> <strong>Ángulos:</strong> Los ángulos correspondientes en ambos triángulos son siempre iguales, lo que demuestra que los triángulos son semejantes. Puedes observar los valores de los ángulos en el panel de abajo y comprobar que se mantienen iguales.</div>
+<div class="instruction"><span class="instruction-number">5</span> <strong>Proporciones:</strong> El panel de mediciones muestra las proporciones entre los lados correspondientes. Observa cómo estas proporciones permanecen iguales independientemente de la posición de la línea paralela.</div>
+</div>
+</div>
+<p><script>
+        // Referencias a elementos del DOM
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const linePositionSlider = document.getElementById('linePosition');
+        const ratio1Element = document.getElementById('ratio1');
+        const ratio2Element = document.getElementById('ratio2');
+        const ratio3Element = document.getElementById('ratio3');
+        const angle1Element = document.getElementById('angle1');
+        const angle1primeElement = document.getElementById('angle1prime');
+        const angle2Element = document.getElementById('angle2');
+        const angle2primeElement = document.getElementById('angle2prime');
+        const angle3Element = document.getElementById('angle3');
+        const instructionsBtn = document.getElementById('instructionsBtn');
+        const instructionsModal = document.getElementById('instructionsModal');
+        const closeBtn = document.querySelector('.close');
+        
+        // Configuración del lienzo
+        let canvasWidth, canvasHeight;
+        let centerX, centerY;
+        
+        // Puntos del triángulo original
+        let pointA, pointB, pointC;
+        // Puntos del triángulo formado por la línea paralela
+        let pointAprime, pointBprime, pointCprime;
+        
+        // Variables para controlar el arrastre del vértice
+        let isDragging = false;
+        let selectedPoint = null;
+        const dragRadius = 15; // Radio para detectar clic en el punto
+        
+        // Inicializar el lienzo
+        function initCanvas() {
+            canvasWidth = canvas.parentElement.clientWidth;
+            canvasHeight = canvas.parentElement.clientHeight;
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            centerX = canvasWidth / 2;
+            centerY = canvasHeight / 2;
+            
+            // Inicializar los puntos del triángulo con valores más pequeños
+            pointA = { x: centerX - 120, y: centerY - 150 };
+            pointB = { x: centerX + 120, y: centerY - 150 };
+            pointC = { x: centerX, y: centerY + 150 };
+            
+            updateLinePosition();
+        }
+        
+        // Calcular ángulo entre tres puntos
+        function calculateAngle(p1, p2, p3) {
+            const a = Math.atan2(p3.y - p2.y, p3.x - p2.x) - Math.atan2(p1.y - p2.y, p1.x - p2.x);
+            let angle = a * 180 / Math.PI;
+            if (angle < 0) angle += 360;
+            return angle;
+        }
+        
+        // Actualizar la posición de la línea paralela
+        function updateLinePosition() {
+            const linePosition = parseFloat(linePositionSlider.value) / 100;
+            
+            // Calcular los puntos del triángulo formado por la línea paralela
+            pointAprime = {
+                x: pointA.x + (pointC.x - pointA.x) * linePosition,
+                y: pointA.y + (pointC.y - pointA.y) * linePosition
+            };
+            
+            pointBprime = {
+                x: pointB.x + (pointC.x - pointB.x) * linePosition,
+                y: pointB.y + (pointC.y - pointB.y) * linePosition
+            };
+            
+            // Punto C' es el mismo que C para este ejemplo (no es necesario, pero se incluye para claridad)
+            pointCprime = { ...pointC };
+            
+            // Calcular las proporciones
+            const AB = distance(pointA, pointB);
+            const AC = distance(pointA, pointC);
+            const BC = distance(pointB, pointC);
+            
+            const ABprime = distance(pointAprime, pointBprime);
+            const ACprime = distance(pointAprime, pointCprime);
+            const BCprime = distance(pointBprime, pointCprime);
+            
+            const ratio1 = AB / ABprime;
+            const ratio2 = AC / ACprime;
+            const ratio3 = BC / BCprime;
+            
+            // Calcular ángulos
+            const angleBAC = calculateAngle(pointB, pointA, pointC);
+            const angleBpAC = calculateAngle(pointBprime, pointAprime, pointC);
+            const angleABC = calculateAngle(pointA, pointB, pointC);
+            const angleApBC = calculateAngle(pointAprime, pointBprime, pointC);
+            const angleBCA = calculateAngle(pointB, pointC, pointA);
+            
+            // Actualizar la interfaz con las proporciones y ángulos
+            ratio1Element.textContent = ratio1.toFixed(2);
+            ratio2Element.textContent = ratio2.toFixed(2);
+            ratio3Element.textContent = ratio3.toFixed(2);
+            
+            angle1Element.textContent = angleBAC.toFixed(1) + '°';
+            angle1primeElement.textContent = angleBpAC.toFixed(1) + '°';
+            angle2Element.textContent = angleABC.toFixed(1) + '°';
+            angle2primeElement.textContent = angleApBC.toFixed(1) + '°';
+            angle3Element.textContent = angleBCA.toFixed(1) + '°';
+            
+            // Redibujar el lienzo
+            draw();
+        }
+        
+        // Calcular la distancia entre dos puntos
+        function distance(point1, point2) {
+            return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+        }
+        
+        // Verificar si un punto está cerca de otro (para detectar clic en vértice)
+        function isPointNear(point1, point2, radius) {
+            return distance(point1, point2) < radius;
+        }
+        
+        // Dibujar en el lienzo
+        function draw() {
+            // Limpiar el lienzo
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Dibujar el triángulo original
+            ctx.beginPath();
+            ctx.moveTo(pointA.x, pointA.y);
+            ctx.lineTo(pointB.x, pointB.y);
+            ctx.lineTo(pointC.x, pointC.y);
+            ctx.closePath();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Dibujar la línea paralela
+            ctx.beginPath();
+            ctx.moveTo(pointAprime.x, pointAprime.y);
+            ctx.lineTo(pointBprime.x, pointBprime.y);
+            ctx.strokeStyle = '#0066cc';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Dibujar el triángulo pequeño
+            ctx.beginPath();
+            ctx.moveTo(pointAprime.x, pointAprime.y);
+            ctx.lineTo(pointBprime.x, pointBprime.y);
+            ctx.lineTo(pointC.x, pointC.y);
+            ctx.closePath();
+            ctx.strokeStyle = '#0066cc';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(0, 102, 204, 0.1)';
+            ctx.fill();
+            
+            // Etiquetar los puntos
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#333';
+            
+            // Etiquetar puntos del triángulo original
+            ctx.fillText('A', pointA.x - 20, pointA.y - 10);
+            ctx.fillText('B', pointB.x + 10, pointB.y - 10);
+            ctx.fillText('C', pointC.x + 10, pointC.y + 10);
+            
+            // Etiquetar puntos del triángulo formado por la línea paralela
+            ctx.fillStyle = '#0066cc';
+            ctx.fillText('A\'', pointAprime.x - 30, pointAprime.y);
+            ctx.fillText('B\'', pointBprime.x + 15, pointBprime.y);
+            
+            // Dibujar puntos
+            drawPoint(pointA, '#333');
+            drawPoint(pointB, '#333');
+            // Resaltar el punto C si es seleccionable/arrastrable
+            drawPoint(pointC, isDragging && selectedPoint === 'C' ? '#ff6600' : '#333', isDragging && selectedPoint === 'C' ? 7 : 5);
+            drawPoint(pointAprime, '#0066cc');
+            drawPoint(pointBprime, '#0066cc');
+        }
+        
+        // Dibujar un punto
+        function drawPoint(point, color, size = 5) {
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+        
+        // Obtener coordenadas del ratón relativas al canvas
+        function getMousePos(canvas, evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+        
+        // Eventos de mouse para arrastrar el vértice C
+        canvas.addEventListener('mousedown', function(event) {
+            const mousePos = getMousePos(canvas, event);
+            
+            // Verificar si el clic está cerca del punto C
+            if (isPointNear(mousePos, pointC, dragRadius)) {
+                isDragging = true;
+                selectedPoint = 'C';
+            }
+        });
+        
+        canvas.addEventListener('mousemove', function(event) {
+            if (isDragging && selectedPoint === 'C') {
+                const mousePos = getMousePos(canvas, event);
+                
+                // Limitar el movimiento dentro del canvas con un margen
+                const margin = 20;
+                // Limitar también para que el punto C no suba demasiado y sea visible
+                pointC.x = Math.min(Math.max(mousePos.x, margin), canvasWidth - margin);
+                pointC.y = Math.min(Math.max(mousePos.y, pointA.y + 50), canvasHeight - margin);
+                
+                // Actualizar la posición de la línea paralela y las proporciones
+                updateLinePosition();
+            }
+            
+            // Cambiar el cursor al pasar por encima del punto C
+            const mousePos = getMousePos(canvas, event);
+            if (isPointNear(mousePos, pointC, dragRadius)) {
+                canvas.style.cursor = isDragging ? 'grabbing' : 'grab';
+            } else {
+                canvas.style.cursor = 'default';
+            }
+        });
+        
+        canvas.addEventListener('mouseup', function() {
+            isDragging = false;
+            selectedPoint = null;
+        });
+        
+        canvas.addEventListener('mouseleave', function() {
+            isDragging = false;
+            selectedPoint = null;
+        });
+        
+        // Evento para cambiar la posición de la línea
+        linePositionSlider.addEventListener('input', updateLinePosition);
+        
+        // Eventos para el modal de instrucciones
+        instructionsBtn.addEventListener('click', function() {
+            instructionsModal.style.display = 'flex';
+        });
+        
+        closeBtn.addEventListener('click', function() {
+            instructionsModal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', function(event) {
+            if (event.target === instructionsModal) {
+                instructionsModal.style.display = 'none';
+            }
+        });
+        
+        // Inicializar el lienzo al cargar la página
+        window.addEventListener('load', initCanvas);
+        
+        // Redimensionar el lienzo si cambia el tamaño de la ventana
+        window.addEventListener('resize', function() {
+            // Guardar la posición actual del deslizador y del punto C
+            const currentPosition = linePositionSlider.value;
+            const currentPointC = { ...pointC };
+            
+            // Reinicializar el lienzo
+            initCanvas();
+            
+            // Restaurar la posición del deslizador y del punto C
+            linePositionSlider.value = currentPosition;
+            // Ajustar las coordenadas de C proporcionalmente al nuevo tamaño
+            pointC.x = (currentPointC.x / canvasWidth) * canvas.width;
+            pointC.y = (currentPointC.y / canvasHeight) * canvas.height;
+            updateLinePosition();
+        });
+</script></p></body></html>

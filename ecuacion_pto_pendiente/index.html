@@ -1,1 +1,272 @@
+<!DOCTYPE html>
+<html lang="en"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>3-U8-L5: Interactivo - Ecuación punto-pendiente de la línea recta</title> 
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+      }
+      #container {
+          width: 700px; /* Reducido para una vista más estrecha */
+          text-align: center;
+      }
+      input[type="number"] {
+          width: 80px; /* Ancho más reducido para los inputs */
+          padding: 8px; /* Aumento de padding para mayor visibilidad */
+          margin: 5px; /* Espacio entre los inputs */
+      }
+      button {
+          padding: 10px 20px; /* Más grande para mejor interacción */
+          margin-top: 10px; /* Espacio antes del botón */
+      }
+      canvas {
+          background-color: #fff;
+          border: 1px solid #ccc;
+          width: 800px; /* Ajustando el tamaño del canvas */
+          height: 900px;
+      }
+      button {
+    width: 200px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #1887e2; /* Color de fondo del botón */
+    color: white; /* Color del texto */
+    border: 2px solid #1887e2; /* Color del borde */
+    border-radius: 5px; /* Añade bordes redondeados */
+    transition: background-color 0.3s, color 0.3s; /* Suaviza la transición de colores */
+}
 
+button:hover {
+    background-color: #2c1fe1; /* Color de fondo al pasar el ratón */
+    color: #c4da1b; /* Color del texto al pasar el ratón */
+}
+  
+  </style> 
+  <link rel="stylesheet" href="https://s.brightspace.com/lib/fonts/0.6.1/fonts.css"> 
+ </head><body><div id="container">
+<h1><span style="font-family: Lato, sans-serif; font-size: 24px;">Graficar una línea a partir de un punto y la pendiente</span></h1>
+<p><span style="font-family: Lato, sans-serif; font-size: 24px;"> <math title="" xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><semantics><mstyle> 
+        <mstyle mathsize="14px"> 
+         <mo>
+           ( 
+         </mo> 
+         <mi>
+           y 
+         </mi> 
+         <mo>
+           - 
+         </mo> 
+         <msub> 
+          <mi>
+            y 
+          </mi> 
+          <mn>
+            1 
+          </mn> 
+         </msub> 
+         <mo>
+           ) 
+         </mo> 
+         <mo>
+           = 
+         </mo> 
+         <mi>
+           m 
+         </mi> 
+         <mo>
+           ( 
+         </mo> 
+         <mi>
+           x 
+         </mi> 
+         <mo>
+           - 
+         </mo> 
+         <msub> 
+          <mi>
+            x 
+          </mi> 
+          <mn>
+            1 
+          </mn> 
+         </msub> 
+         <mo>
+           ) 
+         </mo> 
+         <mo>
+           &nbsp; 
+         </mo> 
+        </mstyle> 
+       </mstyle><annotation encoding="wiris" data-d2l-attr-encoding="wiris">
+         {"version":"1.1","math":"&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mstyle mathsize="14px"&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/msub&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/msub&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mo&gt;&amp;#xA0;&lt;/mo&gt;&lt;/mstyle&gt;&lt;/math&gt;"} 
+       </annotation></semantics></math></span></p>
+<p><span style="font-family: Lato, sans-serif; font-size: 24px;">Para hacer el gráfico,&nbsp; introduzca el valor de la pendiente ( <math title="" xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><semantics><mstyle> 
+        <mstyle mathsize="14px"> 
+         <mi>
+           m 
+         </mi> 
+        </mstyle> 
+       </mstyle><annotation encoding="wiris" data-d2l-attr-encoding="wiris">
+         {"version":"1.1","math":"&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mstyle mathsize="14px"&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;/mstyle&gt;&lt;/math&gt;"} 
+       </annotation></semantics></math>) y las las coordenadas ( <math title="" xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><semantics><mstyle> 
+        <mstyle mathsize="14px"> 
+         <mi>
+           x 
+         </mi> 
+         <mo>
+           , 
+         </mo> 
+         <mi>
+           y 
+         </mi> 
+        </mstyle> 
+       </mstyle><annotation encoding="wiris" data-d2l-attr-encoding="wiris">
+         {"version":"1.1","math":"&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mstyle mathsize="14px"&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;/mstyle&gt;&lt;/math&gt;"} 
+       </annotation></semantics></math>) de manera tal que</span></p>
+<p><math title="" xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><semantics><mstyle> 
+       <mstyle mathsize="14px"> 
+        <mo>
+          - 
+        </mo> 
+        <mn>
+          10 
+        </mn> 
+        <mo>
+          ≤ 
+        </mo> 
+        <mi>
+          x 
+        </mi> 
+        <mo>
+          , 
+        </mo> 
+        <mi>
+          y 
+        </mi> 
+        <mo>
+          ≤ 
+        </mo> 
+        <mn>
+          10 
+        </mn> 
+       </mstyle> 
+      </mstyle><annotation encoding="wiris" data-d2l-attr-encoding="wiris">
+        {"version":"1.1","math":"&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mstyle mathsize="14px"&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mn&gt;10&lt;/mn&gt;&lt;mo&gt;&amp;#x2264;&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;mo&gt;&amp;#x2264;&lt;/mo&gt;&lt;mn&gt;10&lt;/mn&gt;&lt;/mstyle&gt;&lt;/math&gt;"} 
+      </annotation></semantics></math></p>
+<p><span style="font-family: Lato, sans-serif; font-size: 24px;">después, pulse el botón <strong>Graficar</strong></span></p>
+<span style="font-family: Lato, sans-serif; font-size: 19px;"><label for="x-coordinate"><strong>Coordenada <math title="" xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><semantics><mstyle> 
+         <mstyle mathsize="14px"> 
+          <mi>
+            x 
+          </mi> 
+         </mstyle> 
+        </mstyle><annotation encoding="wiris" data-d2l-attr-encoding="wiris">
+          {"version":"1.1","math":"&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mstyle mathsize="14px"&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;/mstyle&gt;&lt;/math&gt;"} 
+        </annotation></semantics></math>:</strong></label>&nbsp;<input type="number" id="x-coordinate" value="0" step="any"> <label for="y-coordinate"><strong>Coordenada <math title="" xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><semantics><mstyle> 
+         <mstyle mathsize="14px"> 
+          <mi>
+            y 
+          </mi> 
+         </mstyle> 
+        </mstyle><annotation encoding="wiris" data-d2l-attr-encoding="wiris">
+          {"version":"1.1","math":"&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mstyle mathsize="14px"&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;/mstyle&gt;&lt;/math&gt;"} 
+        </annotation></semantics></math></strong>:</label> <input type="number" id="y-coordinate" value="0" step="any"> <br><label for="slope"><strong>Pendiente <math title="" xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><semantics><mstyle> 
+         <mstyle mathsize="14px"> 
+          <mi>
+            m 
+          </mi> 
+         </mstyle> 
+        </mstyle><annotation encoding="wiris" data-d2l-attr-encoding="wiris">
+          {"version":"1.1","math":"&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;mstyle mathsize="14px"&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;/mstyle&gt;&lt;/math&gt;"} 
+        </annotation></semantics></math></strong>:</label> <input type="number" id="slope" value="1" step="any"><br></span> <strong><button style="color: #000000;" onclick="plotLine()">Graficar</button></strong>&nbsp; <canvas id="myChart"></canvas></div>
+<!-- Import Chart.js from CDN -->
+<p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</p>
+<p><script>
+        function plotLine() {
+            const x = parseFloat(document.getElementById('x-coordinate').value);
+            const y = parseFloat(document.getElementById('y-coordinate').value);
+            const m = parseFloat(document.getElementById('slope').value);
+
+            const ctx = document.getElementById('myChart').getContext('2d');
+            if (window.myLineChart instanceof Chart) {
+                window.myLineChart.destroy(); // Destroy the previous chart
+            }
+            window.myLineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Line',
+                        data: [{x: -10, y: m * (-10 - x) + y}, {x: 10, y: m * (10 - x) + y}],
+                        borderColor: 'red',
+                        fill: false,
+                        showLine: true,
+                        pointRadius: 0
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'center',
+                            min: -10,
+                            max: 10,
+                            gridLines: {
+                                drawOnChartArea: true,
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                zeroLineColor: 'black',
+                                zeroLineWidth: 3
+                            },
+                            ticks: {
+                                suggestedMin: -10,
+                                suggestedMax: 10,
+                                callback: function(value) {
+                                    if (value === 0) {
+                                        return '';
+                                    }
+                                    return value;
+                                }
+                            }
+                        },
+                        y: {
+                          position: 'center',
+                            min: -10,
+                            max: 10,
+                            gridLines: {
+                             
+                                drawOnChartArea: true,
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                zeroLineColor: 'black',
+                                zeroLineWidth: 3,
+                                drawTicks: true
+                            },
+                            ticks: {
+                                suggestedMin: -10,
+                                suggestedMax: 10,
+                                callback: function(value) {
+                                    if (value === 0) {
+                                        return '';
+                                    }
+                                    return value;
+                                },
+                                crossAlign: 'center'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    </script></p></body></html>

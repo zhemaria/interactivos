@@ -1,1 +1,592 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ángulos entre paralelas y secante</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 500px;
+        height: 560px; /* Reducido de 700px */
+        margin: 0 auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 5px;
+        box-sizing: border-box;
+        overflow: hidden;
+        position: relative;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 5px;
+      }
+      .header h1 {
+        font-size: 18px; /* Reducido de 20px */
+        margin-bottom: 0; /* Reducido de 5px */
+        color: #333;
+      }
+      .mode-selector {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 5px; /* Reducido de 10px */
+      }
+      .mode-btn {
+        padding: 8px 15px; /* Reducido de 10px 20px */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+      }
+      .mode-btn.active {
+        transform: scale(1.05);
+      }
+      .study-btn {
+        background-color: #4caf50;
+        color: white;
+      }
+      .quiz-btn {
+        background-color: #2196f3;
+        color: white;
+      }
+      .diagram {
+        position: relative;
+        width: 440px;
+        height: 220px; /* Reducido de 240px */
+        margin: 0 auto 10px; /* Reducido de 15px */
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .line {
+        position: absolute;
+        background-color: #8bc34a;
+      }
+      .transversal {
+        position: absolute;
+        height: 3px;
+        background-color: #558b2f;
+        transform-origin: center;
+        transform: rotate(40deg);
+        width: 440px;
+        left: -5px;
+        top: 110px;
+        z-index: 5;
+      }
+      .parallel1 {
+        width: 480px;
+        left: 20px;
+        top: 90px;
+        height: 3px;
+      }
+      .parallel2 {
+        width: 480px;
+        left: 20px;
+        top: 160px;
+        height: 3px;
+      }
+      .angle {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border-color: black;
+        border-style: solid;
+        border-width: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        z-index: 10;
+      }
+      .angle:hover {
+        transform: scale(1.1);
+      }
+      .label {
+        position: absolute;
+        font-size: 20px;
+        font-weight: bold;
+        color: #558b2f;
+      }
+      .r-label {
+        top: 65px;
+        left: 70px;
+      }
+      .s-label {
+        top: 130px;
+        left: 70px;
+      }
+      .t-label {
+        top: 15px;
+        left: 90px;
+      }
+
+      .info-box {
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #e8f5e9;
+        margin: 0 auto;
+        width: 440px;
+        height: 160px; /* Altura fija */
+        overflow-y: auto;
+      }
+      #infoText {
+        margin: 0;
+        font-size: 14px; /* Reducido de 16px */
+        line-height: 1.4; /* Reducido de 1.5 */
+      }
+      .quiz-controls {
+        display: none;
+        text-align: center;
+        width: 440px;
+        margin: 0 auto;
+        height: 520px; /* Altura fija para controles del quiz */
+        overflow-y: auto;
+      }
+      .quiz-question {
+        font-size: 16px; /* Reducido de 18px */
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: 5px; /* Reducido de 10px */
+        margin-bottom: 10px;
+      }
+      .option-btn {
+        padding: 8px; /* Reducido de 10px */
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+        font-size: 14px; /* Añadido para reducir tamaño de texto */
+      }
+      .option-btn:hover {
+        background-color: #f1f1f1;
+      }
+      .option-btn.correct {
+        background-color: #a5d6a7;
+        border-color: #4caf50;
+      }
+      .option-btn.incorrect {
+        background-color: #ef9a9a;
+        border-color: #f44336;
+      }
+      .feedback {
+        margin-top: 5px; /* Reducido de 10px */
+        padding: 8px; /* Reducido de 10px */
+        border-radius: 5px;
+        display: none;
+        font-size: 14px; /* Añadido para reducir tamaño */
+      }
+      .correct-feedback {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+      .incorrect-feedback {
+        background-color: #ffebee;
+        color: #c62828;
+      }
+      .next-btn {
+        padding: 8px 15px; /* Reducido de 10px 20px */
+        background-color: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 5px; /* Reducido de 10px */
+        display: none;
+      }
+      /* Posiciones de los ángulos (mantenemos las mismas que has ajustado) */
+      #angle1 {
+        top: 70px;
+        left: 150px;
+        background-color: #ffccbc;
+      }
+      #angle2 {
+        top: 70px;
+        left: 190px;
+        background-color: #fff9c4;
+      }
+      #angle3 {
+        top: 90px;
+        left: 170px;
+        background-color: #d7ccc8;
+      }
+      #angle4 {
+        top: 90px;
+        left: 210px;
+        background-color: #b3e5fc;
+      }
+      #angle5 {
+        top: 135px;
+        left: 225px;
+        background-color: #ffccbc;
+      }
+      #angle6 {
+        top: 135px;
+        left: 270px;
+        background-color: #fff9c4;
+      }
+      #angle7 {
+        top: 165px;
+        left: 250px;
+        background-color: #d7ccc8;
+      }
+      #angle8 {
+        top: 165px;
+        left: 300px;
+        background-color: #b3e5fc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Ángulos formados por paralelas y una secante</h1>
+      </div>
+
+      <div class="mode-selector">
+        <button class="mode-btn study-btn active" id="studyMode">Modo Estudio</button>
+        <button class="mode-btn quiz-btn" id="quizMode">Modo Comprensión</button>
+      </div>
+
+      <div class="diagram" id="diagram">
+        <div class="line parallel1"></div>
+        <div class="line parallel2"></div>
+        <div class="line transversal"></div>
+
+        <div class="angle" id="angle1">1</div>
+        <div class="angle" id="angle2">2</div>
+        <div class="angle" id="angle3">3</div>
+        <div class="angle" id="angle4">4</div>
+        <div class="angle" id="angle5">5</div>
+        <div class="angle" id="angle6">6</div>
+        <div class="angle" id="angle7">7</div>
+        <div class="angle" id="angle8">8</div>
+
+        <div class="label r-label">r</div>
+        <div class="label s-label">s</div>
+        <div class="label t-label">t</div>
+      </div>
+
+      <div class="info-box">
+        <p id="infoText">Haz clic en cualquier ángulo numerado para ver sus relaciones con los demás ángulos.</p>
+      </div>
+
+      <div class="quiz-controls" id="quizControls">
+        <div class="quiz-question" id="quizQuestion">¿Qué relación existe entre los ángulos 1 y 5?</div>
+        <div class="quiz-options" id="quizOptions">
+          <!-- Options will be dynamically generated -->
+        </div>
+        <div class="feedback correct-feedback" id="correctFeedback">¡Correcto! Has identificado la relación correctamente.</div>
+        <div class="feedback incorrect-feedback" id="incorrectFeedback">Incorrecto. Intenta otra vez.</div>
+        <button class="next-btn" id="nextBtn">Siguiente pregunta</button>
+      </div>
+    </div>
+
+    <script>
+      // Angle relationships
+      const angleRelationships = {
+        1: {
+          correspondientes: [5],
+          alternos: [7, 8],
+          opuestos: [4],
+          adyacentes: [2, 3]
+        },
+        2: {
+          correspondientes: [6],
+          alternos: [7, 8],
+          opuestos: [3],
+          adyacentes: [1, 4]
+        },
+        3: {
+          correspondientes: [7],
+          alternos: [5, 6],
+          opuestos: [2],
+          adyacentes: [1, 4]
+        },
+        4: {
+          correspondientes: [8],
+          alternos: [5, 6],
+          opuestos: [1],
+          adyacentes: [2, 3]
+        },
+        5: {
+          correspondientes: [1],
+          alternos: [3, 4],
+          opuestos: [8],
+          adyacentes: [6, 7]
+        },
+        6: {
+          correspondientes: [2],
+          alternos: [3, 4],
+          opuestos: [7],
+          adyacentes: [5, 8]
+        },
+        7: {
+          correspondientes: [3],
+          alternos: [1, 2],
+          opuestos: [6],
+          adyacentes: [5, 8]
+        },
+        8: {
+          correspondientes: [4],
+          alternos: [1, 2],
+          opuestos: [5],
+          adyacentes: [6, 7]
+        }
+      };
+
+      let activeMode = 'study';
+      let highlightedAngles = [];
+
+      // Helper functions for angle classification
+      function isInternoAlterno(angle1, angle2) {
+        if (
+          (angle1 <= 4 && angle2 > 4 && (angle2 === 7 || angle2 === 6)) ||
+          (angle2 <= 4 && angle1 > 4 && (angle1 === 7 || angle1 === 6)) ||
+          (angle1 > 4 && angle2 <= 4 && (angle2 === 3 || angle2 === 4)) ||
+          (angle2 > 4 && angle1 <= 4 && (angle1 === 3 || angle1 === 4))
+        ) {
+          return true;
+        }
+        return false;
+      }
+
+      function isExternoAlterno(angle1, angle2) {
+        if (
+          (angle1 <= 4 && angle2 > 4 && (angle2 === 5 || angle2 === 8)) ||
+          (angle2 <= 4 && angle1 > 4 && (angle1 === 5 || angle1 === 8)) ||
+          (angle1 > 4 && angle2 <= 4 && (angle2 === 1 || angle2 === 2)) ||
+          (angle2 > 4 && angle1 <= 4 && (angle1 === 1 || angle1 === 2))
+        ) {
+          return true;
+        }
+        return false;
+      }
+
+      // Setup event listeners for angles
+      for (let i = 1; i <= 8; i++) {
+        const angleElement = document.getElementById(`angle${i}`);
+        angleElement.addEventListener('click', function () {
+          if (activeMode === 'study') {
+            handleAngleClick(i);
+          }
+        });
+      }
+
+      function resetAngleStyles() {
+        // Reset all angle styles
+        for (let i = 1; i <= 8; i++) {
+          const angleElement = document.getElementById(`angle${i}`);
+          angleElement.style.borderColor = 'black';
+          angleElement.style.borderWidth = '1px';
+          angleElement.style.transform = 'scale(1)';
+
+          // Reset to original colors
+          if (i === 1 || i === 5) angleElement.style.backgroundColor = '#ffccbc';
+          if (i === 2 || i === 6) angleElement.style.backgroundColor = '#fff9c4';
+          if (i === 3 || i === 7) angleElement.style.backgroundColor = '#d7ccc8';
+          if (i === 4 || i === 8) angleElement.style.backgroundColor = '#b3e5fc';
+        }
+      }
+
+      function highlightAngles(angles, borderColor = '#ff5722', scale = 1.1) {
+        resetAngleStyles();
+
+        angles.forEach(angleId => {
+          const angleElement = document.getElementById(`angle${angleId}`);
+          angleElement.style.borderColor = borderColor;
+          angleElement.style.borderWidth = '2px';
+          angleElement.style.transform = `scale(${scale})`;
+        });
+
+        highlightedAngles = angles;
+      }
+
+      // Handle angle click in Study Mode
+      function handleAngleClick(angleId) {
+        const relationships = angleRelationships[angleId];
+        let infoText = `<strong>Ángulo ${angleId}:</strong><br>`;
+
+        // Corresponding angles
+        infoText += `- Ángulos correspondientes: ${relationships.correspondientes.join(', ')} (Congruentes)<br>`;
+
+        // Alternate angles (internal)
+        const alternosInternos = relationships.alternos.filter(a => isInternoAlterno(angleId, a));
+        if (alternosInternos.length > 0) {
+          infoText += `- Ángulos alternos internos: ${alternosInternos.join(', ')} (Congruentes)<br>`;
+        }
+
+        // Alternate angles (external)
+        const alternosExternos = relationships.alternos.filter(a => isExternoAlterno(angleId, a));
+        if (alternosExternos.length > 0) {
+          infoText += `- Ángulos alternos externos: ${alternosExternos.join(', ')} (Congruentes)<br>`;
+        }
+
+        // Vertically opposite angles
+        infoText += `- Ángulos opuestos por el vértice: ${relationships.opuestos.join(', ')} (Congruentes)<br>`;
+
+        // Adjacent angles
+        infoText += `- Ángulos adyacentes: ${relationships.adyacentes.join(', ')} (Suplementarios - suman 180°)`;
+
+        // Update info text
+        document.getElementById('infoText').innerHTML = infoText;
+
+        // Highlight the selected angle
+        highlightAngles([angleId]);
+      }
+
+      // Mode switching
+      document.getElementById('studyMode').addEventListener('click', function () {
+        activeMode = 'study';
+        updateModeDisplay();
+        resetAngleStyles();
+        document.getElementById('infoText').innerHTML = 'Haz clic en cualquier ángulo numerado para ver sus relaciones con los demás ángulos.';
+      });
+
+      document.getElementById('quizMode').addEventListener('click', function () {
+        activeMode = 'quiz';
+        updateModeDisplay();
+        startQuiz();
+      });
+
+      function updateModeDisplay() {
+        document.getElementById('studyMode').classList.toggle('active', activeMode === 'study');
+        document.getElementById('quizMode').classList.toggle('active', activeMode === 'quiz');
+        document.getElementById('quizControls').style.display = activeMode === 'quiz' ? 'block' : 'none';
+        document.querySelector('.info-box').style.display = activeMode === 'study' ? 'block' : 'none';
+      }
+
+      // Quiz mode functionality
+      let currentQuizAngles = [];
+      let currentQuizRelation = '';
+      let currentAnswer = '';
+
+      function startQuiz() {
+        generateQuizQuestion();
+        document.getElementById('correctFeedback').style.display = 'none';
+        document.getElementById('incorrectFeedback').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+      }
+
+      function generateQuizQuestion() {
+        // Pick two random angles
+        const angle1 = Math.floor(Math.random() * 8) + 1;
+
+        // Pick relationship type
+        const relationTypes = ['correspondientes', 'alternos', 'opuestos', 'adyacentes'];
+        const randomRelationType = relationTypes[Math.floor(Math.random() * relationTypes.length)];
+
+        // Get second angle based on relationship
+        const possibleAngles = angleRelationships[angle1][randomRelationType];
+        const angle2 = possibleAngles[Math.floor(Math.random() * possibleAngles.length)];
+
+        // Set current quiz state
+        currentQuizAngles = [angle1, angle2];
+        currentQuizRelation = randomRelationType;
+
+        // Determine the correct answer
+        if (randomRelationType === 'correspondientes') {
+          currentAnswer = 'Ángulos correspondientes (congruentes)';
+        } else if (randomRelationType === 'opuestos') {
+          currentAnswer = 'Ángulos opuestos por el vértice (congruentes)';
+        } else if (randomRelationType === 'adyacentes') {
+          currentAnswer = 'Ángulos adyacentes (suplementarios - suman 180°)';
+        } else if (isInternoAlterno(angle1, angle2)) {
+          currentAnswer = 'Ángulos alternos internos (congruentes)';
+        } else if (isExternoAlterno(angle1, angle2)) {
+          currentAnswer = 'Ángulos alternos externos (congruentes)';
+        }
+
+        // Display the question
+        document.getElementById('quizQuestion').textContent = `¿Qué relación existe entre el ángulo ${angle1} y el ángulo ${angle2}?`;
+
+        // Generate options
+        const options = [
+          'Ángulos correspondientes (congruentes)',
+          'Ángulos alternos internos (congruentes)',
+          'Ángulos alternos externos (congruentes)',
+          'Ángulos opuestos por el vértice (congruentes)',
+          'Ángulos adyacentes (suplementarios - suman 180°)'
+        ];
+
+        // Shuffle options
+        const shuffledOptions = shuffleArray([...options]);
+
+        // Create option buttons
+        const optionsContainer = document.getElementById('quizOptions');
+        optionsContainer.innerHTML = '';
+
+        shuffledOptions.forEach(option => {
+          const button = document.createElement('button');
+          button.className = 'option-btn';
+          button.textContent = option;
+          button.addEventListener('click', () => checkAnswer(option, button));
+          optionsContainer.appendChild(button);
+        });
+
+        // Highlight quiz angles
+        highlightAngles(currentQuizAngles, '#673ab7', 1.2);
+      }
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+      function checkAnswer(selectedOption, buttonElement) {
+        // Disable all option buttons
+        document.querySelectorAll('.option-btn').forEach(btn => {
+          btn.disabled = true;
+        });
+
+        if (selectedOption === currentAnswer) {
+          // Correct answer
+          buttonElement.classList.add('correct');
+          document.getElementById('correctFeedback').style.display = 'block';
+          document.getElementById('incorrectFeedback').style.display = 'none';
+        } else {
+          // Incorrect answer
+          buttonElement.classList.add('incorrect');
+          document.getElementById('incorrectFeedback').style.display = 'block';
+          document.getElementById('correctFeedback').style.display = 'none';
+
+          // Highlight correct answer
+          document.querySelectorAll('.option-btn').forEach(btn => {
+            if (btn.textContent === currentAnswer) {
+              btn.classList.add('correct');
+            }
+          });
+        }
+
+        // Show next button
+        document.getElementById('nextBtn').style.display = 'block';
+      }
+
+      // Next question button
+      document.getElementById('nextBtn').addEventListener('click', function () {
+        startQuiz();
+      });
+    </script>
+  </body>
+</html>
 

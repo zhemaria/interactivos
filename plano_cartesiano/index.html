@@ -1,1 +1,389 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=yes,minimal-ui" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <title>Coordenadas en el plano</title>
+    <style>
+      body {
+        background-color: #fafafa;
+      }
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 640px;
+        margin: 5px auto;
+        padding: 5px;
+      }
+
+      .mode-selector {
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .coordinate-plane {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        border: 2px solid #16a085;
+        margin: 10px auto;
+        background: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px);
+        background-size: 20px 20px;
+      }
+
+      .axis-label {
+        position: absolute;
+        font-size: 16px;
+        font-weight: bold;
+        color: blue;
+      }
+
+      .x-label {
+        top: 49%;
+        right: 5px;
+        transform: translateY(-70%);
+      }
+
+      .y-label {
+        left: 51%;
+        top: 5px;
+        transform: translateX(-5%);
+      }
+
+      .coordinate-label {
+        position: absolute;
+        font-size: 16px;
+        color: blue;
+      }
+
+      /* Posiciones específicas para las etiquetas de coordenadas */
+      .label-5x {
+        top: 51%;
+        left: 300px; /* 5 unidades a la derecha del centro */
+        transform: translateY(-5%);
+      }
+
+      .label-neg5x {
+        top: 51%;
+        left: 95px; /* 5 unidades a la izquierda del centro */
+        transform: translateY(-5%);
+      }
+
+      .label-5y {
+        left: 51%;
+        top: 90px; /* 5 unidades arriba del centro */
+        transform: translateX(5%);
+      }
+
+      .label-neg5y {
+        left: 51%;
+        top: 290px; /* 5 unidades abajo del centro */
+        transform: translateX(-5%);
+      }
+
+      .axis {
+        position: absolute;
+        background-color: #333;
+      }
+
+      .x-axis {
+        width: 100%;
+        height: 2px;
+        top: 50%;
+      }
+
+      .y-axis {
+        width: 2px;
+        height: 100%;
+        left: 50%;
+      }
+
+      .point {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background-color: red;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .point-label {
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 2px 5px;
+        border-radius: 3px;
+        transform: translate(10px, -50%);
+        font-size: 12px;
+        border: 1px solid #ccc;
+      }
+
+      .coordinates {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .task {
+        text-align: center;
+        margin: 10px 0;
+        font-size: 1em;
+        color: #333;
+      }
+
+      button {
+        padding: 8px 10px;
+        margin: 5px;
+        cursor: pointer;
+        background-color: #98dacd;
+        color: #16a085;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        border-radius: 4px;
+      }
+
+      button.active {
+        background-color: #16a085;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+        color: white;
+        font-weight: bold;
+      }
+
+      .feedback {
+        text-align: center;
+        margin-top: 5px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .input-form {
+        text-align: center;
+        margin: 10px 0;
+        display: none;
+      }
+
+      .input-form input {
+        width: 50px;
+        margin: 0 5px;
+        padding: 5px;
+        text-align: center;
+      }
+
+      .input-form button {
+        margin-left: 10px;
+      }
+
+      .new-point-btn {
+        display: none;
+        margin: 5px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 style="text-align: center">Coordenadas en el Plano Cartesiano</h1>
+      <div class="mode-selector">
+        <button onclick="setMode('free')">Modo Libre</button>
+        <button onclick="setMode('practice')">Modo Práctica</button>
+        <button onclick="setMode('guess')">Localizar Coordenadas</button>
+      </div>
+
+      <div class="task" id="task"></div>
+
+      <div class="coordinate-plane" id="plane">
+        <div class="axis x-axis"></div>
+        <div class="axis y-axis"></div>
+        <!-- Etiquetas de los ejes -->
+        <div class="axis-label x-label">X</div>
+        <div class="axis-label y-label">Y</div>
+        <!-- Etiquetas de coordenadas de referencia -->
+        <div class="coordinate-label label-5x">5</div>
+        <div class="coordinate-label label-neg5x">-5</div>
+        <div class="coordinate-label label-5y">5</div>
+        <div class="coordinate-label label-neg5y">-5</div>
+      </div>
+
+      <div class="coordinates" id="coordinates">
+        Coordenadas del último punto:
+        <span id="coord-display">Ninguno</span>
+      </div>
+
+      <div class="input-form" id="input-form">
+        Coordenadas: (
+        <input type="number" id="x-input" placeholder="x" />
+        ,
+        <input type="number" id="y-input" placeholder="y" />
+        )
+        <button onclick="checkCoordinates()">Verificar</button>
+      </div>
+
+      <button class="new-point-btn" id="new-point-btn" onclick="generatePointToGuess()">Nuevo Punto</button>
+
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+      let currentMode = 'free';
+      let targetPoint = null;
+      const plane = document.getElementById('plane');
+      const coordDisplay = document.getElementById('coord-display');
+      const taskDisplay = document.getElementById('task');
+      const feedbackDisplay = document.getElementById('feedback');
+      const inputForm = document.getElementById('input-form');
+      const newPointBtn = document.getElementById('new-point-btn');
+      const planeSize = 400;
+      const gridSize = 20;
+
+      // Modificación de la función setMode
+      function setMode(mode) {
+        currentMode = mode;
+        clearPoints();
+        clearLabels();
+        feedbackDisplay.textContent = '';
+        inputForm.style.display = 'none';
+        newPointBtn.style.display = 'none';
+
+        // Añadir esta línea para limpiar las coordenadas mostradas
+        coordDisplay.textContent = '()';
+
+        // Remover la clase active de todos los botones
+        document.querySelectorAll('.mode-selector button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+
+        // Agregar la clase active al botón del modo actual
+        document.querySelector(`.mode-selector button[onclick="setMode('${mode}')"]`).classList.add('active');
+
+        switch (mode) {
+          case 'practice':
+            generateNewTask();
+            break;
+          case 'free':
+            taskDisplay.textContent = 'Haz clic en cualquier punto del plano y analiza sus coordenadas que aparecen debajo. ';
+            break;
+          case 'guess':
+            inputForm.style.display = 'block';
+            newPointBtn.style.display = 'block';
+            generatePointToGuess();
+            break;
+        }
+      }
+
+      function generateNewTask() {
+        const x = Math.floor(Math.random() * 19) - 9;
+        const y = Math.floor(Math.random() * 19) - 9;
+        targetPoint = {x, y};
+        taskDisplay.textContent = `Ubica el punto (${x}, ${y})`;
+      }
+
+      function clearLabels() {
+        const labels = document.getElementsByClassName('point-label');
+        while (labels.length > 0) {
+          labels[0].parentNode.removeChild(labels[0]);
+        }
+      }
+
+      function generatePointToGuess() {
+        clearPoints();
+        clearLabels();
+        document.getElementById('x-input').value = '';
+        document.getElementById('y-input').value = '';
+        feedbackDisplay.textContent = '';
+
+        const x = Math.floor(Math.random() * 19) - 9;
+        const y = Math.floor(Math.random() * 19) - 9;
+        targetPoint = {x, y};
+        taskDisplay.textContent = 'Localiza las coordenadas del punto rojo';
+        createPoint(coordToPixel(x), coordToPixel(-y));
+      }
+
+      function createLabel(x, y, text) {
+        const label = document.createElement('div');
+        label.className = 'point-label';
+        label.textContent = text;
+        label.style.left = x + 'px';
+        label.style.top = y + 'px';
+        plane.appendChild(label);
+      }
+
+      function checkCoordinates() {
+        const xInput = parseInt(document.getElementById('x-input').value);
+        const yInput = parseInt(document.getElementById('y-input').value);
+
+        if (isNaN(xInput) || isNaN(yInput)) {
+          feedbackDisplay.textContent = 'Por favor, ingresa números válidos';
+          return;
+        }
+
+        if (xInput === targetPoint.x && yInput === targetPoint.y) {
+          feedbackDisplay.textContent = '¡Correcto! 🎉';
+          createLabel(coordToPixel(targetPoint.x), coordToPixel(-targetPoint.y), `(${targetPoint.x}, ${targetPoint.y})`);
+        } else {
+          feedbackDisplay.textContent = 'Intenta de nuevo';
+        }
+      }
+
+      function clearPoints() {
+        const points = document.getElementsByClassName('point');
+        while (points.length > 0) {
+          points[0].parentNode.removeChild(points[0]);
+        }
+      }
+
+      function createPoint(x, y) {
+        const point = document.createElement('div');
+        point.className = 'point';
+        // Ajustar la posición para que coincida con las intersecciones
+        point.style.left = Math.round(x / gridSize) * gridSize + 'px';
+        point.style.top = Math.round(y / gridSize) * gridSize + 'px';
+        plane.appendChild(point);
+      }
+
+      function pixelToCoord(pixel) {
+        const coord = Math.round((pixel - planeSize / 2) / gridSize);
+        return coord;
+      }
+
+      function coordToPixel(coord) {
+        return coord * gridSize + planeSize / 2;
+      }
+
+      plane.addEventListener('click', function (e) {
+        if (currentMode === 'guess') return; // Deshabilitar clics en modo adivinar
+
+        const rect = plane.getBoundingClientRect();
+        const rawX = e.clientX - rect.left;
+        const rawY = e.clientY - rect.top;
+
+        // Ajustar a la cuadrícula más cercana
+        const x = Math.round(rawX / gridSize) * gridSize;
+        const y = Math.round(rawY / gridSize) * gridSize;
+
+        const coordX = pixelToCoord(x);
+        const coordY = -pixelToCoord(y); // Invertir Y para sistema de coordenadas tradicional
+
+        if (currentMode === 'free') {
+          createPoint(x, y);
+          coordDisplay.textContent = `(${coordX}, ${coordY})`;
+        } else if (currentMode === 'practice') {
+          createPoint(x, y);
+          coordDisplay.textContent = `(${coordX}, ${coordY})`;
+
+          if (coordX === targetPoint.x && coordY === targetPoint.y) {
+            feedbackDisplay.textContent = '¡Correcto! 🎉';
+            setTimeout(generateNewTask, 1500);
+          } else {
+            feedbackDisplay.textContent = 'Intenta de nuevo';
+          }
+        }
+      });
+
+      // Iniciar en modo libre y activar el botón correspondiente
+      setMode('free');
+      document.querySelector(`.mode-selector button[onclick="setMode('free')"]`).classList.add('active');
+    </script>
+  </body>
+</html>
 

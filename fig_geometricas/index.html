@@ -1,1 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=yes,minimal-ui"/>
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <title>Figuras Geométricas</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        width: 500px;
+        height: 700px;
+        margin: 0 auto;
+        overflow: hidden;
+        background-color: rgba(240, 244, 244, 0.2);
+      }
+
+      .container {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      h1 {
+        color: #2e827c;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .figure-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        padding: 10px;
+        background-color: #ecf1ec;
+        border-radius: 4px;
+      }
+
+      .figure-btn {
+        padding: 5px 12px;
+        border: 1px solid #98dacd;
+        background-color: #2e827c;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        min-width: 100px;
+        transition: all 0.3s ease;
+      }
+
+      .figure-btn:hover {
+        background: #98dacd;
+      }
+
+      .figure-btn.active {
+        background: #2e827c;
+        color: white;
+      }
+
+      .canvas-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+
+        border-radius: 4px;
+        padding: 10px;
+      }
+
+      canvas {
+        border: 2px solid #2e827c;
+        border-radius: 4px;
+        background: #f0f4f4;
+      }
+
+      .description {
+        text-align: center;
+        color: #2e827c;
+        font-size: 16px;
+        padding: 15px;
+        background: white;
+        border-radius: 4px;
+        min-height: 60px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-style: solid;
+        border-color: #2e827c;
+      }
+
+      .new-figure {
+        width: 200px;
+        margin: 0 auto;
+        background-color: #2e827c;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+      }
+
+      .new-figure:hover {
+        background-color: #236b66;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>FIGURAS GEOMÉTRICAS</h1>
+
+      <div class="figure-selector">
+        <button class="figure-btn" data-figure="triangle">Triángulo</button>
+        <button class="figure-btn" data-figure="square">Cuadrado</button>
+        <button class="figure-btn" data-figure="rectangle">Rectángulo</button>
+        <button class="figure-btn" data-figure="parallelogram">
+          Paralelogramo
+        </button>
+        <button class="figure-btn" data-figure="trapezoid">Trapezoide</button>
+        <button class="figure-btn" data-figure="pentagon">Pentágono</button>
+        <button class="figure-btn" data-figure="hexagon">Hexágono</button>
+        <button class="figure-btn" data-figure="heptagon">Heptágono</button>
+        <button class="figure-btn" data-figure="octagon">Octágono</button>
+        <button class="figure-btn" data-figure="nonagon">Nonágono</button>
+        <button class="figure-btn" data-figure="decagon">Decágono</button>
+        <button class="figure-btn" data-figure="circle">Círculo</button>
+      </div>
+
+      <div class="canvas-container">
+        <canvas id="shapeCanvas" width="460" height="300"></canvas>
+      </div>
+
+      <div class="description" id="figureDescription">
+        Seleccione una figura para ver su descripción
+      </div>
+
+      <button class="new-figure" id="newFigure">ESCOJA OTRA FIGURA</button>
+    </div>
+
+    <script>
+      class GeometricFiguresApp {
+        constructor() {
+          this.canvas = document.getElementById("shapeCanvas");
+          this.ctx = this.canvas.getContext("2d");
+          this.descriptionContainer =
+            document.getElementById("figureDescription");
+          this.currentFigure = null;
+
+          this.descriptions = {
+            triangle: "El triángulo es un polígono de 3 lados y 3 ángulos.",
+            square:
+              "El cuadrado es un polígono regular de 4 lados iguales y 4 ángulos rectos.",
+            rectangle:
+              "El rectángulo es un polígono de 4 lados, con lados opuestos iguales y 4 ángulos rectos.",
+            parallelogram:
+              "El paralelogramo es un polígono de 4 lados, con lados opuestos paralelos e iguales.",
+            trapezoid:
+              "El trapezoide es un polígono de 4 lados, con dos lados paralelos de diferente longitud.",
+            pentagon:
+              "El pentágono es un polígono regular de 5 lados iguales y 5 ángulos iguales.",
+            hexagon:
+              "El hexágono es un polígono regular de 6 lados iguales y 6 ángulos iguales.",
+            heptagon:
+              "El heptágono es un polígono regular de 7 lados iguales y 7 ángulos iguales.",
+            octagon:
+              "El octágono es un polígono regular de 8 lados iguales y 8 ángulos iguales.",
+            nonagon:
+              "El nonágono es un polígono regular de 9 lados iguales y 9 ángulos iguales.",
+            decagon:
+              "El decágono es un polígono regular de 10 lados iguales y 10 ángulos iguales.",
+            circle:
+              "El círculo es una figura geométrica sin lados rectos, definida por una línea curva cerrada.",
+          };
+
+          this.setupEventListeners();
+        }
+
+        setupEventListeners() {
+          document.querySelectorAll(".figure-btn").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              this.selectFigure(e.target.dataset.figure);
+              document
+                .querySelectorAll(".figure-btn")
+                .forEach((b) => b.classList.remove("active"));
+              e.target.classList.add("active");
+            });
+          });
+
+          document
+            .getElementById("newFigure")
+            .addEventListener("click", () => this.resetSelection());
+        }
+
+        selectFigure(figure) {
+          this.currentFigure = figure;
+          this.drawShape();
+          this.updateDescription();
+        }
+
+        resetSelection() {
+          this.currentFigure = null;
+          this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          this.descriptionContainer.textContent =
+            "Seleccione una figura para ver su descripción";
+          document
+            .querySelectorAll(".figure-btn")
+            .forEach((btn) => btn.classList.remove("active"));
+        }
+
+        drawRegularPolygon(
+          centerX,
+          centerY,
+          radius,
+          sides,
+          startAngle = -Math.PI / 2
+        ) {
+          this.ctx.beginPath();
+          for (let i = 0; i < sides; i++) {
+            const angle = startAngle + (i * 2 * Math.PI) / sides;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            if (i === 0) {
+              this.ctx.moveTo(x, y);
+            } else {
+              this.ctx.lineTo(x, y);
+            }
+          }
+          this.ctx.closePath();
+        }
+
+        drawShape() {
+          // Limpiamos completamente el canvas
+          this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+          if (!this.currentFigure) return;
+
+          const centerX = this.canvas.width / 2;
+          const centerY = this.canvas.height / 2;
+          const scale = 80; // Reducimos un poco el tamaño para mejor visualización
+
+          this.ctx.strokeStyle = "#FFA648";
+          this.ctx.fillStyle = "#FFCE55";
+          this.ctx.lineWidth = 2;
+
+          switch (this.currentFigure) {
+            case "triangle":
+              this.drawRegularPolygon(centerX, centerY, scale, 3);
+              break;
+
+            case "square":
+              this.ctx.beginPath();
+              this.ctx.rect(
+                centerX - scale / 2,
+                centerY - scale / 2,
+                scale,
+                scale
+              );
+              break;
+
+            case "rectangle":
+              this.ctx.beginPath();
+              this.ctx.rect(
+                centerX - scale * 0.7,
+                centerY - scale / 2,
+                scale * 1.4,
+                scale
+              );
+              break;
+
+            case "parallelogram":
+              this.ctx.beginPath();
+              const skew = scale * 0.5;
+              this.ctx.moveTo(centerX - scale / 2 + skew, centerY - scale / 2);
+              this.ctx.lineTo(centerX + scale / 2 + skew, centerY - scale / 2);
+              this.ctx.lineTo(centerX + scale / 2 - skew, centerY + scale / 2);
+              this.ctx.lineTo(centerX - scale / 2 - skew, centerY + scale / 2);
+              this.ctx.closePath();
+              break;
+
+            case "trapezoid":
+              this.ctx.beginPath();
+              const topWidth = scale * 0.6;
+              const bottomWidth = scale * 1.2;
+              this.ctx.moveTo(centerX - bottomWidth / 2, centerY + scale / 2);
+              this.ctx.lineTo(centerX + bottomWidth / 2, centerY + scale / 2);
+              this.ctx.lineTo(centerX + topWidth / 2, centerY - scale / 2);
+              this.ctx.lineTo(centerX - topWidth / 2, centerY - scale / 2);
+              this.ctx.closePath();
+              break;
+
+            case "pentagon":
+              this.drawRegularPolygon(centerX, centerY, scale, 5);
+              break;
+
+            case "hexagon":
+              this.drawRegularPolygon(centerX, centerY, scale, 6);
+              break;
+
+            case "heptagon":
+              this.drawRegularPolygon(centerX, centerY, scale, 7);
+              break;
+
+            case "octagon":
+              this.drawRegularPolygon(centerX, centerY, scale, 8);
+              break;
+
+            case "nonagon":
+              this.drawRegularPolygon(centerX, centerY, scale, 9);
+              break;
+
+            case "decagon":
+              this.drawRegularPolygon(centerX, centerY, scale, 10);
+              break;
+
+            case "circle":
+              this.ctx.beginPath();
+              this.ctx.arc(centerX, centerY, scale, 0, Math.PI * 2);
+              break;
+          }
+
+          this.ctx.fill();
+          this.ctx.stroke();
+        }
+
+        updateDescription() {
+          this.descriptionContainer.textContent =
+            this.descriptions[this.currentFigure] || "";
+        }
+      }
+
+      // Initialize the application
+      document.addEventListener("DOMContentLoaded", () => {
+        new GeometricFiguresApp();
+      });
+    </script>
+  </body>
+</html>
 

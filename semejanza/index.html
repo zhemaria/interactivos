@@ -1,1 +1,768 @@
+<!DOCTYPE html>
+<html lang="es"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>3-U10-Lección 8: INTERACTIVO - Igualdad y semejanza de triánguos</title> 
+  <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
 
+      body {
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        background-color: #fafafa;
+      }
+
+      .container {
+        max-width: 600px;
+        width: 100%;
+        max-height: 800px;
+        overflow-y: auto;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .main-content {
+        background-color: #fafafa;
+        padding: 1rem;
+        border-radius: 0.5rem;
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .button {
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        border: none;
+        font-weight: bold;
+      }
+
+      .button.active {
+        background-color: #3b82f6;
+        color: white;
+      }
+
+      .button.inactive {
+        background-color: #d1d5db;
+        color: #000;
+      }
+
+      .instructions-button {
+        background-color: white;
+        color: green;
+        border: 1px solid #ced4da;
+      }
+
+      .slider-container {
+        margin-bottom: 1rem;
+      }
+
+      .slider-container label {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .slider {
+        width: 100%;
+      }
+
+      .result-container {
+        background-color: #fafafa;
+        padding: 0.4rem;
+        border-radius: 0.25rem;
+        width: 100%;
+        text-align: left;
+      }
+
+      .result {
+        font-size: 1.125rem;
+        font-weight: 600;
+      }
+
+      .canvas-container {
+        background-color: #fafafa;
+        padding: 1rem;
+        border-radius: 0.25rem;
+        margin-bottom: 1rem;
+      }
+
+      svg {
+        border: 1px solid #d1d5db;
+        background: white;
+        margin-bottom: 0;
+        touch-action: none;
+        max-width: 500px;
+        max-height: 500px;
+      }
+
+      .info-panel {
+        background-color: #fafafa;
+        padding: 10px;
+        border-style: solid;
+        border-color: #9abae1;
+        border-radius: 4px;
+        width: 100%;
+        margin-top: 0;
+      }
+
+      .triangle-info {
+        width: 100%;
+      }
+
+      .blue-triangle {
+        color: #3498db;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .red-triangle {
+        color: #e74c3c;
+        font-weight: bold;
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 5px;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background-color: #fefce8;
+        margin: auto;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #fef08a;
+        width: 80%;
+        max-width: 500px;
+        max-height: 65%;
+        overflow-y: auto;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+      }
+
+      .instructions {
+        background-color: #fefce8;
+      }
+
+      .instructions h3 {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .instructions ul {
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .instructions p {
+        margin-bottom: 0.5rem;
+      }
+
+      .concepts {
+        margin-top: 1rem;
+      }
+
+      .concepts p {
+        margin-bottom: 0.5rem;
+      }
+      
+      /* Ajuste para los puntos de las listas */
+      ul[type="circle"] {
+        padding-left: 15px; /* Reducir el padding izquierdo */
+        list-style-position: inside; /* Colocar los marcadores dentro del contenido */
+        text-align: left;
+      }
+      
+      ul[type="circle"] li {
+        margin-bottom: 2px; /* Reducir el espacio entre elementos */
+      }
+      
+      /* Estilo para la tabla de triángulos */
+      .triangle-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      
+      .triangle-table th {
+        text-align: center;
+        padding-bottom: 5px;
+      }
+      
+      .triangle-table td {
+        vertical-align: top;
+        padding: 0 5px;
+      }
+    </style> 
+ </head><body><div class="container">
+<h1 id="titulo">Interactivo de Triángulos: Igualdad</h1>
+<div class="main-content">
+<div class="button-group"><button id="btnInstrucciones" class="button instructions-button"> Instrucciones </button> <button id="btnIgualdad" class="button active" style="color: #000000;">Igualdad</button> <button id="btnSemejanza" class="button inactive">Semejanza</button></div>
+<div class="result-container">
+<h2 id="resultado" class="result">Los triángulos son iguales</h2>
+</div>
+<div class="canvas-container"><svg xmlns="http://www.w3.org/2000/svg" id="canvas" width="500" height="400"></svg></div>
+<div id="sliderContainer" class="slider-container" style="display: none;"><label>Factor de escala: <span id="factorEscalaValue">1.0</span></label> <input type="range" id="factorEscala" class="slider" min="0.5" max="2" step="0.1" value="1"></div>
+<div class="info-panel">
+<div class="triangle-info">
+<table class="triangle-table">
+<tbody>
+<tr>
+<th width="50%"><span class="blue-triangle" style="color: #000000;">Triángulo Azul</span></th>
+<th width="50%"><span class="red-triangle" style="color: #000000;">Triángulo Rojo</span></th>
+</tr>
+<tr>
+<td>
+<ul type="circle" id="medidas1"></ul>
+</td>
+<td>
+<ul type="circle" id="medidas2"></ul>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="instruccionesModal" class="modal">
+<div class="modal-content"><span class="close">×</span>
+<div class="instructions">
+<h3>Instrucciones:</h3>
+<ul>
+<li>Arrastra los puntos (círculos blancos) para cambiar la forma de los triángulos</li>
+<li>Cambia entre el modo de igualdad y semejanza con los botones superiores</li>
+<li>En modo de semejanza, ajusta el factor de escala con el deslizador</li>
+<li>Observa cómo cambian las medidas de los lados y la relación entre los triángulos</li>
+</ul>
+<div class="concepts">
+<p><strong>Conceptos:</strong></p>
+<p><strong>Igualdad:</strong> Dos triángulos son iguales cuando tienen exactamente la misma forma y tamaño (todos sus lados y ángulos son iguales).</p>
+<p><strong>Semejanza:</strong> Dos triángulos son semejantes cuando tienen la misma forma pero pueden tener diferente tamaño (sus ángulos son iguales y sus lados son proporcionales).</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p><script>
+      // Variables globales
+      let modo = "igualdad";
+      let triangulo1 = {
+        puntos: [
+          { x: 150, y: 300 },
+          { x: 250, y: 100 },
+          { x: 350, y: 300 },
+        ],
+        color: "#3498db",
+      };
+
+      let triangulo2 = {
+        puntos: [
+          { x: 150, y: 300 },
+          { x: 250, y: 100 },
+          { x: 350, y: 300 },
+        ],
+        color: "#e74c3c",
+        escala: 1,
+      };
+
+      let puntoActivo = null;
+      let trianguloActivo = null;
+      let factorEscala = 1;
+      let svgElement;
+      let modal;
+
+      // Triángulo inicial como en la imagen
+      function inicializarTrianguloIsosceles() {
+        // Establecer un triángulo isósceles parecido al de la imagen
+        triangulo1.puntos = [
+          { x: 100, y: 300 }, // Punto izquierdo
+          { x: 250, y: 100 }, // Punto superior
+          { x: 400, y: 300 }, // Punto derecho
+        ];
+
+        triangulo2.puntos = JSON.parse(JSON.stringify(triangulo1.puntos));
+      }
+
+      // Inicialización cuando el DOM está listo
+      document.addEventListener("DOMContentLoaded", function () {
+        svgElement = document.getElementById("canvas");
+        modal = document.getElementById("instruccionesModal");
+
+        // Inicializar el triángulo para que coincida con la imagen de referencia
+        inicializarTrianguloIsosceles();
+
+        // Configurar botones de modo
+        document
+          .getElementById("btnIgualdad")
+          .addEventListener("click", () => cambiarModo("igualdad"));
+        document
+          .getElementById("btnSemejanza")
+          .addEventListener("click", () => cambiarModo("semejanza"));
+
+        // Configurar slider de escala
+        document
+          .getElementById("factorEscala")
+          .addEventListener("input", cambiarEscala);
+
+        // Configurar modal de instrucciones
+        document
+          .getElementById("btnInstrucciones")
+          .addEventListener("click", abrirModal);
+        document.querySelector(".close").addEventListener("click", cerrarModal);
+
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener("click", function (event) {
+          if (event.target == modal) {
+            cerrarModal();
+          }
+        });
+
+        // Dibujar triángulos iniciales
+        dibujarTriangulos();
+        actualizarMedidas();
+        verificarIgualdadSemejanza();
+
+        // Configurar eventos de arrastre globales
+        document.addEventListener("mousemove", moverPunto);
+        document.addEventListener("touchmove", moverPuntoTouch, {
+          passive: false,
+        });
+        document.addEventListener("mouseup", finalizarArrastre);
+        document.addEventListener("touchend", finalizarArrastre);
+      });
+
+      function abrirModal() {
+        modal.style.display = "flex";
+      }
+
+      function cerrarModal() {
+        modal.style.display = "none";
+      }
+
+      // Función para dibujar los triángulos
+      function dibujarTriangulos() {
+        // Limpiar SVG
+        svgElement.innerHTML = "";
+
+        // Ajustar las posiciones para que los triángulos queden centrados en el canvas más pequeño
+        const centrarTriangulos = () => {
+          const centroOriginalX = 250;
+          const centroOriginalY = 200;
+
+          // Calcular el centro actual de los triángulos
+          const centroPuntosT1 = calcularCentro(triangulo1.puntos);
+
+          // Calcular el desplazamiento necesario
+          const offsetX = centroOriginalX - centroPuntosT1.x;
+          const offsetY = centroOriginalY - centroPuntosT1.y;
+
+          // Aplicar el desplazamiento a ambos triángulos
+          triangulo1.puntos = triangulo1.puntos.map((p) => ({
+            x: p.x + offsetX,
+            y: p.y + offsetY,
+          }));
+
+          triangulo2.puntos = triangulo2.puntos.map((p) => ({
+            x: p.x + offsetX,
+            y: p.y + offsetY,
+          }));
+        };
+
+        // Solo centrar si es necesario (primera vez)
+        if (triangulo1.puntos[0].x < 100 || triangulo1.puntos[0].x > 400) {
+          centrarTriangulos();
+        }
+
+        if (modo === "igualdad") {
+          // En modo igualdad, mostrar ambos triángulos con un desplazamiento para distinguirlos
+          
+          // Offset para separar visualmente los triángulos
+          const offsetX = -25; // Desplazamiento horizontal
+          const offsetY = -20; // Desplazamiento vertical
+          
+          // Dibujar el triángulo azul con offset hacia arriba-izquierda
+          const puntosAzul = triangulo1.puntos.map(p => ({
+            x: p.x + offsetX,
+            y: p.y + offsetY
+          }));
+          
+          dibujarTriangulo(
+            {
+              puntos: puntosAzul,
+              color: "#3498db",
+            },
+            1
+          );
+          
+          // Dibujar el triángulo rojo en la posición original
+          dibujarTriangulo(
+            {
+              puntos: triangulo2.puntos,
+              color: "#e74c3c",
+            },
+            2
+          );
+        } else {
+          // En modo semejanza, mostrar ambos triángulos
+          dibujarTriangulo(
+            {
+              puntos: triangulo1.puntos,
+              color: "#3498db",
+            },
+            1
+          );
+          dibujarTriangulo(
+            {
+              puntos: triangulo2.puntos,
+              color: "#e74c3c",
+            },
+            2
+          );
+        }
+      }
+
+      // Función para dibujar un triángulo
+      function dibujarTriangulo(triangulo, id) {
+        const { puntos, color } = triangulo;
+        const lados = calcularLados(puntos);
+
+        // Crear el polígono
+        const polygon = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "polygon"
+        );
+        const pointsStr = puntos.map((p) => `${p.x},${p.y}`).join(" ");
+        polygon.setAttribute("points", pointsStr);
+        polygon.setAttribute("fill", color);
+        polygon.setAttribute("fill-opacity", "0.3");
+        polygon.setAttribute("stroke", color);
+        polygon.setAttribute("stroke-width", "2");
+        svgElement.appendChild(polygon);
+
+        // Crear los puntos de control
+        puntos.forEach((p, i) => {
+          const circle = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "circle"
+          );
+          circle.setAttribute("cx", p.x);
+          circle.setAttribute("cy", p.y);
+          circle.setAttribute("r", "8");
+          circle.setAttribute("fill", "white");
+          circle.setAttribute("stroke", color);
+          circle.setAttribute("stroke-width", "2");
+          circle.style.cursor = "pointer";
+
+          // Añadir eventos de arrastre
+          circle.addEventListener("mousedown", (e) =>
+            iniciarArrastre(id, i, e)
+          );
+          circle.addEventListener("touchstart", (e) =>
+            iniciarArrastreTouch(id, i, e)
+          );
+
+          svgElement.appendChild(circle);
+        });
+
+        // Añadir etiquetas con longitudes de los lados
+        puntos.forEach((p, i) => {
+          const nextIndex = (i + 1) % puntos.length;
+          const midX = (p.x + puntos[nextIndex].x) / 2;
+          const midY = (p.y + puntos[nextIndex].y) / 2;
+          const ladoLength = lados[i].toFixed(1);
+
+          const text = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text"
+          );
+          text.setAttribute("x", midX);
+          text.setAttribute("y", midY);
+          text.setAttribute("fill", color);
+          text.setAttribute("font-weight", "bold");
+          text.setAttribute("text-anchor", "middle");
+          text.setAttribute("dy", "-5");
+          text.textContent = ladoLength;
+
+          svgElement.appendChild(text);
+        });
+      }
+
+      // Funciones para manejar el arrastre
+      function iniciarArrastre(trianguloId, puntoIndex, e) {
+        e.preventDefault();
+        puntoActivo = puntoIndex;
+        trianguloActivo = trianguloId;
+      }
+
+      function iniciarArrastreTouch(trianguloId, puntoIndex, e) {
+        e.preventDefault();
+        puntoActivo = puntoIndex;
+        trianguloActivo = trianguloId;
+      }
+
+      function moverPunto(e) {
+        if (puntoActivo === null) return;
+
+        const svgRect = svgElement.getBoundingClientRect();
+        let x = e.clientX - svgRect.left;
+        let y = e.clientY - svgRect.top;
+
+        actualizarPosicionPunto(x, y);
+      }
+
+      function moverPuntoTouch(e) {
+        if (puntoActivo === null) return;
+        e.preventDefault();
+
+        const touch = e.touches[0];
+        const svgRect = svgElement.getBoundingClientRect();
+        let x = touch.clientX - svgRect.left;
+        let y = touch.clientY - svgRect.top;
+
+        actualizarPosicionPunto(x, y);
+      }
+
+      function actualizarPosicionPunto(x, y) {
+        // Limitar coordenadas dentro del SVG
+        x = Math.max(0, Math.min(x, 500));
+        y = Math.max(0, Math.min(y, 400));
+
+        // Actualizar el punto del triángulo actual
+        if (trianguloActivo === 1) {
+          // Estamos moviendo un punto del triángulo azul
+          
+          // En modo igualdad, debemos ajustar por el offset del triángulo azul
+          if (modo === "igualdad") {
+            // Revertir el offset para calcular la posición real
+            const offsetX = -25;
+            const offsetY = -20;
+            
+            // Ajustamos la posición para mantener la alineación visual
+            triangulo1.puntos[puntoActivo] = { 
+              x: x - offsetX, 
+              y: y - offsetY 
+            };
+            
+            // Actualizamos el triángulo rojo para mantener la igualdad
+            triangulo2.puntos[puntoActivo] = { 
+              x: x - offsetX, 
+              y: y - offsetY 
+            };
+          } else {
+            // En modo semejanza, actualizamos normalmente
+            triangulo1.puntos[puntoActivo] = { x, y };
+            
+            // Mantener proporciones para el triángulo rojo
+            actualizarTrianguloSemejante();
+          }
+        } else if (trianguloActivo === 2) {
+          // Estamos moviendo un punto del triángulo rojo
+          triangulo2.puntos[puntoActivo] = { x, y };
+
+          // Si estamos en modo igualdad, actualizar también el primer triángulo
+          if (modo === "igualdad") {
+            triangulo1.puntos[puntoActivo] = { x, y };
+          }
+        }
+
+        dibujarTriangulos();
+        actualizarMedidas();
+        verificarIgualdadSemejanza();
+      }
+
+      function finalizarArrastre() {
+        puntoActivo = null;
+        trianguloActivo = null;
+      }
+
+      // Función para cambiar el modo
+      function cambiarModo(nuevoModo) {
+        modo = nuevoModo;
+
+        // Actualizar UI
+        document.getElementById("titulo").textContent =
+          "Interactivo de Triángulos: " +
+          (modo === "igualdad" ? "Igualdad" : "Semejanza");
+
+        const btnIgualdad = document.getElementById("btnIgualdad");
+        const btnSemejanza = document.getElementById("btnSemejanza");
+
+        if (modo === "igualdad") {
+          btnIgualdad.className = "button active";
+          btnSemejanza.className = "button inactive";
+          document.getElementById("sliderContainer").style.display = "none";
+
+          // En modo igualdad, ambos triángulos son idénticos
+          triangulo2.puntos = JSON.parse(JSON.stringify(triangulo1.puntos));
+          factorEscala = 1;
+          document.getElementById("factorEscala").value = 1;
+          document.getElementById("factorEscalaValue").textContent = "1.0";
+
+          // Actualizar texto resultado
+          document.getElementById("resultado").textContent =
+            "Los triángulos son iguales";
+        } else {
+          btnIgualdad.className = "button inactive";
+          btnSemejanza.className = "button active";
+          document.getElementById("sliderContainer").style.display = "block";
+
+          // Aplicar escala al segundo triángulo
+          actualizarTrianguloSemejante();
+
+          // Verificar semejanza y actualizar texto
+          verificarIgualdadSemejanza();
+        }
+
+        dibujarTriangulos();
+        actualizarMedidas();
+      }
+
+      // Función para cambiar la escala
+      function cambiarEscala(e) {
+        factorEscala = parseFloat(e.target.value);
+        document.getElementById("factorEscalaValue").textContent =
+          factorEscala.toFixed(1);
+
+        if (modo === "semejanza") {
+          actualizarTrianguloSemejante();
+          dibujarTriangulos();
+          actualizarMedidas();
+          verificarIgualdadSemejanza();
+        }
+      }
+
+      // Función para actualizar el triángulo semejante
+      function actualizarTrianguloSemejante() {
+        const centro = calcularCentro(triangulo1.puntos);
+
+        // Calcular nuevos puntos escalados
+        triangulo2.puntos = triangulo1.puntos.map((p) => {
+          return {
+            x: centro.x + (p.x - centro.x) * factorEscala,
+            y: centro.y + (p.y - centro.y) * factorEscala,
+          };
+        });
+      }
+
+      // Función para calcular el centro de un conjunto de puntos
+      function calcularCentro(puntos) {
+        const sumX = puntos.reduce((sum, p) => sum + p.x, 0);
+        const sumY = puntos.reduce((sum, p) => sum + p.y, 0);
+
+        return {
+          x: sumX / puntos.length,
+          y: sumY / puntos.length,
+        };
+      }
+
+      // Función para calcular la distancia entre dos puntos
+      function distancia(p1, p2) {
+        return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+      }
+
+      // Calcular lados del triángulo
+      function calcularLados(puntos) {
+        const lado1 = distancia(puntos[0], puntos[1]);
+        const lado2 = distancia(puntos[1], puntos[2]);
+        const lado3 = distancia(puntos[2], puntos[0]);
+
+        return [lado1, lado2, lado3];
+      }
+
+      function actualizarMedidas() {
+        const lados1 = calcularLados(triangulo1.puntos);
+        const lados2 = calcularLados(triangulo2.puntos);
+
+        // Actualizar lista de medidas del primer triángulo
+        const medidas1 = document.getElementById("medidas1");
+        medidas1.innerHTML = "";
+
+        lados1.forEach((lado, i) => {
+          const li = document.createElement("li");
+          li.textContent = `Lado ${i + 1}: ${lado.toFixed(1)} u`;
+          medidas1.appendChild(li);
+        });
+
+        // Actualizar lista de medidas del segundo triángulo
+        const medidas2 = document.getElementById("medidas2");
+        medidas2.innerHTML = "";
+
+        lados2.forEach((lado, i) => {
+          const li = document.createElement("li");
+          li.textContent = `Lado ${i + 1}: ${lado.toFixed(1)} u`;
+          medidas2.appendChild(li);
+        });
+      }
+
+      // Verificar si los triángulos son iguales o semejantes
+      function verificarIgualdadSemejanza() {
+        const lados1 = calcularLados(triangulo1.puntos);
+        const lados2 = calcularLados(triangulo2.puntos);
+
+        const resultadoElement = document.getElementById("resultado");
+
+        if (modo === "igualdad") {
+          // Para igualdad, los lados deben ser iguales (con una pequeña tolerancia)
+          const sonIguales = lados1.every(
+            (lado, i) => Math.abs(lado - lados2[i]) < 0.5
+          );
+
+          resultadoElement.textContent = sonIguales
+            ? "Los triángulos son iguales"
+            : "Los triángulos no son iguales";
+        } else {
+          // Para semejanza, las proporciones deben ser iguales
+          const proporciones = lados1.map((lado, i) => lado / lados2[i]);
+          const mediaProporcion =
+            proporciones.reduce((sum, p) => sum + p, 0) / proporciones.length;
+
+          const sonSemejantes = proporciones.every(
+            (p) => Math.abs(p - mediaProporcion) < 0.1
+          );
+
+          resultadoElement.textContent = sonSemejantes
+            ? `Los triángulos son semejantes (proporción: ${mediaProporcion.toFixed(
+                2
+              )})`
+            : "Los triángulos no son semejantes";
+        }
+      }
+    </script></p></body></html>

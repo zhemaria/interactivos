@@ -1,1 +1,647 @@
+<!DOCTYPE html>
+<html lang="es"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>1-U1-Lección 2: INTERACTIVO - Valor posicional de los números naturales</title> 
+  <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --accent-color: #FF9800;
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --highlight-color: #ffeb3b;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 800px;
+            height: 950px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .header h1 {
+            font-size: 36px;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            border: 1px solid #ccc;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ccc;
+            border-radius: 0 0 5px 5px;
+            padding: 20px;
+            background-color: white;
+            overflow: auto;
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .number-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0 50px 0;
+            flex-wrap: wrap;
+        }
+
+        .digit-box {
+            width: 60px;
+            height: 70px;
+            border: 2px solid #ccc;
+            margin: 0 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .digit-box:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        .digit-box.selected {
+            border-color: var(--secondary-color);
+            background-color: var(--highlight-color);
+        }
+
+        .position-label {
+            position: absolute;
+            bottom: -45px;
+            font-size: 12px;
+            color: var(--text-color);
+            text-align: center;
+            width: 100%;
+            line-height: 1.2;
+            height: 40px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .option-button {
+            padding: 15px 20px;
+            margin: 5px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .option-button:hover {
+            background-color: #0b7dda;
+            transform: scale(1.05);
+        }
+
+        .result-container {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 18px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .result-message {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .value-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .value-item {
+            margin: 5px 10px;
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        input {
+            width: 200px;
+            padding: 10px;
+            font-size: 18px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .position-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .position-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .position-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .position-card {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            padding: 10px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .position-card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .position-card-body {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .check-button {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .refresh-button {
+            padding: 8px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .correct {
+            color: var(--primary-color);
+        }
+
+        .incorrect {
+            color: crimson;
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        .score-label {
+            font-weight: bold;
+        }
+
+        .score-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .help-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .close:hover {
+            color: black;
+        }
+    </style> 
+ </head><body><div class="container">
+<div class="header">
+<h1 style="color: #265828;">Valor Posicional</h1>
+</div>
+<div class="tab-container">
+<div class="tab active" style="color: #000000;" onclick="switchTab(0)">Encontrar Posición</div>
+<div class="tab" style="color: #265828;" onclick="switchTab(1)">Encontrar Dígito</div>
+</div>
+<div class="content"><!-- Tab 1: Encontrar Posición -->
+<div class="tab-content active" id="tab-content-0">
+<h2 style="text-align: center; margin-bottom: 10px;">Selecciona, en el siguiente número, un dígito<br>para conocer su valor posicional</h2>
+<div class="number-container" id="number-container"><!-- Se llena dinámicamente con JavaScript --></div>
+<div class="result-container" id="position-result">
+<h3 class="result-message" style="color: #265828;">Selecciona un dígito del número</h3>
+<div class="value-info" id="value-info" style="color: #265828;"></div>
+</div>
+<div class="options-container"><button class="option-button" style="color: #000000;" onclick="generateRandomNumber()">Nuevo número</button></div>
+<div class="position-card">
+<div class="position-card-header" style="color: #000000;">Tabla de Valores Posicionales</div>
+<div class="position-card-body" style="color: #000000;">
+<table class="position-table" style="color: #000000;">
+<tbody style="color: #000000;">
+<tr style="color: #000000;">
+<th style="color: #000000;">Centena de Millón</th>
+<th style="color: #000000;">Decena de Millón</th>
+<th style="color: #000000;">Unidad de Millón</th>
+<th style="color: #000000;">Centena de Millar</th>
+<th style="color: #000000;">Decena de Millar</th>
+<th style="color: #000000;">Unidad de Millar</th>
+<th style="color: #000000;">Centena</th>
+<th style="color: #000000;">Decena</th>
+<th style="color: #000000;">Unidad</th>
+</tr>
+<tr style="color: #000000;">
+<td style="color: #000000;">100,000,000</td>
+<td style="color: #000000;">10,000,000</td>
+<td style="color: #000000;">1,000,000</td>
+<td style="color: #000000;">100,000</td>
+<td style="color: #000000;">10,000</td>
+<td style="color: #000000;">1,000</td>
+<td style="color: #000000;">100</td>
+<td style="color: #000000;">10</td>
+<td style="color: #000000;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Tab 2: Encontrar Dígito -->
+<div class="tab-content" id="tab-content-1">
+<div class="position-card-header">Encuentra el dígito</div>
+<h2 style="text-align: center; margin-bottom: 10px;">Sobre el siguiente número diga:</h2>
+<div class="number-container" id="find-digit-container"><!-- Se llena dinámicamente con JavaScript --></div>
+<div class="position-card">
+<div class="position-card-body">
+<div id="position-question" style="margin-bottom: 15px; font-size: 22px; font-weight: bold;">¿Qué dígito está en la posición de <span id="position-name" style="font-weight: bold; color: var(--secondary-color);"></span>?</div>
+<input type="number" id="digit-answer" min="0" max="9" placeholder="Escribe el dígito"> <button class="check-button" onclick="checkDigitAnswer()">Comprobar</button>
+<div class="feedback" id="digit-feedback"></div>
+</div>
+</div>
+<div class="options-container"><button class="option-button" onclick="generateNewQuestion()">Nueva pregunta</button></div>
+<div class="score-container">
+<div class="score-label">Puntuación:</div>
+<div class="score-value" id="score">0</div>
+</div>
+</div>
+</div>
+<button class="help-button" onclick="showHelp()">?</button></div>
+<div id="helpModal" class="modal">
+<div class="modal-content"><span class="close" onclick="closeHelp()">×</span>
+<h2>¿Qué es el Valor Posicional?</h2>
+<p style="margin-top: 15px;">El valor posicional es un concepto fundamental en matemáticas que indica que el valor de un dígito depende de su posición en el número.</p>
+<p style="margin-top: 10px;">Por ejemplo, en el número 235:</p>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>El dígito 5 está en la posición de las unidades y su valor es 5.</li>
+<li>El dígito 3 está en la posición de las decenas y su valor es 30.</li>
+<li>El dígito 2 está en la posición de las centenas y su valor es 200.</li>
+</ul>
+<p style="margin-top: 10px;">En este juego puedes practicar:</p>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li><strong>Encontrar Posición:</strong> Selecciona un dígito para conocer su posición y valor.</li>
+<li><strong>Encontrar Dígito:</strong> Se te dará una posición y deberás identificar qué dígito ocupa esa posición.</li>
+</ul>
+</div>
+</div>
+<p><script>
+  // Variables globales
+let currentNumber = '';
+let currentQuestion = '';
+let currentAnswer = '';
+let score = 0;
+
+// Posiciones de valores
+const positions = [
+    {name: "Unidades", value: 1},
+    {name: "Decenas", value: 10},
+    {name: "Centenas", value: 100},
+    {name: "Unidades de Millar", value: 1000},
+    {name: "Decenas de Millar", value: 10000},
+    {name: "Centenas de Millar", value: 100000},
+    {name: "Unidades de Millón", value: 1000000},
+    {name: "Decenas de Millón", value: 10000000},
+    {name: "Centenas de Millón", value: 100000000}
+];
+
+// Inicialización
+window.onload = function() {
+    generateRandomNumber();
+    generateNewQuestion();
+};
+
+// Cambiar entre pestañas
+function switchTab(tabIndex) {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => tab.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+    
+    tabs[tabIndex].classList.add('active');
+    document.getElementById(`tab-content-${{tabIndex}}`).classList.add('active');
+}
+
+// Generar un número aleatorio
+function generateRandomNumber() {
+    const min = 1;
+    const max = 999999999;
+    const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    currentNumber = randomNum.toString().padStart(9, '0');
+    
+    // Actualizar la visualización del número
+    const container = document.getElementById('number-container');
+    container.innerHTML = '';
+    
+    for (let i = 0; i < currentNumber.length; i++) {
+        const digitBox = document.createElement('div');
+        digitBox.className = 'digit-box';
+        digitBox.textContent = currentNumber[i];
+        digitBox.setAttribute('data-index', i);
+        digitBox.setAttribute('data-digit', currentNumber[i]);
+        digitBox.setAttribute('onclick', `selectDigit(${{i}})`);
+        
+        const posLabel = document.createElement('div');
+        posLabel.className = 'position-label';
+        posLabel.textContent = positions[positions.length - 1 - i].name;
+        
+        digitBox.appendChild(posLabel);
+        container.appendChild(digitBox);
+    }
+    
+    // Restablecer el resultado
+    document.getElementById('position-result').innerHTML = '<div class="result-message">Selecciona un dígito del número</div><div class="value-info" id="value-info"></div>';
+    
+    // Actualizar la pantalla de encontrar dígito
+    updateFindDigitDisplay();
+}
+
+// Seleccionar un dígito
+function selectDigit(index) {
+    // Quitar selección anterior
+    const digitBoxes = document.querySelectorAll('.digit-box');
+    digitBoxes.forEach(box => box.classList.remove('selected'));
+    
+    // Seleccionar el nuevo dígito
+    digitBoxes[index].classList.add('selected');
+    
+    // Mostrar información de valor posicional
+    const digit = currentNumber[index];
+    const position = positions[positions.length - 1 - index];
+    const actualValue = digit * position.value;
+    
+    const resultContainer = document.getElementById('position-result');
+    resultContainer.innerHTML = `
+        <div class="result-message">El dígito ${{digit}} está en la posición de las ${position.name}</div>
+        <div class="value-info">
+            <div class="value-item">Valor posicional: ${position.value.toLocaleString()}</div>
+            <div class="value-item">Valor real: ${{digit}} × ${position.value.toLocaleString()} = ${actualValue.toLocaleString()}</div>
+        </div>
+    `;
+}
+
+// Encontrar dígito - Nuevas funciones
+function updateFindDigitDisplay() {
+    const container = document.getElementById('find-digit-container');
+    container.innerHTML = '';
+    
+    for (let i = 0; i < currentNumber.length; i++) {
+        const digitBox = document.createElement('div');
+        digitBox.className = 'digit-box';
+        digitBox.textContent = currentNumber[i];
+        
+        // MODIFICACIÓN: No agregamos las etiquetas de posición en esta vista
+        // para que el estudiante tenga que identificarlas sin ayuda visual
+        
+        container.appendChild(digitBox);
+    }
+}
+
+function generateNewQuestion() {
+    // Generar un nuevo número aleatorio si es necesario
+    if (!currentNumber) {
+        generateRandomNumber();
+    }
+    
+    // Elegir una posición aleatoria
+    const randomPosIndex = Math.floor(Math.random() * positions.length);
+    const position = positions[randomPosIndex];
+    currentQuestion = position.name;
+    
+    // Determinar el dígito en esa posición
+    const digitIndex = positions.length - 1 - randomPosIndex;
+    currentAnswer = currentNumber[digitIndex];
+    
+    // Actualizar la pregunta
+    document.getElementById('position-name').textContent = position.name;
+    document.getElementById('digit-answer').value = '';
+    document.getElementById('digit-feedback').textContent = '';
+    
+    // Eliminar selección anterior
+    const digitBoxes = document.querySelectorAll('#find-digit-container .digit-box');
+    digitBoxes.forEach(box => box.classList.remove('selected'));
+}
+
+function checkDigitAnswer() {
+    const userAnswer = document.getElementById('digit-answer').value;
+    const feedbackElement = document.getElementById('digit-feedback');
+    
+    if (userAnswer === '') {
+        feedbackElement.textContent = 'Por favor, ingresa un dígito.';
+        feedbackElement.className = 'feedback incorrect';
+        return;
+    }
+    
+    // Convertir ambos valores a números antes de comparar
+    if (Number(userAnswer) === Number(currentAnswer)) {
+        feedbackElement.textContent = '¡Correcto!';
+        feedbackElement.className = 'feedback correct';
+        score += 10;
+        updateScore();
+        
+        // Resaltar el dígito correcto
+        const posIndex = positions.findIndex(p => p.name === currentQuestion);
+        const digitIndex = positions.length - 1 - posIndex;
+        const digitBoxes = document.querySelectorAll('#find-digit-container .digit-box');
+        digitBoxes[digitIndex].classList.add('selected');
+        
+        // Generar nueva pregunta después de 1.5 segundos
+        setTimeout(generateNewQuestion, 1500);
+    } else {
+        feedbackElement.textContent = `Incorrecto. Inténtalo de nuevo.`;
+        feedbackElement.className = 'feedback incorrect';
+        
+        if (score > 0) {
+            score -= 2;
+            updateScore();
+        }
+    }
+}
+
+function updateScore() {
+    document.getElementById('score').textContent = score;
+}
+
+// Funciones de ayuda
+function showHelp() {
+    document.getElementById('helpModal').style.display = 'block';
+}
+
+function closeHelp() {
+    document.getElementById('helpModal').style.display = 'none';
+}
+
+// Cerrar modal al hacer clic fuera
+window.onclick = function(event) {
+    const modal = document.getElementById('helpModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+};
+</script></p></body></html>

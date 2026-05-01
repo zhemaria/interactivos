@@ -1,1 +1,359 @@
+<!DOCTYPE html>
+<html lang="es"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Ubicación de Fracciones</title> 
+  <script src="https://cdn.tailwindcss.com"></script> 
+  <style>
+        /* DUA: Fuentes legibles y tamaños grandes */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f4f8; /* Fondo suave para reducir fatiga visual */
+            color: #1a202c;
+        }
+        
+        /* Contenedor del Canvas */
+        #canvas-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            cursor: crosshair;
+            touch-action: none; /* Prevenir scroll al tocar el canvas */
+        }
 
+        /* Botones accesibles: alto contraste y áreas grandes */
+        .btn {
+            transition: all 0.2s;
+            border-bottom: 4px solid rgba(0,0,0,0.2);
+        }
+        .btn:active {
+            transform: translateY(2px);
+            border-bottom: 2px solid rgba(0,0,0,0.2);
+        }
+
+        /* Animación suave para mensajes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Patrones para daltonismo en barras de progreso (opcional visual) */
+        .pattern-bg {
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px);
+        }
+    </style> 
+ </head><body class="min-h-screen flex flex-col items-center justify-center p-4"><header class="w-full max-w-3xl mb-6 text-center">
+<h1 class="text-3xl font-bold text-slate-800 mb-2">📍 Ubicación de Fracciones</h1>
+<p class="text-slate-600 text-lg">Toque o haga clic en la recta numérica para estimar dónde se encuentra la fracción indicada.</p>
+</header><!-- Tarjeta Principal --><main class="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200"><!-- Panel de Estado -->
+<div class="bg-slate-800 text-white p-4 flex justify-between items-center">
+<div class="flex items-center gap-2"><span class="text-2xl">🎯</span>
+<div>
+<p class="text-xs text-slate-400 uppercase tracking-wider" style="color: #fafafa; font-weight: bold;">Aciertos</p>
+<p class="text-xl font-bold" id="score">0</p>
+</div>
+</div>
+<div class="flex items-center gap-2"><span class="text-2xl">📊</span>
+<div>
+<p class="text-xs text-slate-400 uppercase tracking-wider" style="color: #fafafa; font-weight: bold;">Racha</p>
+<p class="text-xl font-bold" id="streak">0</p>
+</div>
+</div>
+</div>
+<!-- Área de Pregunta -->
+<div class="p-6 text-center border-b border-slate-100">
+<p class="text-slate-500 mb-2 text-sm uppercase tracking-wide font-semibold">Encuentre la ubicación de:</p>
+<div class="inline-block bg-blue-50 px-8 py-4 rounded-lg border-2 border-blue-200"><span id="target-fraction" class="text-5xl font-bold text-blue-800 font-mono">1/2</span></div>
+</div>
+<!-- Canvas Interactivo -->
+<div class="p-6 bg-slate-50">
+<div id="canvas-container"><canvas id="gameCanvas"></canvas></div>
+<!-- Leyenda Visual DUA -->
+<div class="flex justify-center gap-6 mt-4 text-sm text-slate-600 flex-wrap">
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span> <span>Su respuesta</span></div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-600 inline-block"></span> <span>Correcto</span></div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-800 inline-block"></span> <span>Marcas principales</span></div>
+</div>
+</div>
+<!-- Área de Feedback -->
+<div id="feedback-area" class="p-6 text-center hidden bg-white border-t border-slate-100">
+<h3 id="feedback-title" class="text-2xl font-bold mb-2"></h3>
+<p id="feedback-message" class="text-lg mb-4"></p>
+<button class="btn bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-lg text-lg w-full sm:w-auto focus:outline-none focus:ring-4 focus:ring-slate-300" onclick="nextProblem()"> Siguiente Problema ➡️ </button></div>
+</main><!-- Footer Educativo --><footer class="mt-8 text-slate-500 text-sm max-w-2xl text-center">
+<p style="color: #000000;">💡 <strong style="color: #000000;">Consejo:</strong> Recuerde que el denominador indica las partes en que se divide la unidad y el numerados las que se tienen.</p>
+</footer>
+<p><script>
+        // Configuración DUA (Colores de alto contraste y amigables)#cbd5e1
+        const COLORS = {
+            line: '#1f2937',       // Slate 800
+            text: '#334155',       // Slate 700
+            userMark: '#2563eb',   // Blue 600
+            correctMark: '#059669',// Emerald 600
+            errorMark: '#dc2626',  // Red 600
+            guide: '#cbd5e1'       // Slate 300
+        };
+
+        // Estado del juego
+        const state = {
+            numerator: 1,
+            denominator: 2,
+            value: 0.5,
+            isAnswered: false,
+            score: 0,
+            streak: 0,
+            canvasWidth: 0,
+            canvasHeight: 0,
+            padding: 50,
+            lineY: 125, // Mitad del canvas height (250/2)
+            lineStart: 0,
+            lineEnd: 0
+        };
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvas-container');
+
+        // Inicialización
+        function init() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            generateFraction();
+            
+            // Eventos Mouse
+            canvas.addEventListener('mousedown', handleInput);
+            // Eventos Táctiles
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevenir scroll
+                handleInput(e.touches[0]);
+            }, {passive: false});
+            
+            draw();
+        }
+
+        // Ajustar canvas al contenedor responsive
+        function resizeCanvas() {
+            state.canvasWidth = container.clientWidth;
+            state.canvasHeight = container.clientHeight;
+            canvas.width = state.canvasWidth;
+            canvas.height = state.canvasHeight;
+            
+            state.lineStart = state.padding;
+            state.lineEnd = state.canvasWidth - state.padding;
+            
+            if (state.isAnswered) {
+                // Si redimensiona después de responder, mantener el dibujo estático es complejo,
+                // por simplicidad, redibujamos el estado base.
+                draw(); 
+            } else {
+                draw();
+            }
+        }
+
+        // Generar fracción aleatoria (enfocado en denominadores comunes para GED)
+        function generateFraction() {
+            const denominators = [2, 3, 4, 5, 8, 10];
+            state.denominator = denominators[Math.floor(Math.random() * denominators.length)];
+            // Numerador entre 1 y denominador-1
+            state.numerator = Math.floor(Math.random() * (state.denominator - 1)) + 1;
+            state.value = state.numerator / state.denominator;
+            
+            // Actualizar UI
+            document.getElementById('target-fraction').innerText = `${state.numerator}/${state.denominator}`;
+            
+            // Reset estado de turno
+            state.isAnswered = false;
+            document.getElementById('feedback-area').classList.add('hidden');
+            
+            draw();
+        }
+
+        // Lógica principal de dibujo
+        function draw(userX = null) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Dibujar la línea base
+            ctx.beginPath();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = COLORS.line;
+            ctx.lineCap = 'round';
+            ctx.moveTo(state.lineStart, state.lineY);
+            ctx.lineTo(state.lineEnd, state.lineY);
+            ctx.stroke();
+
+            // 2. Dibujar marcas de división (Scaffolding DUA)
+            // Dividimos la recta según el denominador para ayudar al conteo visual
+            const step = (state.lineEnd - state.lineStart) / state.denominator;
+            for (let i = 1; i < state.denominator; i++) {
+                const tickX = state.lineStart + (i * step);
+                // Marcas pequeñas y sutiles (gris claro)
+                drawTick(tickX, "", false, '#8d9aa8'); 
+            }
+
+            // 3. Dibujar extremos (0 y 1) - Se dibujan después para quedar encima
+            drawTick(state.lineStart, "0", true);
+            drawTick(state.lineEnd, "1", true);
+
+            // Si el usuario ya respondió, dibujar los resultados
+            if (state.isAnswered && userX !== null) {
+                const correctX = state.lineStart + (state.value * (state.lineEnd - state.lineStart));
+                
+                // Dibujar rango de error aceptable (zona visual)
+                ctx.fillStyle = 'rgba(5, 150, 105, 0.1)';
+                const tolerancePx = (state.lineEnd - state.lineStart) * 0.10; // 10% de tolerancia visual
+                ctx.fillRect(correctX - tolerancePx/2, state.lineY - 10, tolerancePx, 20);
+
+                // Dibujar marca del usuario
+                drawMarker(userX, "Su marca", COLORS.userMark, false);
+                
+                // Dibujar respuesta correcta
+                drawMarker(correctX, `${state.numerator}/${state.denominator}`, COLORS.correctMark, true);
+
+                // Dibujar línea de conexión si están lejos
+                if (Math.abs(userX - correctX) > 20) {
+                    ctx.beginPath();
+                    ctx.setLineDash([5, 5]);
+                    ctx.strokeStyle = '#94a3b8';
+                    ctx.lineWidth = 2;
+                    ctx.moveTo(userX, state.lineY + 30);
+                    ctx.lineTo(correctX, state.lineY + 30);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+        }
+
+        // Función auxiliar para dibujar marcas en la recta
+        function drawTick(x, label, isMain = false, color = COLORS.line) {
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = isMain ? 3 : 2;
+            const height = isMain ? 15 : 10;
+            ctx.moveTo(x, state.lineY - height);
+            ctx.lineTo(x, state.lineY + height);
+            ctx.stroke();
+
+            if (label) {
+                ctx.fillStyle = COLORS.text;
+                ctx.font = "bold 20px sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "top";
+                ctx.fillText(label, x, state.lineY + 20);
+            }
+        }
+
+        // Función para dibujar indicadores (Usuario vs Correcto)
+        function drawMarker(x, label, color, isCorrect) {
+            ctx.fillStyle = color;
+            
+            // Dibujar punto/forma en la línea
+            ctx.beginPath();
+            if (isCorrect) {
+                // Triángulo para la correcta
+                ctx.moveTo(x, state.lineY);
+                ctx.lineTo(x - 8, state.lineY - 14);
+                ctx.lineTo(x + 8, state.lineY - 14);
+            } else {
+                // Círculo para el usuario
+                ctx.arc(x, state.lineY, 8, 0, Math.PI * 2);
+            }
+            ctx.fill();
+
+            // Etiqueta flotante
+            const labelY = isCorrect ? state.lineY - 45 : state.lineY + 45;
+            
+            // Fondo de la etiqueta para legibilidad
+            ctx.font = "bold 16px sans-serif";
+            const textWidth = ctx.measureText(label).width;
+            ctx.fillStyle = "white";
+            ctx.fillRect(x - textWidth/2 - 4, labelY - 14, textWidth + 8, 20);
+            
+            // Texto de la etiqueta
+            ctx.fillStyle = color;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(label, x, labelY);
+        }
+
+        // Manejar el clic/toque
+        function handleInput(e) {
+            if (state.isAnswered) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.pageX) - rect.left;
+            
+            // Validar que esté dentro del rango de la línea (con un pequeño margen)
+            if (x < state.lineStart - 20 || x > state.lineEnd + 20) return;
+
+            // Normalizar x dentro de los límites exactos para el cálculo
+            let validX = Math.max(state.lineStart, Math.min(x, state.lineEnd));
+            
+            const totalWidth = state.lineEnd - state.lineStart;
+            const userValue = (validX - state.lineStart) / totalWidth;
+            
+            evaluateAnswer(userValue, validX);
+        }
+
+        // Evaluar la respuesta
+        function evaluateAnswer(userValue, userX) {
+            state.isAnswered = true;
+            
+            // Tolerancia del 5% (0.05)
+            const tolerance = 0.08; 
+            const diff = Math.abs(userValue - state.value);
+            const isCorrect = diff <= tolerance;
+
+            draw(userX);
+            showFeedback(isCorrect, diff);
+        }
+
+        function showFeedback(isCorrect, diff) {
+            const feedbackArea = document.getElementById('feedback-area');
+            const title = document.getElementById('feedback-title');
+            const msg = document.getElementById('feedback-message');
+            
+            feedbackArea.classList.remove('hidden');
+            feedbackArea.classList.add('fade-in');
+
+            if (isCorrect) {
+                state.score++;
+                state.streak++;
+                title.innerText = "¡Excelente! ✅";
+                title.className = "text-2xl font-bold mb-2 text-green-700";
+                msg.innerText = "Su estimación fue muy precisa.";
+            } else {
+                state.streak = 0;
+                title.innerText = "Intente de nuevo ⚠️";
+                title.className = "text-2xl font-bold mb-2 text-orange-600";
+                
+                // Mensaje constructivo
+                let advice = "";
+                if (state.value < 0.5) advice = "Este número es menor que la mitad.";
+                else if (state.value > 0.5) advice = "Este número es mayor que la mitad.";
+                else advice = "Es exactamente la mitad.";
+                
+                msg.innerHTML = `La ubicación correcta está marcada en verde.<br><span class="text-sm text-slate-500">${{advice}}</span>`;
+            }
+
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('score').innerText = state.score;
+            document.getElementById('streak').innerText = state.streak;
+        }
+
+        function nextProblem() {
+            generateFraction();
+        }
+
+        // Iniciar al cargar
+        window.onload = init;
+
+    </script></p></body></html>

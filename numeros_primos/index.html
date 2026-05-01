@@ -1,1 +1,858 @@
+<!DOCTYPE html>
+<html lang="es"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>1-U4: Leccion 6: INTERACTIVO - Números primos</title> 
+  <style>
+        :root {
+            --primary-color: #673AB7;
+            --secondary-color: #9C27B0;
+            --accent-color: #FFC107;
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --highlight-color: #EDE7F6;
+            --prime-color: #4CAF50;
+            --non-prime-color: #E0E0E0;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 800px;
+            height: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            border: 1px solid #ccc;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ccc;
+            border-radius: 0 0 5px 5px;
+            padding: 20px;
+            background-color: white;
+            overflow: auto;
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .number-cell {
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--non-prime-color);
+            color: var(--text-color);
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .number-cell.prime {
+            background-color: var(--prime-color);
+            color: white;
+        }
+
+        .info-panel {
+            padding: 15px;
+            background-color: var(--highlight-color);
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .info-panel h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .info-panel p {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .control-button {
+            padding: 10px 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            background-color: #7B1FA2;
+            transform: scale(1.05);
+        }
+
+        .number-display {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: var(--primary-color);
+            padding: 10px 30px;
+            border-radius: 10px;
+            background-color: var(--highlight-color);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+
+        .exercise-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 20px;
+        }
+
+        .option-button {
+            padding: 15px 30px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .option-button:hover {
+            background-color: #7B1FA2;
+            transform: scale(1.05);
+        }
+
+        .result-container {
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 5px;
+            min-height: 60px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .correct {
+            color: var(--prime-color);
+        }
+
+        .incorrect {
+            color: #F44336;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 150px;
+            padding: 10px;
+            font-size: 18px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            margin: 0 10px;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .check-button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .check-button:hover {
+            background-color: #5E35B1;
+            transform: scale(1.05);
+        }
+
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--highlight-color);
+            border-radius: 5px;
+        }
+
+        .score-label {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .score-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 5px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .factors-display {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .factor-box {
+            padding: 10px 15px;
+            background-color: var(--highlight-color);
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+    </style> 
+ </head><body><div class="container"><button class="help-button" onclick="showHelp()">?</button>
+<div class="header">
+<h1>Explorando los Números Primos</h1>
+<p>Descubre las propiedades y patrones de estos fascinantes números</p>
+</div>
+<div class="tab-container">
+<div class="tab active" onclick="switchTab(0)">Criba de Eratóstenes</div>
+<div class="tab" onclick="switchTab(1)">¿Es Primo?</div>
+<div class="tab" onclick="switchTab(2)">Factorización</div>
+</div>
+<div class="content"><!-- Tab 1: Criba de Eratóstenes -->
+<div class="tab-content active" id="tab-content-0">
+<div class="info-panel">
+<h2>¿Qué es un número primo?</h2>
+<p>Un número primo es aquel que solo puede dividirse entre 1 y sí mismo. En otras palabras, un número primo tiene exactamente dos divisores: 1 y el propio número.</p>
+<p>Por ejemplo, 7 es primo porque solo es divisible entre 1 y 7. Pero 6 no es primo porque es divisible entre 1, 2, 3 y 6.</p>
+</div>
+<div class="grid-container" id="sieve-grid"><!-- Se llenará dinámicamente con JavaScript --></div>
+<div class="control-panel"><button class="control-button" onclick="resetSieve()">Reiniciar</button> <button class="control-button" onclick="showAllPrimes()">Mostrar Primos</button> <button class="control-button" onclick="animateSieve()">Animar Criba</button></div>
+<div class="info-panel">
+<h3>La Criba de Eratóstenes</h3>
+<p>Este método antiguo, desarrollado por el matemático griego Eratóstenes, permite encontrar todos los números primos hasta un límite dado.</p>
+<p>El algoritmo funciona marcando como no primos todos los múltiplos de cada número primo, empezando por el 2. Los números que quedan sin marcar son los primos.</p>
+<ol style="margin-left: 20px; margin-top: 10px;">
+<li>Comienza marcando el 2 como primo.</li>
+<li>Marca todos los múltiplos de 2 como no primos.</li>
+<li>El siguiente número no marcado (3) es primo.</li>
+<li>Marca todos los múltiplos de 3 como no primos.</li>
+<li>Continúa este proceso hasta recorrer todos los números.</li>
+</ol>
+</div>
+</div>
+<!-- Tab 2: ¿Es Primo? -->
+<div class="tab-content" id="tab-content-1">
+<div class="exercise-container">
+<h2 style="margin-bottom: 20px;">¿Es primo o no es primo?</h2>
+<div class="number-display" id="prime-test-number">37</div>
+<div class="options-container"><button class="option-button" onclick="checkPrimeAnswer(true)">ES PRIMO</button> <button class="option-button" onclick="checkPrimeAnswer(false)">NO ES PRIMO</button></div>
+<div class="result-container" id="prime-test-result"></div>
+</div>
+<div class="score-container">
+<div class="score-label">Puntuación:</div>
+<div class="score-value" id="prime-test-score">0</div>
+</div>
+<div class="input-container">
+<h3 style="margin-bottom: 15px;">Prueba con tu propio número</h3>
+<div class="input-row"><input type="number" id="custom-number" min="2" placeholder="Ingresa un número"> <button class="check-button" onclick="checkCustomNumber()">Comprobar</button></div>
+<div id="custom-result" style="margin-top: 10px; font-size: 16px;"></div>
+</div>
+<div class="info-panel">
+<h3>Curiosidades de los números primos</h3>
+<ul style="margin-left: 20px; margin-top: 10px;">
+<li>El 2 es el único número primo par.</li>
+<li>Los números primos son infinitos (Euclides lo demostró alrededor del año 300 a.C.)</li>
+<li>Los primos gemelos son pares de números primos consecutivos que difieren en 2 unidades (como 3 y 5, 11 y 13).</li>
+<li>No existe una fórmula simple que genere todos los números primos.</li>
+<li>Los números primos son la base de muchos sistemas de seguridad en internet (criptografía).</li>
+</ul>
+</div>
+</div>
+<!-- Tab 3: Factorización -->
+<div class="tab-content" id="tab-content-2">
+<div class="exercise-container">
+<h2 style="margin-bottom: 20px;">Factorización en números primos</h2>
+<div class="number-display" id="factorization-number">84</div>
+<div class="input-container">
+<p style="margin-bottom: 10px;">Escribe los factores primos separados por × (por ejemplo: 2×2×3×7)</p>
+<input type="text" id="factors-answer" placeholder="Factores primos"> <button class="check-button" style="margin-top: 10px;" onclick="checkFactorization()">Comprobar</button></div>
+<div class="result-container" id="factorization-result"></div>
+<button class="control-button" onclick="showFactors()">Ver factores</button>
+<div class="factors-display" id="factors-display" style="display: none;"></div>
+</div>
+<div class="info-panel">
+<h3>Teorema Fundamental de la Aritmética</h3>
+<p>Todo número entero mayor que 1 puede expresarse como un producto de números primos de manera única (salvo el orden de los factores).</p>
+<div style="margin: 15px 0; padding: 10px; background-color: #f5f5f5; border-radius: 5px;">
+<p><strong>Ejemplo:</strong> 60 = 2 × 2 × 3 × 5 = 2² × 3 × 5</p>
+</div>
+<p>Para factorizar un número en sus factores primos:</p>
+<ol style="margin-left: 20px; margin-top: 10px;">
+<li>Divide el número por el menor número primo (2).</li>
+<li>Si es divisible, anota 2 como un factor y continúa con el resultado.</li>
+<li>Si no es divisible, intenta con el siguiente número primo (3, 5, 7...).</li>
+<li>Repite hasta que el resultado sea 1.</li>
+</ol>
+</div>
+<div style="text-align: center; margin-top: 20px;"><button class="control-button" onclick="generateNewFactorizationNumber()">Nuevo número</button></div>
+</div>
+</div>
+</div>
+<div id="helpModal" class="modal">
+<div class="modal-content"><span class="close" onclick="closeHelp()">×</span>
+<h2 style="color: var(--primary-color); margin-bottom: 15px;">Todo sobre los Números Primos</h2>
+<h3 style="color: var(--primary-color); margin: 15px 0 10px 0;">Definición</h3>
+<p>Un número primo es un número natural mayor que 1 que solo tiene dos divisores: 1 y él mismo.</p>
+<h3 style="color: var(--primary-color); margin: 15px 0 10px 0;">Ejemplos</h3>
+<ul style="margin-left: 20px;">
+<li>2, 3, 5, 7, 11, 13, 17, 19, 23, 29... son números primos.</li>
+<li>4, 6, 8, 9, 10, 12... no son primos (se llaman números compuestos).</li>
+</ul>
+<h3 style="color: var(--primary-color); margin: 15px 0 10px 0;">Importancia</h3>
+<p>Los números primos son fundamentales en matemáticas y tienen aplicaciones prácticas en:</p>
+<ul style="margin-left: 20px;">
+<li><strong>Criptografía:</strong> Los sistemas de seguridad en internet utilizan números primos grandes.</li>
+<li><strong>Teoría de números:</strong> Son la base para entender las propiedades de los números enteros.</li>
+<li><strong>Ciencias de la computación:</strong> Se utilizan en algoritmos de hash y generación de números aleatorios.</li>
+</ul>
+<h3 style="color: var(--primary-color); margin: 15px 0 10px 0;">Cómo usar esta aplicación</h3>
+<p>Explora las tres pestañas para aprender sobre los números primos:</p>
+<ol style="margin-left: 20px;">
+<li><strong>Criba de Eratóstenes:</strong> Visualiza cómo se identifican los números primos.</li>
+<li><strong>¿Es Primo?:</strong> Practica identificando números primos y aprende curiosidades.</li>
+<li><strong>Factorización:</strong> Descompón números en sus factores primos y comprende el Teorema Fundamental de la Aritmética.</li>
+</ol>
+</div>
+</div>
+<p><script>
+  // Variables globales
+let maxNumber = 100;
+let primes = [];
+let currentNumber = 37;
+let score = 0;
+let factorizationNumber = 84;
+let animationInProgress = false;
+
+// Inicialización
+window.onload = function() {
+    initializeSieve();
+    generatePrimeTestNumber();
+    updateFactorizationNumber();
+};
+
+// Cambiar entre pestañas
+function switchTab(tabIndex) {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => tab.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+    
+    tabs[tabIndex].classList.add('active');
+    document.getElementById(`tab-content-${{tabIndex}}`).classList.add('active');
+}
+
+// Funciones para la Criba de Eratóstenes
+function initializeSieve() {
+    const grid = document.getElementById('sieve-grid');
+    grid.innerHTML = '';
+    
+    for (let i = 1; i <= maxNumber; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'number-cell';
+        cell.textContent = i;
+        cell.setAttribute('data-number', i);
+        cell.addEventListener('click', () => toggleNumber(i));
+        
+        // El 1 no es primo
+        if (i === 1) {
+            cell.style.backgroundColor = '#FFE0B2';
+            cell.style.color = '#FF9800';
+        }
+        
+        grid.appendChild(cell);
+    }
+}
+
+function toggleNumber(num) {
+    if (num === 1) return; // El 1 no se puede cambiar
+    
+    const cell = document.querySelector(`.number-cell[data-number="${{num}}"]`);
+    if (cell.classList.contains('prime')) {
+        cell.classList.remove('prime');
+    } else {
+        cell.classList.add('prime');
+    }
+}
+
+function resetSieve() {
+    if (animationInProgress) return;
+    initializeSieve();
+    primes = [];
+}
+
+function isPrime(num) {
+    if (num <= 1) return false;
+    if (num <= 3) return true;
+    if (num % 2 === 0 || num % 3 === 0) return false;
+    
+    let i = 5;
+    while (i * i <= num) {
+        if (num % i === 0 || num % (i + 2) === 0) return false;
+        i += 6;
+    }
+    return true;
+}
+
+function showAllPrimes() {
+    if (animationInProgress) return;
+    
+    resetSieve();
+    primes = [];
+    
+    for (let i = 2; i <= maxNumber; i++) {
+        if (isPrime(i)) {
+            const cell = document.querySelector(`.number-cell[data-number="${{i}}"]`);
+            cell.classList.add('prime');
+            primes.push(i);
+        }
+    }
+}
+
+async function animateSieve() {
+    if (animationInProgress) return;
+    
+    animationInProgress = true;
+    resetSieve();
+    primes = [];
+    
+    // Marcar 2 como primo
+    const cell2 = document.querySelector(`.number-cell[data-number="2"]`);
+    cell2.classList.add('prime');
+    primes.push(2);
+    await new Promise(r => setTimeout(r, 500));
+    
+    // Marcar múltiplos de 2
+    for (let i = 4; i <= maxNumber; i += 2) {
+        const cell = document.querySelector(`.number-cell[data-number="${{i}}"]`);
+        cell.style.backgroundColor = '#ffcdd2';
+        await new Promise(r => setTimeout(r, 50));
+    }
+    
+    // Continuar con 3
+    const cell3 = document.querySelector(`.number-cell[data-number="3"]`);
+    cell3.classList.add('prime');
+    primes.push(3);
+    await new Promise(r => setTimeout(r, 500));
+    
+    // Marcar múltiplos de 3
+    for (let i = 6; i <= maxNumber; i += 3) {
+        if (i % 2 !== 0) { // Si no es par (ya marcado)
+            const cell = document.querySelector(`.number-cell[data-number="${{i}}"]`);
+            cell.style.backgroundColor = '#ffcdd2';
+            await new Promise(r => setTimeout(r, 50));
+        }
+    }
+    
+    // Continuar con 5 y otros primos
+    for (let i = 5; i <= Math.sqrt(maxNumber); i += 2) {
+        const cell = document.querySelector(`.number-cell[data-number="${{i}}"]`);
+        if (!cell.style.backgroundColor) {
+            cell.classList.add('prime');
+            primes.push(i);
+            await new Promise(r => setTimeout(r, 500));
+            
+            // Marcar múltiplos de i
+            for (let j = i * i; j <= maxNumber; j += i) {
+                const cellJ = document.querySelector(`.number-cell[data-number="${{j}}"]`);
+                if (!cellJ.style.backgroundColor) {
+                    cellJ.style.backgroundColor = '#ffcdd2';
+                    await new Promise(r => setTimeout(r, 50));
+                }
+            }
+        }
+    }
+    
+    // Marcar los primos restantes
+    for (let i = Math.floor(Math.sqrt(maxNumber)) + 1; i <= maxNumber; i++) {
+        const cell = document.querySelector(`.number-cell[data-number="${{i}}"]`);
+        if (!cell.style.backgroundColor && !cell.classList.contains('prime')) {
+            if (isPrime(i)) {
+                cell.classList.add('prime');
+                primes.push(i);
+                await new Promise(r => setTimeout(r, 50));
+            }
+        }
+    }
+    
+    animationInProgress = false;
+}
+
+// Funciones para la pestaña "¿Es Primo?"
+function generatePrimeTestNumber() {
+    // Generar un número aleatorio entre 2 y 200
+    const isRandomPrime = Math.random() > 0.5;
+    
+    if (isRandomPrime) {
+        // Generar un número primo
+        let newNumber;
+        do {
+            newNumber = Math.floor(Math.random() * 198) + 2;
+        } while (!isPrime(newNumber));
+        currentNumber = newNumber;
+    } else {
+        // Generar un número compuesto
+        let newNumber;
+        do {
+            newNumber = Math.floor(Math.random() * 198) + 2;
+        } while (isPrime(newNumber));
+        currentNumber = newNumber;
+    }
+    
+    document.getElementById('prime-test-number').textContent = currentNumber;
+    document.getElementById('prime-test-result').innerHTML = '';
+}
+
+function checkPrimeAnswer(answer) {
+    const resultContainer = document.getElementById('prime-test-result');
+    const isActuallyPrime = isPrime(currentNumber);
+    
+    if (answer === isActuallyPrime) {
+        resultContainer.innerHTML = `
+            <div class="correct">¡Correcto!</div>
+        `;
+        
+        score += 10;
+        updateScore();
+        
+        // Generar un nuevo número después de 1.5 segundos
+        setTimeout(generatePrimeTestNumber, 1500);
+    } else {
+        resultContainer.innerHTML = `
+            <div class="incorrect">Incorrecto. Inténtalo de nuevo.</div>
+        `;
+        
+        if (score > 0) {
+            score -= 2;
+            updateScore();
+        }
+    }
+}
+
+function updateScore() {
+    document.getElementById('prime-test-score').textContent = score;
+}
+
+function checkCustomNumber() {
+    const customNumber = parseInt(document.getElementById('custom-number').value);
+    const resultElement = document.getElementById('custom-result');
+    
+    if (isNaN(customNumber) || customNumber < 2) {
+        resultElement.innerHTML = '<span style="color: #F44336;">Por favor, ingresa un número válido mayor o igual a 2.</span>';
+        return;
+    }
+    
+    const isPrimeResult = isPrime(customNumber);
+    
+    if (isPrimeResult) {
+        resultElement.innerHTML = `<span style="color: #4CAF50; font-weight: bold;">${{customNumber}} ES un número primo.</span>`;
+    } else {
+        resultElement.innerHTML = `<span style="color: #F44336; font-weight: bold;">${{customNumber}} NO es un número primo.</span>`;
+        const divisors = findDivisors(customNumber);
+        if (divisors.length > 0) {
+            resultElement.innerHTML += `<div style="margin-top: 5px;">Es divisible por: ${divisors.join(', ')}</div>`;
+        }
+    }
+}
+
+function findDivisors(num) {
+    const divisors = [];
+    for (let i = 2; i <= Math.sqrt(num); i++) {
+        if (num % i === 0) {
+            divisors.push(i);
+            if (i !== num / i) {
+                divisors.push(num / i);
+            }
+        }
+    }
+    return divisors.sort((a, b) => a - b);
+}
+
+// Funciones para la pestaña de Factorización
+function updateFactorizationNumber() {
+    document.getElementById('factorization-number').textContent = factorizationNumber;
+    document.getElementById('factorization-result').innerHTML = '';
+    document.getElementById('factors-display').style.display = 'none';
+    document.getElementById('factors-answer').value = '';
+}
+
+function generateNewFactorizationNumber() {
+    // Generar un número compuesto aleatorio entre 4 y 999
+    let newNumber;
+    do {
+        newNumber = Math.floor(Math.random() * 996) + 4;
+    } while (isPrime(newNumber));
+    
+    factorizationNumber = newNumber;
+    updateFactorizationNumber();
+}
+
+function findPrimeFactors(num) {
+    const factors = [];
+    let n = num;
+    
+    // Factorizar por 2
+    while (n % 2 === 0) {
+        factors.push(2);
+        n /= 2;
+    }
+    
+    // Factorizar por números impares
+    for (let i = 3; i <= Math.sqrt(n); i += 2) {
+        while (n % i === 0) {
+            factors.push(i);
+            n /= i;
+        }
+    }
+    
+    // Si n es un número primo mayor que 2
+    if (n > 2) {
+        factors.push(n);
+    }
+    
+    return factors;
+}
+
+function checkFactorization() {
+    const userAnswer = document.getElementById('factors-answer').value.trim();
+    const resultContainer = document.getElementById('factorization-result');
+    
+    if (!userAnswer) {
+        resultContainer.innerHTML = '<div class="incorrect">Por favor, ingresa los factores primos.</div>';
+        return;
+    }
+    
+    const userFactors = userAnswer.split('×').map(factor => parseInt(factor.trim()));
+    const correctFactors = findPrimeFactors(factorizationNumber);
+    
+    // Verificar si todos los factores son primos
+    const allPrimes = userFactors.every(factor => isPrime(factor));
+    
+    if (!allPrimes) {
+        resultContainer.innerHTML = '<div class="incorrect">Algunos de los factores que ingresaste no son primos.</div>';
+        return;
+    }
+    
+    // Calcular el producto de los factores del usuario
+    const product = userFactors.reduce((acc, factor) => acc * factor, 1);
+    
+    if (product === factorizationNumber) {
+        resultContainer.innerHTML = '<div class="correct">¡Correcto! La factorización es correcta.</div>';
+        // Generar nuevo número después de 2 segundos
+        setTimeout(generateNewFactorizationNumber, 2000);
+    } else {
+        resultContainer.innerHTML = '<div class="incorrect">Incorrecto. Verifica tus factores.</div>';
+    }
+}
+
+function showFactors() {
+    const factorsDisplay = document.getElementById('factors-display');
+    const correctFactors = findPrimeFactors(factorizationNumber);
+    
+    if (factorsDisplay.style.display === 'none') {
+        factorsDisplay.innerHTML = '';
+        correctFactors.forEach(factor => {
+            const factorBox = document.createElement('div');
+            factorBox.className = 'factor-box';
+            factorBox.textContent = factor;
+            factorsDisplay.appendChild(factorBox);
+        });
+        factorsDisplay.style.display = 'flex';
+    } else {
+        factorsDisplay.style.display = 'none';
+    }
+}
+
+// Funciones para el modal de ayuda
+function showHelp() {
+    document.getElementById('helpModal').style.display = 'block';
+}
+
+function closeHelp() {
+    document.getElementById('helpModal').style.display = 'none';
+}
+
+// Cerrar modal al hacer clic fuera
+window.onclick = function(event) {
+    const modal = document.getElementById('helpModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+};
+</script></p></body></html>

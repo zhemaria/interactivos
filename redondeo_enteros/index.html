@@ -1,1 +1,720 @@
+<!DOCTYPE html>
+<html lang="es"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Redondeo</title> 
+  <style>
+        :root {
+            --primary-color: #3F51B5;
+            --secondary-color: #2196F3;
+            --accent-color: #FF9800;
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --highlight-color: #E8EAF6;
+            --correct-color: #4CAF50;
+            --incorrect-color: #F44336;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .header h1 {
+            font-size: 36px;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            border: 1px solid #ccc;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ccc;
+            border-radius: 0 0 5px 5px;
+            padding: 20px;
+            background-color: white;
+            overflow: auto;
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .exercise-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .number-display {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: var(--primary-color);
+            padding: 10px 40px;
+            border-radius: 10px;
+            background-color: var(--highlight-color);
+            box-shadow: var(--box-shadow);
+        }
+
+        .instruction {
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+
+        .option-button {
+            padding: 15px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .option-button:hover {
+            background-color: #1976D2;
+            transform: scale(1.05);
+        }
+
+        .action-button {
+            padding: 15px 25px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .action-button:hover {
+            background-color: #F57C00;
+            transform: scale(1.05);
+        }
+
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            min-height: 60px;
+            font-size: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-message {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+
+        .correct {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--correct-color);
+        }
+
+        .incorrect {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--incorrect-color);
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #ECEFF1;
+            border-radius: 5px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .explanation h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .explanation p {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ECEFF1;
+            border-radius: 5px;
+        }
+
+        .score-label {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .score-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        input {
+            width: 200px;
+            padding: 15px;
+            font-size: 20px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .information-card {
+            width: 100%;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .card-body {
+            padding: 15px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .card-body p {
+            margin-bottom: 12px;
+        }
+
+        .example-container {
+            margin: 15px 0;
+            padding: 12px;
+            background-color: var(--highlight-color);
+            border-radius: 5px;
+        }
+
+        .example-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            gap: 10px;
+        }
+
+        .level-button {
+            padding: 10px 15px;
+            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .level-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .help-button {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .arrow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .arrow {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 30px solid var(--accent-color);
+            position: absolute;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .highlight {
+            background-color: var(--highlight-color);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+    </style> 
+ </head><body><div class="container"><button class="help-button" onclick="showHelp()">?</button>
+<div class="header">
+<h1>Redondeo de Números Enteros</h1>
+</div>
+<div class="tab-container">
+<div class="tab active" onclick="switchTab(0)">Practicar Redondeo</div>
+<div class="tab" onclick="switchTab(1)">Encuentra el Redondeo</div>
+</div>
+<div class="content"><!-- Tab 1: Practicar Redondeo -->
+<div class="tab-content active" id="tab-content-0">
+<div class="instruction">Redondea el siguiente número según la posición indicada:</div>
+<div class="level-selector">
+<div class="level-button active" onclick="setLevel(0)">Nivel 1</div>
+<div class="level-button" onclick="setLevel(1)">Nivel 2</div>
+<div class="level-button" onclick="setLevel(2)">Nivel 3</div>
+</div>
+<div class="exercise-container">
+<div class="number-display" id="number-to-round">12345</div>
+<div id="round-instruction">Redondea a la centena más cercana</div>
+<div class="arrow-container">
+<div class="arrow"></div>
+</div>
+<div class="input-container"><input type="number" id="round-answer" placeholder="Tu respuesta"> <button class="action-button" style="color: #000000;" onclick="checkRoundingAnswer()">Comprobar</button></div>
+</div>
+<div class="result-container" id="round-result"></div>
+<div class="information-card">
+<div class="card-header">Reglas de Redondeo</div>
+<div class="card-body">
+<p>Para redondear un número a una posición determinada, sigue estos pasos:</p>
+<p>1. Identifica el dígito en la posición a la que quieres redondear.</p>
+<p>2. Mira el dígito a la derecha de esa posición:</p>
+<p>• Si es <span class="highlight">menor que 5</span> (0, 1, 2, 3, 4): redondea hacia abajo (mantén el dígito igual).</p>
+<p>• Si es <span class="highlight">mayor o igual a 5</span> (5, 6, 7, 8, 9): redondea hacia arriba (aumenta el dígito en 1).</p>
+<p>3. Cambia todos los dígitos a la derecha de la posición de redondeo por ceros.</p>
+<div class="example-container">
+<div class="example-title">Ejemplo: Redondear 3472 a la centena</div>
+<p>1. El dígito en la posición de las centenas es 4.</p>
+<p>2. El dígito a la derecha es 7, que es mayor o igual a 5.</p>
+<p>3. Por lo tanto, redondeamos hacia arriba: 4 + 1 = 5.</p>
+<p>4. Resultado: 3500</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Tab 2: Encuentra el Redondeo -->
+<div class="tab-content" id="tab-content-1">
+<div class="instruction">¿Cómo se ha redondeado este número?</div>
+<div class="exercise-container">
+<div><span class="number-display" id="original-number">3472</span> <span style="font-size: 30px; margin: 0 15px;">→</span> <span class="number-display" id="rounded-number">3500</span></div>
+<div class="options-container" id="rounding-options"><button class="option-button" onclick="checkRoundingOption('unidades')">Unidades</button> <button class="option-button" onclick="checkRoundingOption('decenas')">Decenas</button> <button class="option-button" onclick="checkRoundingOption('centenas')">Centenas</button> <button class="option-button" onclick="checkRoundingOption('millares')">Millares</button></div>
+</div>
+<div class="result-container" id="option-result"></div>
+<div class="score-container">
+<div class="score-label">Puntuación:</div>
+<div class="score-value" id="score">0</div>
+</div>
+<div class="options-container"><button class="action-button" onclick="generateRoundingQuestion()">Nueva pregunta</button></div>
+</div>
+</div>
+</div>
+<div id="helpModal" class="modal">
+<div class="modal-content"><span class="close" onclick="closeHelp()">×</span>
+<h2 style="color: var(--primary-color); margin-bottom: 15px;">¿Qué es el Redondeo de Números?</h2>
+<p style="margin-bottom: 12px;">El redondeo es una técnica matemática para simplificar números, aproximándolos al valor más cercano según una posición determinada.</p>
+<h3 style="color: var(--primary-color); margin: 15px 0 10px 0;">¿Por qué es importante?</h3>
+<ul style="margin-left: 20px; margin-bottom: 15px;">
+<li>Facilita cálculos mentales rápidos</li>
+<li>Ayuda a estimar resultados</li>
+<li>Simplifica la comunicación de cantidades grandes</li>
+<li>Es útil en la vida cotidiana para presupuestos, mediciones, etc.</li>
+</ul>
+<h3 style="color: var(--primary-color); margin: 15px 0 10px 0;">Posiciones de redondeo</h3>
+<p style="margin-bottom: 12px;">Podemos redondear a diferentes posiciones:</p>
+<ul style="margin-left: 20px;">
+<li><strong>Unidades:</strong> 43 → 40</li>
+<li><strong>Decenas:</strong> 437 → 440</li>
+<li><strong>Centenas:</strong> 4372 → 4400</li>
+<li><strong>Millares:</strong> 43728 → 44000</li>
+</ul>
+<h3 style="color: var(--primary-color); margin: 15px 0 10px 0;">En este juego puedes:</h3>
+<ul style="margin-left: 20px;">
+<li><strong>Practicar Redondeo:</strong> Aprende a redondear números a diferentes posiciones</li>
+<li><strong>Encuentra el Redondeo:</strong> Identifica a qué posición se ha redondeado un número</li>
+</ul>
+</div>
+</div>
+<p><script>
+        // Variables globales
+        let currentLevel = 0;
+        let currentNumber = 0;
+        let targetPosition = '';
+        let correctRoundedNumber = 0;
+        let score = 0;
+        let roundingQuestion = {
+            original: 0,
+            rounded: 0,
+            position: ''
+        };
+        
+        // Posiciones de redondeo
+        const roundingPositions = [
+            { name: 'unidades', displayName: 'Unidades', factor: 1 },
+            { name: 'decenas', displayName: 'Decenas', factor: 10 },
+            { name: 'centenas', displayName: 'Centenas', factor: 100 },
+            { name: 'millares', displayName: 'Millares', factor: 1000 },
+            { name: 'decenas_de_millar', displayName: 'Decenas de Millar', factor: 10000 },
+            { name: 'centenas_de_millar', displayName: 'Centenas de Millar', factor: 100000 },
+        ];
+        
+        // Inicialización
+        window.onload = function() {
+            generateRoundingExercise();
+            generateRoundingQuestion();
+        };
+        
+        // Cambiar entre pestañas
+        function switchTab(tabIndex) {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            tabs[tabIndex].classList.add('active');
+            document.getElementById(`tab-content-${{tabIndex}}`).classList.add('active');
+        }
+        
+        // Configurar nivel
+        function setLevel(level) {
+            const levelButtons = document.querySelectorAll('.level-button');
+            levelButtons.forEach((btn, index) => {
+                btn.classList.toggle('active', index === level);
+            });
+            
+            currentLevel = level;
+            generateRoundingExercise();
+        }
+        
+        // Generar ejercicio de redondeo
+        function generateRoundingExercise() {
+            let minNumber, maxNumber, positionIndex;
+            
+            // Configurar dificultad según el nivel
+            switch(currentLevel) {
+                case 0: // Nivel 1: Números hasta 999, redondeo a decenas o centenas
+                    minNumber = 10;
+                    maxNumber = 999;
+                    positionIndex = Math.floor(Math.random() * 2) + 1; // Decenas o centenas
+                    break;
+                case 1: // Nivel 2: Números hasta 9999, redondeo a decenas, centenas o millares
+                    minNumber = 100;
+                    maxNumber = 9999;
+                    positionIndex = Math.floor(Math.random() * 3) + 1; // Decenas, centenas o millares
+                    break;
+                case 2: // Nivel 3: Números hasta 999999, cualquier posición
+                    minNumber = 1000;
+                    maxNumber = 999999;
+                    positionIndex = Math.floor(Math.random() * 5) + 1; // Cualquier posición excepto unidades
+                    break;
+                default:
+                    minNumber = 10;
+                    maxNumber = 999;
+                    positionIndex = 1;
+            }
+            
+            // Generar número aleatorio
+            currentNumber = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+            
+            // Establecer posición objetivo
+            targetPosition = roundingPositions[positionIndex];
+            
+            // Calcular respuesta correcta
+            correctRoundedNumber = roundNumber(currentNumber, targetPosition.factor);
+            
+            // Actualizar UI
+            document.getElementById('number-to-round').textContent = currentNumber.toLocaleString();
+            document.getElementById('round-instruction').textContent = `Redondea a la ${targetPosition.displayName.toLowerCase()} más cercana`;
+            document.getElementById('round-result').innerHTML = '';
+            document.getElementById('round-answer').value = '';
+        }
+        
+        // Comprobar respuesta
+        function checkRoundingAnswer() {
+            const userAnswer = parseInt(document.getElementById('round-answer').value);
+            const resultContainer = document.getElementById('round-result');
+            
+            if (isNaN(userAnswer)) {
+                resultContainer.innerHTML = '<div class="result-message incorrect">Por favor, ingresa un número válido.</div>';
+                return;
+            }
+            
+            if (userAnswer === correctRoundedNumber) {
+                resultContainer.innerHTML = `
+                    <div class="result-message correct">¡Correcto!</div>
+                    <div class="explanation">
+                        <h3>Explicación:</h3>
+                        <p>Para redondear ${currentNumber.toLocaleString()} a la ${targetPosition.displayName.toLowerCase()} más cercana:</p>
+                        <p>1. Identificamos el dígito en la posición de las ${targetPosition.displayName.toLowerCase()}.</p>
+                        <p>2. Evaluamos el dígito a la derecha para decidir si redondeamos hacia arriba o hacia abajo.</p>
+                        <p>3. El resultado correcto es ${correctRoundedNumber.toLocaleString()}.</p>
+                    </div>
+                `;
+                
+                // Aumentar puntuación
+                score += 10;
+                updateScore();
+                
+                // Generar nuevo ejercicio después de 3 segundos
+                setTimeout(generateRoundingExercise, 3000);
+            } else {
+                resultContainer.innerHTML = `
+                    <div class="result-message incorrect">Incorrecto. Inténtalo de nuevo.</div>
+                `;
+                
+                // Reducir puntuación
+                if (score > 0) {
+                    score -= 2;
+                    updateScore();
+                }
+            }
+        }
+        
+        // Función para redondear un número a una posición específica
+        function roundNumber(num, factor) {
+            return Math.round(num / factor) * factor;
+        }
+        
+        // Generar pregunta de redondeo (Pestaña 2)
+        function generateRoundingQuestion() {
+            // Generar número original aleatorio (entre 100 y 99999)
+            const originalNumber = Math.floor(Math.random() * 99900) + 100;
+            
+            // Seleccionar posición de redondeo aleatoria
+            const positionIndex = Math.floor(Math.random() * 4); // 0-3: unidades a millares
+            const position = roundingPositions[positionIndex];
+            
+            // Calcular número redondeado
+            const roundedNumber = roundNumber(originalNumber, position.factor);
+            
+            // Guardar datos de la pregunta
+            roundingQuestion = {
+                original: originalNumber,
+                rounded: roundedNumber,
+                position: position.name
+            };
+            
+            // Actualizar UI
+            document.getElementById('original-number').textContent = originalNumber.toLocaleString();
+            document.getElementById('rounded-number').textContent = roundedNumber.toLocaleString();
+            document.getElementById('option-result').innerHTML = '';
+        }
+        
+        // Comprobar opción de redondeo seleccionada
+        function checkRoundingOption(selectedPosition) {
+            const resultContainer = document.getElementById('option-result');
+            
+            if (selectedPosition === roundingQuestion.position) {
+                resultContainer.innerHTML = `
+                    <div class="result-message correct">¡Correcto! El número fue redondeado a ${getPositionDisplayName(selectedPosition)}.</div>
+                `;
+                
+                // Aumentar puntuación
+                score += 10;
+                updateScore();
+                
+                // Generar nueva pregunta después de 2 segundos
+                setTimeout(generateRoundingQuestion, 2000);
+            } else {
+                resultContainer.innerHTML = `
+                    <div class="result-message incorrect">Incorrecto. Inténtalo de nuevo.</div>
+                `;
+                
+                // Reducir puntuación
+                if (score > 0) {
+                    score -= 2;
+                    updateScore();
+                }
+            }
+        }
+        
+        // Obtener nombre para mostrar de una posición
+        function getPositionDisplayName(positionName) {
+            const position = roundingPositions.find(pos => pos.name === positionName);
+            return position ? position.displayName.toLowerCase() : positionName;
+        }
+        
+        // Actualizar puntuación
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        // Funciones de modal de ayuda
+        function showHelp() {
+            document.getElementById('helpModal').style.display = 'block';
+        }
+        
+        function closeHelp() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+        
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('helpModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    </script></p></body></html>

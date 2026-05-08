@@ -1,1 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruleta de Probabilidad Experimental</title>
+  <style>
+      body, html {
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 20px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      
+      .container {
+          display: flex;
+          gap: 40px;
+          align-items: center;
+          background: white;
+          padding: 30px;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      }
+      
+      #roulette-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+      }
+      
+      #roulette {
+          width: 300px;
+          height: 300px;
+          border-radius: 50%;
+          border: 4px solid #333;
+          background-image: conic-gradient(
+              #ff6b6b 0deg 60deg, 
+              #ffd93d 60deg 120deg, 
+              #6bcf7f 120deg 180deg,
+              #4ecdc4 180deg 240deg, 
+              #5e9cff 240deg 300deg, 
+              #c77dff 300deg 360deg
+          );
+          position: relative;
+          transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      }
+      
+      #arrow {
+          position: absolute;
+          top: -30px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 0;
+          height: 0;
+          border-left: 15px solid transparent;
+          border-right: 15px solid transparent;
+          border-top: 30px solid #ff3838;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+          z-index: 10;
+      }
+      
+      button {
+          margin-top: 30px;
+          padding: 15px 30px;
+          font-size: 18px;
+          font-weight: bold;
+          cursor: pointer;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          border-radius: 10px;
+          transition: transform 0.2s;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      }
+      
+      button:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      }
+      
+      button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+      }
+      
+      #result {
+          margin-top: 20px;
+          font-size: 22px;
+          color: #333;
+          font-weight: bold;
+          min-height: 30px;
+      }
+      
+      .stats-container {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+      }
+      
+      h2 {
+          margin: 0 0 10px 0;
+          color: #333;
+          text-align: center;
+      }
+      
+      table {
+          border-collapse: collapse;
+          background: white;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      }
+      
+      th, td {
+          padding: 12px 15px;
+          text-align: center;
+          border-bottom: 1px solid #e0e0e0;
+      }
+      
+      th {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          font-weight: bold;
+          font-size: 14px;
+      }
+      
+      td {
+          font-size: 16px;
+      }
+      
+      tr:last-child td {
+          border-bottom: none;
+      }
+      
+      tr:hover {
+          background: #f5f5f5;
+      }
+      
+      .color-box {
+          display: inline-block;
+          width: 30px;
+          height: 30px;
+          border-radius: 5px;
+          border: 2px solid #333;
+          vertical-align: middle;
+      }
+      
+      #total-giros {
+          text-align: center;
+          font-size: 18px;
+          color: #333;
+          font-weight: bold;
+          padding: 10px;
+          background: #f0f0f0;
+          border-radius: 8px;
+      }
+      
+      .formulas-box {
+          background: #f8f9fa;
+          border: 2px solid #667eea;
+          border-radius: 10px;
+          padding: 15px;
+          margin-top: 15px;
+      }
+      
+      .formulas-box h3 {
+          margin: 0 0 10px 0;
+          color: #667eea;
+          font-size: 16px;
+          text-align: center;
+      }
+      
+      .formula {
+          margin: 8px 0;
+          padding: 8px;
+          background: white;
+          border-radius: 5px;
+          font-size: 14px;
+      }
+      
+      .formula strong {
+          color: #764ba2;
+      }
+      
+      .formula-math {
+          font-family: 'Courier New', monospace;
+          background: #e9ecef;
+          padding: 2px 6px;
+          border-radius: 3px;
+          margin: 0 3px;
+      }
 
+      @media (max-width: 768px) {
+          .container {
+              flex-direction: column;
+              padding: 20px;
+          }
+      }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="roulette-container">
+      <div id="arrow"></div>
+      <div id="roulette"></div>
+      <button onclick="spin()">Girar Ruleta</button>
+      <div id="result"></div>
+    </div>
+    
+    <div class="stats-container">
+      <h2>Probabilidad Teórica y Experimental</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>COLOR</th>
+            <th>FRECUENCIA</th>
+            <th>TEÓRICA</th>
+            <th>EXPERIMENTAL</th>
+          </tr>
+        </thead>
+        <tbody id="stats-body">
+          <tr>
+            <td><span class="color-box" style="background-color: #ff6b6b;"></span></td>
+            <td id="freq-1">0</td>
+            <td>16.67%</td>
+            <td id="exp-1">0.00%</td>
+          </tr>
+          <tr>
+            <td><span class="color-box" style="background-color: #ffd93d;"></span></td>
+            <td id="freq-2">0</td>
+            <td>16.67%</td>
+            <td id="exp-2">0.00%</td>
+          </tr>
+          <tr>
+            <td><span class="color-box" style="background-color: #6bcf7f;"></span></td>
+            <td id="freq-3">0</td>
+            <td>16.67%</td>
+            <td id="exp-3">0.00%</td>
+          </tr>
+          <tr>
+            <td><span class="color-box" style="background-color: #4ecdc4;"></span></td>
+            <td id="freq-4">0</td>
+            <td>16.67%</td>
+            <td id="exp-4">0.00%</td>
+          </tr>
+          <tr>
+            <td><span class="color-box" style="background-color: #5e9cff;"></span></td>
+            <td id="freq-5">0</td>
+            <td>16.67%</td>
+            <td id="exp-5">0.00%</td>
+          </tr>
+          <tr>
+            <td><span class="color-box" style="background-color: #c77dff;"></span></td>
+            <td id="freq-6">0</td>
+            <td>16.67%</td>
+            <td id="exp-6">0.00%</td>
+          </tr>
+        </tbody>
+      </table>
+      <div id="total-giros">Total de giros: 0</div>
+      
+      <div class="formulas-box">
+        <h3>📐 Fórmulas de Cálculo</h3>
+        <div class="formula">
+          <strong>Probabilidad Teórica:</strong><br>
+          <span class="formula-math">P(evento) = 1/n</span><br>
+          donde <em>n</em> = número de resultados posibles<br>
+          Para esta ruleta: <span class="formula-math">1/6 ≈ 16.67%</span>
+        </div>
+        <div class="formula">
+          <strong>Probabilidad Experimental:</strong><br>
+          <span class="formula-math">P(evento) = Frecuencia / Total de experimentos × 100%</span><br>
+          Ejemplo: Si el rojo salió 5 veces en 30 giros:<br>
+          <span class="formula-math">5/30 × 100% = 16.67%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const colores = {
+        1: { nombre: 'Rojo', hex: '#ff6b6b' },
+        2: { nombre: 'Amarillo', hex: '#ffd93d' },
+        3: { nombre: 'Verde', hex: '#6bcf7f' },
+        4: { nombre: 'Turquesa', hex: '#4ecdc4' },
+        5: { nombre: 'Azul', hex: '#5e9cff' },
+        6: { nombre: 'Morado', hex: '#c77dff' }
+    };
+    
+    let frecuencias = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0};
+    let totalGiros = 0;
+    let currentRotation = 0;
+
+    function spin() {
+        const roulette = document.getElementById('roulette');
+        const result = document.getElementById('result');
+        const button = document.querySelector('button');
+
+        button.disabled = true;
+        result.textContent = 'Girando...';
+
+        // Seleccionar un color aleatorio (1-6)
+        const colorSeleccionado = Math.floor(Math.random() * 6) + 1;
+        
+        // Ángulos finales para cada color (donde debe quedar la flecha)
+        const angulosCentrales = [330, 270, 210, 150, 90, 30];
+        const anguloObjetivo = angulosCentrales[colorSeleccionado - 1];
+        
+        // Calcular cuántas vueltas completas dar (5-7 vueltas)
+        const vueltasCompletas = 5 + Math.floor(Math.random() * 3);
+        
+        // Calcular el próximo ángulo absoluto al que llegar
+        const vueltaActual = Math.floor(currentRotation / 360);
+        const proximaVuelta = vueltaActual + vueltasCompletas;
+        const nuevoAngulo = proximaVuelta * 360 + anguloObjetivo;
+        
+        currentRotation = nuevoAngulo;
+        roulette.style.transform = `rotate(${currentRotation}deg)`;
+
+        setTimeout(() => {
+            // Actualizar estadísticas
+            frecuencias[colorSeleccionado]++;
+            totalGiros++;
+            
+            actualizarTabla();
+            
+            result.textContent = `¡Salió el color ${colores[colorSeleccionado].nombre}!`;
+            result.style.color = colores[colorSeleccionado].hex;
+            button.disabled = false;
+        }, 4000);
+    }
+
+    function actualizarTabla() {
+        // Actualizar frecuencias y probabilidades experimentales
+        for (let i = 1; i <= 6; i++) {
+            document.getElementById(`freq-${i}`).textContent = frecuencias[i];
+            
+            const probExperimental = totalGiros > 0 
+                ? ((frecuencias[i] / totalGiros) * 100).toFixed(2) 
+                : 0;
+            document.getElementById(`exp-${i}`).textContent = probExperimental + '%';
+        }
+        
+        // Actualizar total de giros
+        document.getElementById('total-giros').textContent = `Total de giros: ${totalGiros}`;
+    }
+  </script>
+</body>
+</html>

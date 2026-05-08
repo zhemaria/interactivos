@@ -1,1 +1,908 @@
-
+<!DOCTYPE html>
+<html lang="es"><head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>4-U3-L3 - INTERACTIVO La Parábola</title> 
+  <style>
+        :root {
+            --color-primary: #4A73E8;
+            --color-secondary: #6A8EE8;
+            --color-tertiary: #E2E8FD;
+            --color-accent: #2C4CC3;
+            --color-dark: #1A3387;
+            --color-text: #202850;
+            --color-light-text: #4A73E8;
+            --color-background: #F5F7FF;
+            --color-white: #FFFFFF;
+            --color-steps: #D6E0FB;
+            --color-success: #28a745;
+            --color-error: #dc3545;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background-color: var(--color-white);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 900px;
+            padding: 30px;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        h1 {
+            color: var(--color-dark);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .help-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: var(--color-dark);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        
+        .help-icon:hover {
+            background-color: var(--color-accent);
+            transform: scale(1.1);
+        }
+        
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: var(--color-tertiary);
+            border-radius: 10px;
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .sign-display {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 5px;
+            color: var(--color-dark);
+        }
+        
+        .equation-info, .display-info {
+            text-align: center;
+            color: var(--color-light-text);
+            margin: 5px 0 15px 0;
+            font-style: italic;
+        }
+        
+        label {
+            font-size: 24px;
+            margin-right: 5px;
+        }
+        
+        input {
+            width: 60px;
+            padding: 8px;
+            border: 2px solid var(--color-secondary);
+            border-radius: 5px;
+            font-size: 18px;
+            text-align: center;
+            background-color: var(--color-white);
+            color: var(--color-text);
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+        
+        button {
+            background-color: var(--color-accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 15px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        button:hover {
+            background-color: var(--color-dark);
+        }
+        
+        .equation-display {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: var(--color-tertiary);
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .graph-container {
+            width: 100%;
+            height: 400px;
+            margin: 20px 0;
+            border: 1px solid var(--color-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: white;
+            display: none;
+        }
+        
+        .solution-container {
+            margin-top: 20px;
+            border-top: 2px dashed var(--color-secondary);
+            padding-top: 20px;
+            display: none;
+        }
+        
+        .step {
+            background-color: var(--color-steps);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 5px solid var(--color-primary);
+        }
+        
+        .step-title {
+            font-weight: bold;
+            color: var(--color-dark);
+            margin-bottom: 8px;
+        }
+        
+        .step-content {
+            line-height: 1.6;
+        }
+        
+        .highlighted {
+            background-color: var(--color-secondary);
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .feature-point {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .feature-label {
+            font-weight: bold;
+            margin-right: 8px;
+            min-width: 180px;
+        }
+        
+        .feature-value {
+            flex-grow: 1;
+        }
+        
+        .summary-container {
+            background-color: var(--color-tertiary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--color-secondary);
+            display: none;
+        }
+        
+        .summary-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--color-dark);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--color-white);
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 700px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--color-light-text);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close-btn:hover {
+            color: var(--color-dark);
+        }
+        
+        .modal h2 {
+            color: var(--color-dark);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .help-step {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--color-secondary);
+        }
+        
+        .help-step:last-child {
+            border-bottom: none;
+        }
+        
+        .help-step h3 {
+            color: var(--color-accent);
+            margin-bottom: 10px;
+        }
+        
+        .error-message {
+            color: var(--color-error);
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .input-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .input-group {
+                margin-bottom: 10px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+                padding: 15px;
+            }
+        }
+    </style> 
+ </head><body><div class="container">
+<h1>Analizador de Funciones Cuadráticas</h1>
+<div class="help-icon" id="helpIcon">?</div>
+<div class="input-container">
+<div class="input-group"><input type="number" id="coefA" value="1" step="0.1"> <label for="coefA">x²</label></div>
+<div class="input-group"><span class="sign-display">+</span></div>
+<div class="input-group"><input type="number" id="coefB" value="0" step="0.1"> <label for="coefB">x</label></div>
+<div class="input-group"><span class="sign-display">+</span></div>
+<div class="input-group"><input type="number" id="coefC" value="-4" step="0.1"></div>
+</div>
+<p class="equation-info" style="color: #2a4285;">Ingresa los coeficientes de la función cuadrática: f(x) = ax² + bx + c</p>
+<button id="analyzeBtn">Analizar Función</button>
+<div class="equation-display" id="equationDisplay">f(x) = x² + 0x - 4</div>
+<p class="display-info" style="color: #2a4285;">Función a analizar</p>
+<div class="error-message" id="errorMessage"></div>
+<div class="summary-container" id="summaryContainer">
+<div class="summary-title">Características de la Función</div>
+<div id="summaryContent"></div>
+</div>
+<div class="graph-container" id="graphContainer"></div>
+<div class="solution-container" id="solutionContainer"></div>
+</div>
+<div class="modal" id="helpModal">
+<div class="modal-content"><span class="close-btn" id="closeModal">×</span>
+<h2>Guía de Funciones Cuadráticas</h2>
+<div class="help-step">
+<h3>¿Qué es una función cuadrática?</h3>
+<p>Una función cuadrática es una función polinómica de segundo grado que se puede expresar en la forma:</p>
+<p><strong>f(x) = ax² + bx + c</strong></p>
+<p>Donde a, b y c son números reales y a ≠ 0. La gráfica de una función cuadrática es una parábola.</p>
+</div>
+<div class="help-step">
+<h3>Características principales</h3>
+<ul>
+<li><strong>Vértice:</strong> El punto máximo o mínimo de la parábola. Se calcula como (-b/2a, f(-b/2a)).</li>
+<li><strong>Eje de simetría:</strong> La línea vertical que pasa por el vértice. Su ecuación es x = -b/2a.</li>
+<li><strong>Concavidad:</strong> Determinada por el signo de a. Si a &gt; 0, la parábola abre hacia arriba. Si a &lt; 0, abre hacia abajo.</li>
+<li><strong>Raíces o ceros:</strong> Los valores de x para los cuales f(x) = 0. Se calculan usando la fórmula cuadrática.</li>
+<li><strong>Intersección con el eje y:</strong> El valor de f(0), que es igual a c.</li>
+</ul>
+</div>
+<div class="help-step">
+<h3>Forma vértice</h3>
+<p>Una función cuadrática también puede escribirse en la forma:</p>
+<p><strong>f(x) = a(x - h)² + k</strong></p>
+<p>Donde (h, k) son las coordenadas del vértice de la parábola.</p>
+</div>
+<div class="help-step">
+<h3>Discriminante</h3>
+<p>El discriminante de una función cuadrática se calcula como:</p>
+<p><strong>Δ = b² - 4ac</strong></p>
+<p>Y nos indica:</p>
+<ul>
+<li>Si Δ &gt; 0: La función tiene dos raíces reales distintas.</li>
+<li>Si Δ = 0: La función tiene una raíz real con multiplicidad 2 (raíz doble).</li>
+<li>Si Δ &lt; 0: La función no tiene raíces reales (sus raíces son números complejos).</li>
+</ul>
+</div>
+</div>
+</div>
+<p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</p>
+<p><script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos del DOM
+            const coefA = document.getElementById('coefA');
+            const coefB = document.getElementById('coefB');
+            const coefC = document.getElementById('coefC');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const equationDisplay = document.getElementById('equationDisplay');
+            const solutionContainer = document.getElementById('solutionContainer');
+            const graphContainer = document.getElementById('graphContainer');
+            const summaryContainer = document.getElementById('summaryContainer');
+            const summaryContent = document.getElementById('summaryContent');
+            const errorMessage = document.getElementById('errorMessage');
+            const helpIcon = document.getElementById('helpIcon');
+            const helpModal = document.getElementById('helpModal');
+            const closeModal = document.getElementById('closeModal');
+            
+            let chart = null;
+            
+            // Mostrar y ocultar el modal de ayuda
+            helpIcon.addEventListener('click', function() {
+                helpModal.style.display = 'block';
+            });
+            
+            closeModal.addEventListener('click', function() {
+                helpModal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', function(event) {
+                if (event.target === helpModal) {
+                    helpModal.style.display = 'none';
+                }
+            });
+            
+            // Actualizar la ecuación mostrada cuando cambian los coeficientes
+            function updateEquationDisplay() {
+                let a = parseFloat(coefA.value) || 0;
+                let b = parseFloat(coefB.value) || 0;
+                let c = parseFloat(coefC.value) || 0;
+                
+                if (a === 0) {
+                    a = 0.0001; // Evitar que a sea cero
+                    coefA.value = 0.0001;
+                }
+                
+                let equation = '';
+                
+                // Término en x²
+                if (a !== 0) {
+                    if (a === 1) equation += 'x²';
+                    else if (a === -1) equation += '-x²';
+                    else equation += a + 'x²';
+                }
+                
+                // Término en x
+                if (b !== 0) {
+                    if (b > 0 && a !== 0) equation += ' + ';
+                    else if (b < 0) equation += ' - ';
+                    
+                    if (Math.abs(b) === 1) equation += 'x';
+                    else equation += Math.abs(b) + 'x';
+                }
+                
+                // Término independiente
+                if (c !== 0) {
+                    if (c > 0 && (a !== 0 || b !== 0)) equation += ' + ';
+                    else if (c < 0) equation += ' - ';
+                    
+                    equation += Math.abs(c);
+                }
+                
+                // Si la ecuación está vacía (todos los coeficientes son cero)
+                if (equation === '') equation = '0';
+                
+                equationDisplay.textContent = 'f(x) = ' + equation;
+                
+                // Actualizar los signos mostrados
+                const signElements = document.querySelectorAll('.sign-display');
+                if (signElements[0]) {
+                    signElements[0].textContent = b >= 0 ? '+' : '-';
+                }
+                if (signElements[1]) {
+                    signElements[1].textContent = c >= 0 ? '+' : '-';
+                }
+            }
+            
+            coefA.addEventListener('input', updateEquationDisplay);
+            coefB.addEventListener('input', updateEquationDisplay);
+            coefC.addEventListener('input', updateEquationDisplay);
+            
+            // Inicializar con los signos correctos
+            updateEquationDisplay();
+            
+            // Función para formatear un número con precisión
+            function formatNumber(num) {
+                // Si es casi cero, retornar 0
+                if (Math.abs(num) < 1e-10) return 0;
+                
+                // Si es casi entero, retornar entero
+                if (Math.abs(num - Math.round(num)) < 1e-10) return Math.round(num);
+                
+                // De lo contrario, formatear con dos decimales
+                return parseFloat(num.toFixed(4));
+            }
+            
+            // Función para crear un paso
+            function createStep(title, content) {
+                const step = document.createElement('div');
+                step.className = 'step';
+                
+                const stepTitle = document.createElement('div');
+                stepTitle.className = 'step-title';
+                stepTitle.textContent = title;
+                
+                const stepContent = document.createElement('div');
+                stepContent.className = 'step-content';
+                stepContent.innerHTML = content;
+                
+                step.appendChild(stepTitle);
+                step.appendChild(stepContent);
+                
+                return step;
+            }
+            
+            // Función para crear la gráfica
+            function createGraph(a, b, c, points) {
+                if (chart) {
+                    chart.destroy();
+                }
+                
+                // Calcular el dominio apropiado para la gráfica
+                const vertexX = -b / (2 * a);
+                const range = Math.max(10, Math.abs(vertexX) * 3);
+                const minX = vertexX - range / 2;
+                const maxX = vertexX + range / 2;
+                
+                // Calcular los puntos para la parábola
+                const xValues = [];
+                const yValues = [];
+                const step = (maxX - minX) / 100;
+                
+                for (let x = minX; x <= maxX; x += step) {
+                    xValues.push(x);
+                    yValues.push(a * x * x + b * x + c);
+                }
+                
+                // Crear el conjunto de datos para la parábola
+                const data = {
+                    labels: xValues,
+                    datasets: [
+                        {
+                            label: 'f(x) = ' + formatEquation(a, b, c),
+                            data: xValues.map((x, i) => ({ x: x, y: yValues[i] })),
+                            borderColor: '#4A73E8',
+                            backgroundColor: 'rgba(74, 115, 232, 0.1)',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            showLine: true,
+                            fill: false
+                        }
+                    ]
+                };
+                
+                // Agregar puntos especiales (vértice, intersecciones)
+                if (points && points.length > 0) {
+                    let pointColors = ['#E91E63', '#4CAF50', '#FF9800', '#9C27B0'];
+                    let colorIndex = 0;
+                    
+                    points.forEach(point => {
+                        data.datasets.push({
+                            label: point.label,
+                            data: [{ x: point.x, y: point.y }],
+                            backgroundColor: pointColors[colorIndex],
+                            borderColor: pointColors[colorIndex],
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            showLine: false
+                        });
+                        colorIndex = (colorIndex + 1) % pointColors.length;
+                    });
+                }
+                
+                // Configurar la gráfica
+                const config = {
+                    type: 'scatter',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'center',
+                                title: {
+                                    display: true,
+                                    text: 'x'
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'center',
+                                title: {
+                                    display: true,
+                                    text: 'f(x)'
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': (' + formatNumber(context.parsed.x) + ', ' + formatNumber(context.parsed.y) + ')';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                
+                // Crear el canvas para la gráfica
+                const canvas = document.createElement('canvas');
+                graphContainer.innerHTML = '';
+                graphContainer.appendChild(canvas);
+                graphContainer.style.display = 'block';
+                
+                // Inicializar la gráfica
+                chart = new Chart(canvas, config);
+            }
+            
+            // Función para formatear la ecuación
+            function formatEquation(a, b, c) {
+                let equation = '';
+                
+                // Término en x²
+                if (a !== 0) {
+                    if (a === 1) equation += 'x²';
+                    else if (a === -1) equation += '-x²';
+                    else equation += formatNumber(a) + 'x²';
+                }
+                
+                // Término en x
+                if (b !== 0) {
+                    if (b > 0 && a !== 0) equation += ' + ';
+                    else if (b < 0) equation += ' - ';
+                    
+                    if (Math.abs(b) === 1) equation += 'x';
+                    else equation += formatNumber(Math.abs(b)) + 'x';
+                }
+                
+                // Término independiente
+                if (c !== 0) {
+                    if (c > 0 && (a !== 0 || b !== 0)) equation += ' + ';
+                    else if (c < 0) equation += ' - ';
+                    
+                    equation += formatNumber(Math.abs(c));
+                }
+                
+                // Si la ecuación está vacía (todos los coeficientes son cero)
+                if (equation === '') equation = '0';
+                
+                return equation;
+            }
+            
+            // Función para generar el resumen de características
+            function createSummary(a, b, c, vertexX, vertexY, discriminante, x1, x2, yIntercept) {
+                summaryContent.innerHTML = '';
+                
+                // Crear elementos para cada característica
+                const features = [
+                    { label: 'Concavidad:', value: a > 0 ? 'Hacia arriba ∪' : 'Hacia abajo ∩' },
+                    { label: 'Vértice:', value: `(${formatNumber(vertexX)}, ${formatNumber(vertexY)})` },
+                    { label: 'Eje de simetría:', value: `x = ${formatNumber(vertexX)}` },
+                    { label: 'Punto crítico:', value: a > 0 ? 'Mínimo' : 'Máximo' },
+                    { label: 'Discriminante:', value: `${formatNumber(discriminante)}` },
+                ];
+                
+                // Raíces o ceros de la función
+                if (discriminante > 0) {
+                    features.push({ label: 'Raíces:', value: `x₁ = ${formatNumber(x1)}, x₂ = ${formatNumber(x2)}` });
+                } else if (discriminante === 0) {
+                    features.push({ label: 'Raíz (doble):', value: `x = ${formatNumber(x1)}` });
+                } else {
+                    features.push({ label: 'Raíces:', value: 'No tiene raíces reales' });
+                }
+                
+                // Intersección con el eje Y
+                features.push({ label: 'Intersección eje Y:', value: `(0, ${formatNumber(yIntercept)})` });
+                
+                // Crear elementos HTML para cada característica
+                features.forEach(feature => {
+                    const featureElement = document.createElement('div');
+                    featureElement.className = 'feature-point';
+                    
+                    const labelElement = document.createElement('div');
+                    labelElement.className = 'feature-label';
+                    labelElement.textContent = feature.label;
+                    
+                    const valueElement = document.createElement('div');
+                    valueElement.className = 'feature-value';
+                    valueElement.textContent = feature.value;
+                    
+                    featureElement.appendChild(labelElement);
+                    featureElement.appendChild(valueElement);
+                    
+                    summaryContent.appendChild(featureElement);
+                });
+                
+                // Mostrar el contenedor de resumen
+                summaryContainer.style.display = 'block';
+            }
+            
+            // Función para analizar la función cuadrática
+            function analizarFuncion(a, b, c) {
+                // Verificar que es una función de segundo grado
+                if (a === 0) {
+                    errorMessage.textContent = 'Para ser una función cuadrática, el coeficiente de x² debe ser distinto de cero.';
+                    errorMessage.style.display = 'block';
+                    solutionContainer.style.display = 'none';
+                    graphContainer.style.display = 'none';
+                    summaryContainer.style.display = 'none';
+                    return;
+                }
+                
+                errorMessage.style.display = 'none';
+                solutionContainer.style.display = 'block';
+                solutionContainer.innerHTML = '';
+                
+                // Paso 1: Identificar la función y sus coeficientes
+                let step1 = createStep(
+                    'Paso 1: Identificar la función cuadrática',
+                    `
+                    <p>La función cuadrática que vamos a analizar es:</p>
+                    <p>f(x) = ${formatEquation(a, b, c)}</p>
+                    <p>Identificamos los coeficientes:</p>
+                    <p>a = ${formatNumber(a)} (coeficiente de x²)</p>
+                    <p>b = ${formatNumber(b)} (coeficiente de x)</p>
+                    <p>c = ${formatNumber(c)} (término independiente)</p>
+                    `
+                );
+                solutionContainer.appendChild(step1);
+                
+                // Paso 2: Determinar la concavidad
+                let step2 = createStep(
+                    'Paso 2: Determinar la concavidad',
+                    `
+                    <p>La concavidad de la parábola está determinada por el signo del coeficiente 'a':</p>
+                    <p>a = ${formatNumber(a)}</p>
+                    <p>${a > 0 ? 
+                        'Como a > 0, la parábola tiene concavidad hacia arriba (∪). Esto significa que la función tiene un valor mínimo.' : 
+                        'Como a < 0, la parábola tiene concavidad hacia abajo (∩). Esto significa que la función tiene un valor máximo.'}</p>
+                    `
+                );
+                solutionContainer.appendChild(step2);
+                
+                // Paso 3: Calcular el vértice
+                const vertexX = -b / (2 * a);
+                const vertexY = a * vertexX * vertexX + b * vertexX + c;
+                
+                let step3 = createStep(
+                    'Paso 3: Calcular el vértice',
+                    `
+                    <p>El vértice de la parábola se calcula con las fórmulas:</p>
+                    <p>x<sub>v</sub> = -b / (2a) = -(${formatNumber(b)}) / (2 · ${formatNumber(a)}) = ${formatNumber(vertexX)}</p>
+                    <p>y<sub>v</sub> = f(x<sub>v</sub>) = ${formatNumber(a)} · (${formatNumber(vertexX)})² + ${formatNumber(b)} · (${formatNumber(vertexX)}) + ${formatNumber(c)} = ${formatNumber(vertexY)}</p>
+                    <p>Por lo tanto, el vértice de la parábola está en el punto (${formatNumber(vertexX)}, ${formatNumber(vertexY)}).</p>
+                    <p>Este punto corresponde al ${a > 0 ? 'mínimo' : 'máximo'} de la función.</p>
+                    `
+                );
+                solutionContainer.appendChild(step3);
+                
+                // Paso 4: Determinar el eje de simetría
+                let step4 = createStep(
+                    'Paso 4: Determinar el eje de simetría',
+                    `
+                    <p>El eje de simetría de la parábola es una línea vertical que pasa por el vértice.</p>
+                    <p>Su ecuación es x = x<sub>v</sub>, donde x<sub>v</sub> es la coordenada x del vértice.</p>
+                    <p>Eje de simetría: x = ${formatNumber(vertexX)}</p>
+                    `
+                );
+                solutionContainer.appendChild(step4);
+                
+                // Paso 5: Calcular las raíces o ceros de la función
+                const discriminante = b * b - 4 * a * c;
+                let step5Content = '';
+                let x1, x2;
+                let pointsToGraph = [
+                    { x: vertexX, y: vertexY, label: 'Vértice' }
+                ];
+                
+                if (discriminante > 0) {
+                    // Dos soluciones reales distintas
+                    x1 = (-b + Math.sqrt(discriminante)) / (2 * a);
+                    x2 = (-b - Math.sqrt(discriminante)) / (2 * a);
+                    
+                    step5Content = `
+                        <p>Para encontrar las raíces o ceros de la función, resolvemos la ecuación f(x) = 0:</p>
+                        <p>${formatNumber(a)}x² + ${formatNumber(b)}x + ${formatNumber(c)} = 0</p>
+                        <p>Utilizamos la fórmula general:</p>
+                        <p>x = (-b ± √(b² - 4ac)) / (2a)</p>
+                        <p>Primero calculamos el discriminante:</p>
+                        <p>Δ = b² - 4ac = (${formatNumber(b)})² - 4 · ${formatNumber(a)} · ${formatNumber(c)} = ${formatNumber(b*b)} - ${formatNumber(4*a*c)} = ${formatNumber(discriminante)}</p>
+                        <p>Como el discriminante es positivo (Δ > 0), la función tiene dos raíces reales distintas.</p>
+                        <p>x₁ = (-b + √Δ) / (2a) = (-(${formatNumber(b)}) + √${formatNumber(discriminante)}) / (2 · ${formatNumber(a)}) = ${formatNumber(x1)}</p>
+                        <p>x₂ = (-b - √Δ) / (2a) = (-(${formatNumber(b)}) - √${formatNumber(discriminante)}) / (2 · ${formatNumber(a)}) = ${formatNumber(x2)}</p>
+                        <p class="highlighted">Por lo tanto, las raíces de la función son x = ${formatNumber(x1)} y x = ${formatNumber(x2)}.</p>
+                        <p>Estas son las intersecciones de la parábola con el eje X.</p>
+                    `;
+                    
+                    // Agregar las raíces a los puntos para graficar
+                    pointsToGraph.push({ x: x1, y: 0, label: 'Raíz 1' });
+                    pointsToGraph.push({ x: x2, y: 0, label: 'Raíz 2' });
+                    
+                } else if (discriminante === 0) {
+                    // Una solución real (raíz doble)
+                    x1 = x2 = -b / (2 * a);
+                    
+                    step5Content = `
+                        <p>Para encontrar las raíces o ceros de la función, resolvemos la ecuación f(x) = 0:</p>
+                        <p>${formatNumber(a)}x² + ${formatNumber(b)}x + ${formatNumber(c)} = 0</p>
+                        <p>Utilizamos la fórmula general:</p>
+                        <p>x = (-b ± √(b² - 4ac)) / (2a)</p>
+                        <p>Primero calculamos el discriminante:</p>
+                        <p>Δ = b² - 4ac = (${formatNumber(b)})² - 4 · ${formatNumber(a)} · ${formatNumber(c)} = ${formatNumber(b*b)} - ${formatNumber(4*a*c)} = ${formatNumber(discriminante)}</p>
+                        <p>Como el discriminante es cero (Δ = 0), la función tiene una raíz real de multiplicidad 2.</p>
+                        <p>x = -b / (2a) = -(${formatNumber(b)}) / (2 · ${formatNumber(a)}) = ${formatNumber(x1)}</p>
+                        <p class="highlighted">Por lo tanto, la única raíz de la función es x = ${formatNumber(x1)}.</p>
+                        <p>En este caso, la parábola toca el eje X en un solo punto (es tangente al eje X).</p>
+                    `;
+                    
+                    // Agregar la raíz a los puntos para graficar
+                    pointsToGraph.push({ x: x1, y: 0, label: 'Raíz (doble)' });
+                    
+                } else {
+                    // No hay soluciones reales
+                    step5Content = `
+                        <p>Para encontrar las raíces o ceros de la función, resolvemos la ecuación f(x) = 0:</p>
+                        <p>${formatNumber(a)}x² + ${formatNumber(b)}x + ${formatNumber(c)} = 0</p>
+                        <p>Utilizamos la fórmula general:</p>
+                        <p>x = (-b ± √(b² - 4ac)) / (2a)</p>
+                        <p>Primero calculamos el discriminante:</p>
+                        <p>Δ = b² - 4ac = (${formatNumber(b)})² - 4 · ${formatNumber(a)} · ${formatNumber(c)} = ${formatNumber(b*b)} - ${formatNumber(4*a*c)} = ${formatNumber(discriminante)}</p>
+                        <p>Como el discriminante es negativo (Δ < 0), la función no tiene raíces reales.</p>
+                        <p class="highlighted">Por lo tanto, la parábola no intersecta con el eje X en ningún punto.</p>
+                    `;
+                }
+                
+                let step5 = createStep('Paso 5: Calcular las raíces de la función', step5Content);
+                solutionContainer.appendChild(step5);
+                
+                // Paso 6: Intersección con el eje Y
+                const yIntercept = c;
+                
+                let step6 = createStep(
+                    'Paso 6: Calcular la intersección con el eje Y',
+                    `
+                    <p>La intersección con el eje Y ocurre cuando x = 0. Por lo tanto, calculamos f(0):</p>
+                    <p>f(0) = ${formatNumber(a)} · (0)² + ${formatNumber(b)} · (0) + ${formatNumber(c)} = ${formatNumber(c)}</p>
+                    <p class="highlighted">Por lo tanto, la parábola intersecta al eje Y en el punto (0, ${formatNumber(yIntercept)}).</p>
+                    `
+                );
+                solutionContainer.appendChild(step6);
+                
+                // Agregar la intersección con el eje Y a los puntos para graficar
+                pointsToGraph.push({ x: 0, y: yIntercept, label: 'Intersección Y' });
+                
+                // Paso 7: Expresar la función en forma de vértice
+                let step7 = createStep(
+                    'Paso 7: Expresar la función en forma de vértice',
+                    `
+                    <p>La forma estándar de una función cuadrática es f(x) = ax² + bx + c</p>
+                    <p>La forma de vértice es f(x) = a(x - h)² + k, donde (h, k) es el vértice.</p>
+                    <p>Como ya calculamos que el vértice es (${formatNumber(vertexX)}, ${formatNumber(vertexY)}), podemos escribir la función como:</p>
+                    <p>f(x) = ${formatNumber(a)}(x - ${formatNumber(vertexX)})² + ${formatNumber(vertexY)}</p>
+                    <p>Esta forma nos permite ver directamente las coordenadas del vértice.</p>
+                    `
+                );
+                solutionContainer.appendChild(step7);
+                
+                // Paso 8: Resumen y características importantes
+                let step8 = createStep(
+                    'Paso 8: Resumen de características importantes',
+                    `
+                    <p><strong>Características de la función f(x) = ${formatEquation(a, b, c)}:</strong></p>
+                    <ul>
+                        <li>Concavidad: ${a > 0 ? 'Hacia arriba ∪' : 'Hacia abajo ∩'}</li>
+                        <li>Vértice: (${formatNumber(vertexX)}, ${formatNumber(vertexY)})</li>
+                        <li>Punto ${a > 0 ? 'mínimo' : 'máximo'}: (${formatNumber(vertexX)}, ${formatNumber(vertexY)})</li>
+                        <li>Eje de simetría: x = ${formatNumber(vertexX)}</li>
+                        <li>Discriminante: Δ = ${formatNumber(discriminante)}</li>
+                        <li>Raíces: ${discriminante > 0 ? 
+                            `x₁ = ${formatNumber(x1)}, x₂ = ${formatNumber(x2)}` : 
+                            (discriminante === 0 ? 
+                                `x = ${formatNumber(x1)} (raíz doble)` : 
+                                'No tiene raíces reales')}
+                        </li>
+                        <li>Intersección con el eje Y: (0, ${formatNumber(yIntercept)})</li>
+                        <li>Forma de vértice: f(x) = ${formatNumber(a)}(x - ${formatNumber(vertexX)})² + ${formatNumber(vertexY)}</li>
+                    </ul>
+                    `
+                );
+                solutionContainer.appendChild(step8);
+                
+                // Crear la gráfica
+                createGraph(a, b, c, pointsToGraph);
+                
+                // Crear el resumen de características
+                createSummary(a, b, c, vertexX, vertexY, discriminante, x1, x2, yIntercept);
+            }
+            
+            // Función para analizar la función
+            analyzeBtn.addEventListener('click', function() {
+                const a = parseFloat(coefA.value) || 0;
+                const b = parseFloat(coefB.value) || 0;
+                const c = parseFloat(coefC.value) || 0;
+                
+                analizarFuncion(a, b, c);
+            });
+        });
+    </script></p></body></html>

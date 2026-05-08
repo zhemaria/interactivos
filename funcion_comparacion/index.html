@@ -1,1 +1,1089 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica de Comparación de Funciones - GED</title>
+    <style>
+        :root {
+            /* Colores DUA - Accesibles y contrastantes */
+            --primary-blue: #0066CC;
+            --secondary-green: #228B22;
+            --accent-orange: #FF6B35;
+            --warning-red: #D32F2F;
+            --success-green: #388E3C;
+            --neutral-gray: #4A4A4A;
+            --light-bg: #F8F9FA;
+            --white: #FFFFFF;
+            --light-blue: #E3F2FD;
+            --light-green: #E8F5E8;
+            --light-orange: #FFF3E0;
+            --light-red: #FFEBEE;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--light-bg) 0%, var(--light-blue) 100%);
+            color: var(--neutral-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-green) 100%);
+            color: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .exercise-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .exercise-type-btn {
+            background: var(--white);
+            border: 3px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .exercise-type-btn:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .exercise-type-btn.active {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .exercise-container {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-left: 6px solid var(--accent-orange);
+        }
+
+        .exercise-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--light-orange);
+            border-radius: 10px;
+        }
+
+        .exercise-title {
+            font-size: 1.8rem;
+            color: var(--accent-orange);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .exercise-context {
+            font-size: 1.1rem;
+            color: var(--neutral-gray);
+            font-style: italic;
+        }
+
+        .comparison-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+            align-items: start;
+        }
+
+        .function-panel {
+            background: var(--light-bg);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid var(--primary-blue);
+            position: relative;
+        }
+
+        .function-panel h3 {
+            color: var(--primary-blue);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            text-align: center;
+            background: var(--white);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .equation-display {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            background: var(--white);
+            border-radius: 8px;
+            color: var(--secondary-green);
+            border: 2px dashed var(--secondary-green);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .data-table th {
+            background: var(--primary-blue);
+            color: var(--white);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: var(--light-blue);
+        }
+
+        .data-table tr:hover {
+            background: var(--light-green);
+            transform: scale(1.02);
+            transition: all 0.2s ease;
+        }
+
+        .graph-container {
+            width: 100%;
+            height: 300px;
+            background: var(--white);
+            border-radius: 8px;
+            border: 2px solid var(--secondary-green);
+            margin: 15px 0;
+        }
+
+        .question-section {
+            background: var(--light-blue);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border-left: 6px solid var(--primary-blue);
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: center;
+            background: var(--white);
+            padding: 15px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            font-size: 1.1rem;
+        }
+
+        .answer-option:hover {
+            background: var(--light-green);
+            border-color: var(--secondary-green);
+            transform: translateX(5px);
+        }
+
+        .answer-option input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.5);
+            accent-color: var(--secondary-green);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: var(--secondary-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #1E7E1E;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: var(--accent-orange);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: #E55A2B;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .feedback-container {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            display: none;
+        }
+
+        .feedback-correct {
+            background: var(--light-green);
+            border: 2px solid var(--success-green);
+            color: var(--success-green);
+        }
+
+        .feedback-incorrect {
+            background: var(--light-red);
+            border: 2px solid var(--warning-red);
+            color: var(--warning-red);
+        }
+
+        .feedback-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-by-step {
+            margin-top: 20px;
+        }
+
+        .step {
+            background: var(--white);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .step-title {
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            background: var(--light-bg);
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--secondary-green), var(--primary-blue));
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .score-display {
+            text-align: center;
+            background: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .score-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary-green);
+        }
+
+        @media (max-width: 768px) {
+            .comparison-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .exercise-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .exercise-type-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #FFE066 0%, #FFE066 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Práctica de Comparación de Funciones</h1>
+            <p>Prepárate para el examen GED con ejercicios interactivos que cambian cada vez</p>
+        </div>
+
+        <div class="exercise-selector">
+            <button class="exercise-type-btn active" data-type="equation-table">
+                📊 Ecuación vs Tabla
+            </button>
+            <button class="exercise-type-btn" data-type="equation-graph">
+                📈 Ecuación vs Gráfico
+            </button>
+            <button class="exercise-type-btn" data-type="table-graph">
+                🔄 Tabla vs Gráfico
+            </button>
+        </div>
+
+        <div class="score-display">
+            <div>Ejercicios Completados: <span class="score-number" id="completed-count">0</span></div>
+            <div>Respuestas Correctas: <span class="score-number" id="correct-count">0</span></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="exercise-container" id="exercise-container">
+            <!-- El ejercicio se generará aquí dinámicamente -->
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-secondary" id="new-exercise-btn">
+                🔄 Nuevo Ejercicio
+            </button>
+            <button class="btn btn-primary" id="check-answer-btn">
+                ✅ Verificar Respuesta
+            </button>
+        </div>
+
+        <div class="feedback-container" id="feedback-container">
+            <!-- La retroalimentación aparecerá aquí -->
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+    <script>
+        class FunctionComparison {
+            constructor() {
+                this.currentExerciseType = 'equation-table';
+                this.currentExercise = null;
+                this.exerciseCount = 0;
+                this.correctCount = 0;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.generateNewExercise();
+            }
+
+            setupEventListeners() {
+                // Selectores de tipo de ejercicio
+                document.querySelectorAll('.exercise-type-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.exercise-type-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentExerciseType = e.target.dataset.type;
+                        this.generateNewExercise();
+                    });
+                });
+
+                // Botones principales
+                document.getElementById('new-exercise-btn').addEventListener('click', () => {
+                    this.generateNewExercise();
+                });
+
+                document.getElementById('check-answer-btn').addEventListener('click', () => {
+                    this.checkAnswer();
+                });
+            }
+
+            generateNewExercise() {
+                this.hideFeedback();
+                
+                switch(this.currentExerciseType) {
+                    case 'equation-table':
+                        this.generateEquationTableExercise();
+                        break;
+                    case 'equation-graph':
+                        this.generateEquationGraphExercise();
+                        break;
+                    case 'table-graph':
+                        this.generateTableGraphExercise();
+                        break;
+                }
+            }
+
+            generateEquationTableExercise() {
+                const scenarios = [
+                    {
+                        context: "María y Ana trabajan como freelancers. La tabla muestra las ganancias de María y la ecuación muestra las ganancias de Ana.",
+                        question: "¿Quién gana más dinero por hora de trabajo? (Redondea las tasas a dos decimales)",
+                        xLabel: "Horas",
+                        yLabel: "Ganancias ($)"
+                    },
+                    {
+                        context: "Dos empresas de limpieza ofrecen sus servicios. La tabla muestra los precios de CleanPro y la ecuación los de SparkleClean.",
+                        question: "¿Cuál empresa cobra más por cada hora adicional? (Redondea las tasas a dos decimales)",
+                        xLabel: "Horas",
+                        yLabel: "Costo ($)"
+                    },
+                    {
+                        context: "Luis compara dos planes de teléfono. La tabla muestra el Plan A y la ecuación el Plan B.",
+                        question: "¿Cuál plan tiene mayor costo por minuto? (Redondea las tasas a dos decimales)",
+                        xLabel: "Minutos",
+                        yLabel: "Costo ($)"
+                    }
+                ];
+
+                const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+                
+                // Generar ecuación aleatoria (función lineal)
+                const m1 = (Math.random() * 8 + 2).toFixed(2); // Pendiente entre 2 y 10
+                const b1 = (Math.random() * 20 + 5).toFixed(0); // Intersección entre 5 y 25
+                
+                // Generar tabla con pendiente diferente
+                const m2 = (Math.random() * 8 + 2).toFixed(2);
+                const b2 = (Math.random() * 20 + 5).toFixed(0);
+                
+                const tableData = [];
+                for(let x = 2; x <= 10; x += 2) {
+                    tableData.push({
+                        x: x,
+                        y: parseFloat(m2) * x + parseFloat(b2)
+                    });
+                }
+
+                this.currentExercise = {
+                    type: 'equation-table',
+                    scenario: scenario,
+                    equation: {
+                        formula: `y = ${m1}x + ${b1}`,
+                        slope: parseFloat(m1),
+                        intercept: parseFloat(b1)
+                    },
+                    table: {
+                        data: tableData,
+                        slope: parseFloat(m2),
+                        intercept: parseFloat(b2)
+                    },
+                    correctAnswer: parseFloat(m1) > parseFloat(m2) ? 'equation' : 'table'
+                };
+
+                this.renderEquationTableExercise();
+            }
+
+            renderEquationTableExercise() {
+                const exercise = this.currentExercise;
+                const container = document.getElementById('exercise-container');
+                
+                container.innerHTML = `
+                    <div class="exercise-header">
+                        <div class="exercise-title">Comparación: Ecuación vs Tabla</div>
+                        <div class="exercise-context">${exercise.scenario.context}</div>
+                    </div>
+
+                    <div class="comparison-layout">
+                        <div class="function-panel">
+                            <h3>📊 Función A (Tabla)</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>${exercise.scenario.xLabel}</th>
+                                        <th>${exercise.scenario.yLabel}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${exercise.table.data.map(point => 
+                                        `<tr><td>${point.x}</td><td>$${point.y.toFixed(2)}</td></tr>`
+                                    ).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="function-panel">
+                            <h3>📈 Función B (Ecuación)</h3>
+                            <div class="equation-display">
+                                ${exercise.equation.formula}
+                            </div>
+                            <p style="text-align: center; margin-top: 15px; color: #666;">
+                                donde x = ${exercise.scenario.xLabel.toLowerCase()}, y = ${exercise.scenario.yLabel.toLowerCase()}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="question-section">
+                        <div class="question-text">${exercise.scenario.question}</div>
+                        <div class="answer-options">
+                            <label class="answer-option">
+                                <input type="radio" name="answer" value="equation">
+                                <span>Función B (Ecuación) tiene mayor tasa</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="answer" value="table">
+                                <span>Función A (Tabla) tiene mayor tasa</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="answer" value="equal">
+                                <span>Ambas funciones tienen la misma tasa</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            }
+
+            generateEquationGraphExercise() {
+                const scenarios = [
+                    {
+                        context: "Dos atletas entrenan corriendo. La ecuación muestra la velocidad del Atleta A y el gráfico la del Atleta B.",
+                        question: "¿Cuál atleta acelera más rápido (mayor pendiente)? (Redondea las pendientes a dos decimales)",
+                        xLabel: "Tiempo (min)",
+                        yLabel: "Velocidad (km/h)"
+                    },
+                    {
+                        context: "Comparas dos inversiones. La ecuación muestra la Inversión X y el gráfico la Inversión Y.",
+                        question: "¿Cuál inversión crece más rápido? (Redondea las tasas a dos decimales)",
+                        xLabel: "Años",
+                        yLabel: "Valor ($1000s)"
+                    }
+                ];
+
+                const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+                
+                // Generar ecuación
+                const m1 = (Math.random() * 6 + 1).toFixed(1);
+                const b1 = (Math.random() * 10 + 2).toFixed(1);
+                
+                // Generar datos para gráfico con pendiente diferente
+                const m2 = (Math.random() * 6 + 1).toFixed(1);
+                const b2 = (Math.random() * 10 + 2).toFixed(1);
+
+                this.currentExercise = {
+                    type: 'equation-graph',
+                    scenario: scenario,
+                    equation: {
+                        formula: `y = ${m1}x + ${b1}`,
+                        slope: parseFloat(m1),
+                        intercept: parseFloat(b1)
+                    },
+                    graph: {
+                        slope: parseFloat(m2),
+                        intercept: parseFloat(b2)
+                    },
+                    correctAnswer: parseFloat(m1) > parseFloat(m2) ? 'equation' : 'graph'
+                };
+
+                this.renderEquationGraphExercise();
+            }
+
+            renderEquationGraphExercise() {
+                const exercise = this.currentExercise;
+                const container = document.getElementById('exercise-container');
+                
+                container.innerHTML = `
+                    <div class="exercise-header">
+                        <div class="exercise-title">Comparación: Ecuación vs Gráfico</div>
+                        <div class="exercise-context">${exercise.scenario.context}</div>
+                    </div>
+
+                    <div class="comparison-layout">
+                        <div class="function-panel">
+                            <h3>📈 Función A (Ecuación)</h3>
+                            <div class="equation-display">
+                                ${exercise.equation.formula}
+                            </div>
+                            <p style="text-align: center; margin-top: 15px; color: #666;">
+                                donde x = ${exercise.scenario.xLabel.toLowerCase()}, y = ${exercise.scenario.yLabel.toLowerCase()}
+                            </p>
+                        </div>
+
+                        <div class="function-panel">
+                            <h3>📊 Función B (Gráfico)</h3>
+                            <div class="graph-container" id="comparison-graph"></div>
+                        </div>
+                    </div>
+
+                    <div class="question-section">
+                        <div class="question-text">${exercise.scenario.question}</div>
+                        <div class="answer-options">
+                            <label class="answer-option">
+                                <input type="radio" name="answer" value="equation">
+                                <span>Función A (Ecuación) tiene mayor pendiente</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="answer" value="graph">
+                                <span>Función B (Gráfico) tiene mayor pendiente</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="answer" value="equal">
+                                <span>Ambas funciones tienen la misma pendiente</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+
+                // Crear el gráfico
+                this.createComparisonGraph();
+            }
+
+            createComparisonGraph() {
+                const exercise = this.currentExercise;
+                const x = Array.from({length: 50}, (_, i) => i * 0.2);
+                const y = x.map(val => exercise.graph.slope * val + exercise.graph.intercept);
+
+                const data = [{
+                    x: x,
+                    y: y,
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: {
+                        color: '#228B22',
+                        width: 4
+                    },
+                    name: 'Función B'
+                }];
+
+                const layout = {
+                    xaxis: {
+                        title: exercise.scenario.xLabel,
+                        zeroline: true
+                    },
+                    yaxis: {
+                        title: exercise.scenario.yLabel,
+                        zeroline: true
+                    },
+                    margin: { l: 50, r: 30, b: 50, t: 30 },
+                    showlegend: false,
+                    height: 280
+                };
+
+                Plotly.newPlot('comparison-graph', data, layout, {responsive: true});
+            }
+
+            generateTableGraphExercise() {
+                const scenarios = [
+                    {
+                        context: "Dos robots de limpieza trabajan en una oficina. La tabla muestra el área limpiada por RoboA y el gráfico por RoboB.",
+                        question: "¿Cuál robot limpia más área por minuto? (Redondea las tasas a dos decimales)",
+                        xLabel: "Tiempo (min)",
+                        yLabel: "Área (m²)"
+                    },
+                    {
+                        context: "Comparas dos métodos de ahorro. La tabla muestra el Método 1 y el gráfico el Método 2.",
+                        question: "¿Cuál método permite ahorrar más dinero por mes? (Redondea las tasas a dos decimales)",
+                        xLabel: "Meses",
+                        yLabel: "Ahorros ($)"
+                    }
+                ];
+
+                const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+                
+                // Generar tabla
+                const m1 = (Math.random() * 5 + 2).toFixed(1);
+                const b1 = (Math.random() * 15 + 5).toFixed(0);
+                
+                const tableData = [];
+                for(let x = 1; x <= 8; x += 1) {
+                    tableData.push({
+                        x: x,
+                        y: parseFloat(m1) * x + parseFloat(b1)
+                    });
+                }
+
+                // Generar gráfico con pendiente diferente
+                const m2 = (Math.random() * 5 + 2).toFixed(1);
+                const b2 = (Math.random() * 15 + 5).toFixed(0);
+
+                this.currentExercise = {
+                    type: 'table-graph',
+                    scenario: scenario,
+                    table: {
+                        data: tableData,
+                        slope: parseFloat(m1),
+                        intercept: parseFloat(b1)
+                    },
+                    graph: {
+                        slope: parseFloat(m2),
+                        intercept: parseFloat(b2)
+                    },
+                    correctAnswer: parseFloat(m1) > parseFloat(m2) ? 'table' : 'graph'
+                };
+
+                this.renderTableGraphExercise();
+            }
+
+            renderTableGraphExercise() {
+                const exercise = this.currentExercise;
+                const container = document.getElementById('exercise-container');
+                
+                container.innerHTML = `
+                    <div class="exercise-header">
+                        <div class="exercise-title">Comparación: Tabla vs Gráfico</div>
+                        <div class="exercise-context">${exercise.scenario.context}</div>
+                    </div>
+
+                    <div class="comparison-layout">
+                        <div class="function-panel">
+                            <h3>📊 Función A (Tabla)</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>${exercise.scenario.xLabel}</th>
+                                        <th>${exercise.scenario.yLabel}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${exercise.table.data.map(point => 
+                                        `<tr><td>${point.x}</td><td>${point.y.toFixed(2)}</td></tr>`
+                                    ).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="function-panel">
+                            <h3>📈 Función B (Gráfico)</h3>
+                            <div class="graph-container" id="table-comparison-graph"></div>
+                        </div>
+                    </div>
+
+                    <div class="question-section">
+                        <div class="question-text">${exercise.scenario.question}</div>
+                        <div class="answer-options">
+                            <label class="answer-option">
+                                <input type="radio" name="answer" value="table">
+                                <span>Función A (Tabla) tiene mayor tasa</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="answer" value="graph">
+                                <span>Función B (Gráfico) tiene mayor tasa</span>
+                            </label>
+                            <label class="answer-option">
+                                <input type="radio" name="answer" value="equal">
+                                <span>Ambas funciones tienen la misma tasa</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+
+                // Crear el gráfico
+                this.createTableComparisonGraph();
+            }
+
+            createTableComparisonGraph() {
+                const exercise = this.currentExercise;
+                const x = Array.from({length: 50}, (_, i) => i * 0.2);
+                const y = x.map(val => exercise.graph.slope * val + exercise.graph.intercept);
+
+                const data = [{
+                    x: x,
+                    y: y,
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: {
+                        color: '#0066CC',
+                        width: 4
+                    },
+                    name: 'Función B'
+                }];
+
+                const layout = {
+                    xaxis: {
+                        title: exercise.scenario.xLabel,
+                        zeroline: true
+                    },
+                    yaxis: {
+                        title: exercise.scenario.yLabel,
+                        zeroline: true
+                    },
+                    margin: { l: 50, r: 30, b: 50, t: 30 },
+                    showlegend: false,
+                    height: 280
+                };
+
+                Plotly.newPlot('table-comparison-graph', data, layout, {responsive: true});
+            }
+
+            checkAnswer() {
+                const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+                
+                if (!selectedAnswer) {
+                    this.showFeedback(false, "Por favor selecciona una respuesta antes de verificar.", []);
+                    return;
+                }
+
+                const userAnswer = selectedAnswer.value;
+                const isCorrect = userAnswer === this.currentExercise.correctAnswer;
+                
+                this.exerciseCount++;
+                if (isCorrect) {
+                    this.correctCount++;
+                }
+
+                this.updateProgress();
+                
+                const explanation = this.generateExplanation(isCorrect, userAnswer);
+                this.showFeedback(isCorrect, explanation.message, explanation.steps);
+            }
+
+            generateExplanation(isCorrect, userAnswer) {
+                const exercise = this.currentExercise;
+                let message, steps;
+
+                if (isCorrect) {
+                    message = "¡Excelente! Tu respuesta es correcta. 🎉";
+                } else {
+                    message = "Tu respuesta no es correcta, pero ¡no te preocupes! Vamos a revisar el proceso paso a paso. 📚";
+                }
+
+                // Generar pasos específicos según el tipo de ejercicio
+                switch(exercise.type) {
+                    case 'equation-table':
+                        steps = this.generateEquationTableSteps();
+                        break;
+                    case 'equation-graph':
+                        steps = this.generateEquationGraphSteps();
+                        break;
+                    case 'table-graph':
+                        steps = this.generateTableGraphSteps();
+                        break;
+                }
+
+                return { message, steps };
+            }
+
+            generateEquationTableSteps() {
+                const exercise = this.currentExercise;
+                const tableSlope = this.calculateTableSlope(exercise.table.data);
+                const equationSlope = exercise.equation.slope.toFixed(2);
+                
+                return [
+                    {
+                        title: "Paso 1: Identificar la pendiente de la ecuación",
+                        content: `En la ecuación ${exercise.equation.formula}, la pendiente es <span class="highlight">${equationSlope}</span> (el coeficiente de x).`
+                    },
+                    {
+                        title: "Paso 2: Calcular la pendiente de la tabla",
+                        content: `Para calcular la pendiente de la tabla, usamos dos puntos: (${exercise.table.data[0].x}, ${exercise.table.data[0].y.toFixed(2)}) y (${exercise.table.data[1].x}, ${exercise.table.data[1].y.toFixed(2)}). Pendiente = (${exercise.table.data[1].y.toFixed(2)} - ${exercise.table.data[0].y.toFixed(2)}) ÷ (${exercise.table.data[1].x} - ${exercise.table.data[0].x}) = <span class="highlight">${tableSlope}</span>`
+                    },
+                    {
+                        title: "Paso 3: Comparar las pendientes",
+                        content: `Ecuación: ${equationSlope} vs Tabla: ${tableSlope}. ${parseFloat(equationSlope) > parseFloat(tableSlope) ? 'La ecuación' : 'La tabla'} tiene mayor pendiente (${Math.max(parseFloat(equationSlope), parseFloat(tableSlope)).toFixed(2)}).`
+                    },
+                    {
+                        title: "Respuesta correcta",
+                        content: `${exercise.correctAnswer === 'equation' ? 'La Función B (Ecuación)' : 'La Función A (Tabla)'} tiene la mayor tasa de cambio.`
+                    }
+                ];
+            }
+
+            generateEquationGraphSteps() {
+                const exercise = this.currentExercise;
+                const equationSlope = exercise.equation.slope.toFixed(2);
+                const graphSlope = exercise.graph.slope.toFixed(2);
+                
+                return [
+                    {
+                        title: "Paso 1: Identificar la pendiente de la ecuación",
+                        content: `En la ecuación ${exercise.equation.formula}, la pendiente es <span class="highlight">${equationSlope}</span>.`
+                    },
+                    {
+                        title: "Paso 2: Determinar la pendiente del gráfico",
+                        content: `Observando el gráfico, vemos que por cada unidad que aumenta x, y aumenta <span class="highlight">${graphSlope}</span> unidades. Esta es la pendiente del gráfico.`
+                    },
+                    {
+                        title: "Paso 3: Comparar las pendientes",
+                        content: `Ecuación: ${equationSlope} vs Gráfico: ${graphSlope}. ${parseFloat(equationSlope) > parseFloat(graphSlope) ? 'La ecuación' : 'El gráfico'} tiene mayor pendiente.`
+                    },
+                    {
+                        title: "Respuesta correcta",
+                        content: `${exercise.correctAnswer === 'equation' ? 'La Función A (Ecuación)' : 'La Función B (Gráfico)'} tiene la mayor pendiente.`
+                    }
+                ];
+            }
+
+            generateTableGraphSteps() {
+                const exercise = this.currentExercise;
+                const tableSlope = this.calculateTableSlope(exercise.table.data);
+                const graphSlope = exercise.graph.slope.toFixed(2);
+                
+                return [
+                    {
+                        title: "Paso 1: Calcular la pendiente de la tabla",
+                        content: `Usando dos puntos de la tabla: (${exercise.table.data[0].x}, ${exercise.table.data[0].y.toFixed(2)}) y (${exercise.table.data[1].x}, ${exercise.table.data[1].y.toFixed(2)}). Pendiente = <span class="highlight">${tableSlope}</span>`
+                    },
+                    {
+                        title: "Paso 2: Determinar la pendiente del gráfico",
+                        content: `Analizando el gráfico, la pendiente es <span class="highlight">${graphSlope}</span>.`
+                    },
+                    {
+                        title: "Paso 3: Comparar las pendientes",
+                        content: `Tabla: ${tableSlope} vs Gráfico: ${graphSlope}. ${parseFloat(tableSlope) > parseFloat(graphSlope) ? 'La tabla' : 'El gráfico'} tiene mayor pendiente.`
+                    },
+                    {
+                        title: "Respuesta correcta",
+                        content: `${exercise.correctAnswer === 'table' ? 'La Función A (Tabla)' : 'La Función B (Gráfico)'} tiene la mayor tasa de cambio.`
+                    }
+                ];
+            }
+
+            calculateTableSlope(data) {
+                if (data.length < 2) return 0;
+                const deltaY = data[1].y - data[0].y;
+                const deltaX = data[1].x - data[0].x;
+                return (deltaY / deltaX).toFixed(2);
+            }
+
+            showFeedback(isCorrect, message, steps) {
+                const container = document.getElementById('feedback-container');
+                const feedbackClass = isCorrect ? 'feedback-correct' : 'feedback-incorrect';
+                const icon = isCorrect ? '✅' : '❌';
+                
+                let stepsHTML = '';
+                if (steps && steps.length > 0) {
+                    stepsHTML = `
+                        <div class="step-by-step">
+                            <h4 style="color: #0066CC; margin-bottom: 15px;">📝 Proceso paso a paso:</h4>
+                            ${steps.map(step => `
+                                <div class="step">
+                                    <div class="step-title">${step.title}</div>
+                                    <div>${step.content}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = `
+                    <div class="feedback-title">
+                        <span class="icon">${icon}</span>
+                        ${isCorrect ? 'Respuesta Correcta' : 'Revisemos Juntos'}
+                    </div>
+                    <p>${message}</p>
+                    ${stepsHTML}
+                `;
+                
+                container.className = `feedback-container ${feedbackClass}`;
+                container.style.display = 'block';
+                
+                // Scroll suave hacia la retroalimentación
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            hideFeedback() {
+                const container = document.getElementById('feedback-container');
+                container.style.display = 'none';
+            }
+
+            updateProgress() {
+                document.getElementById('completed-count').textContent = this.exerciseCount;
+                document.getElementById('correct-count').textContent = this.correctCount;
+                
+                const percentage = this.exerciseCount > 0 ? (this.correctCount / this.exerciseCount) * 100 : 0;
+                document.getElementById('progress-fill').style.width = percentage + '%';
+            }
+        }
+
+        // Inicializar la aplicación cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            new FunctionComparison();
+        });
+    </script>
+</body>
+</html>

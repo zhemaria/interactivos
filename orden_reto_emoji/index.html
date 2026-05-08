@@ -1,1 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Retos Matemáticos con Emojis</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 40px;
+    }
 
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 1.8em;
+    }
+
+    .problem-container {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-left: 5px solid #667eea;
+    }
+
+    .equation {
+      font-size: 1.5em;
+      margin: 15px 0;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .final-equation {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #667eea;
+      border-top: 2px solid #eee;
+      padding-top: 20px;
+      margin-top: 20px;
+    }
+
+    .emoji {
+      font-size: 1.2em;
+    }
+
+    .input-container {
+      margin: 20px 0;
+    }
+
+    input[type="number"] {
+      padding: 12px 20px;
+      font-size: 1.2em;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      width: 150px;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+
+    .btn-verify {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-verify:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    .btn-new {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-new:hover {
+      background: #5a6fd8;
+      transform: translateY(-2px);
+    }
+
+    .solution {
+      background: #e9f7ef;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      text-align: left;
+      border-left: 5px solid #28a745;
+      display: none;
+    }
+
+    .solution h3 {
+      color: #28a745;
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .step {
+      margin: 15px 0;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      border-left: 3px solid #28a745;
+    }
+
+    .step-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .step-calculation {
+      color: #666;
+      font-family: monospace;
+      background: #f8f9fa;
+      padding: 8px;
+      border-radius: 5px;
+      margin: 5px 0;
+    }
+
+    .result {
+      text-align: center;
+      font-size: 1.3em;
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .correct {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .incorrect {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    .animate-bounce {
+      animation: bounce 1s;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧮 Retos Matemáticos con Emojis<br>Orden de las Operaciones</h1>
+    
+    <div class="problem-container">
+      <div id="equations"></div>
+    </div>
+
+    <div class="input-container">
+      <input type="number" id="answer" placeholder="Tu respuesta" />
+    </div>
+
+    <div>
+      <button class="btn btn-verify" onclick="verifyAnswer()">✓ Verificar</button>
+      <button class="btn btn-new" onclick="generateNewProblem()">🔄 Nuevo Problema</button>
+    </div>
+
+    <div id="solution" class="solution"></div>
+  </div>
+
+  <script>
+    // Pool de emojis para usar en los problemas
+    const emojiPool = [
+      '🍎', '🍌', '🍊', '🍇', '🍓', '🥝', '🍑', '🍒', '🥭', '🍍',
+      '🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐸',
+      '🌸', '🌺', '🌻', '🌷', '🌹', '🌼', '💐', '🌿', '🍀', '🌱',
+      '⭐', '🌟', '✨', '💫', '🌙', '☀️', '🌈', '⚡', '🔥', '💎',
+      '🎈', '🎀', '🎁', '🏆', '🥇', '🎯', '🎪', '🎨', '🎭', '🎪'
+    ];
+
+    let currentProblem = {};
+    let correctAnswer = 0;
+
+    function getRandomEmojis(count) {
+      const shuffled = [...emojiPool].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateNewProblem() {
+      // Limpiar solución anterior
+      document.getElementById('solution').style.display = 'none';
+      document.getElementById('answer').value = '';
+      
+      // Obtener 3 emojis únicos
+      const emojis = getRandomEmojis(3);
+      const [emoji1, emoji2, emoji3] = emojis;
+      
+      // Generar valores aleatorios para cada emoji (ajustados para divisiones)
+      const value1 = getRandomInt(2, 15);
+      const value2 = getRandomInt(2, 12);
+      const value3 = getRandomInt(2, 10);
+      
+      // Guardar el problema actual
+      currentProblem = {
+        emojis: [emoji1, emoji2, emoji3],
+        values: [value1, value2, value3]
+      };
+      
+      // Crear las ecuaciones con diferentes operaciones
+      const equationTypes = [
+        { type: 'add3', result: value1 * 3, display: `${emoji1} + ${emoji1} + ${emoji1}` },
+        { type: 'mult', result: value1 * 3, display: `${emoji1} × 3` },
+        { type: 'div', result: value1 * 6, display: `${emoji1} × 6` } // Para que la división de resultado entero
+      ];
+      
+      const eq1Type = equationTypes[Math.floor(Math.random() * equationTypes.length)];
+      let eq1Result, eq1Display;
+      
+      if (eq1Type.type === 'div') {
+        eq1Result = value1 * 6;
+        eq1Display = `${emoji1} × 6`;
+      } else {
+        eq1Result = eq1Type.result;
+        eq1Display = eq1Type.display;
+      }
+      
+      // Segunda ecuación con diferentes operaciones
+      const eq2Options = [
+        { result: value2 + value1 + value2, display: `${emoji2} + ${emoji1} + ${emoji2}` },
+        { result: value2 * 2 + value1, display: `${emoji2} × 2 + ${emoji1}` },
+        { result: (value2 + value1) * 2, display: `(${emoji2} + ${emoji1}) × 2` }
+      ];
+      
+      const eq2Type = eq2Options[Math.floor(Math.random() * eq2Options.length)];
+      const eq2Result = eq2Type.result;
+      
+      // Tercera ecuación con más variedad
+      const eq3Options = [
+        { result: value3 + value3 + value2, display: `${emoji3} + ${emoji3} + ${emoji2}` },
+        { result: value3 * value2, display: `${emoji3} × ${emoji2}` },
+        { result: value3 * 3 - value2, display: `${emoji3} × 3 - ${emoji2}` }
+      ];
+      
+      const eq3Type = eq3Options[Math.floor(Math.random() * eq3Options.length)];
+      const eq3Result = eq3Type.result;
+      
+      // Operaciones finales más complejas
+      const operations = [
+        { op: 'add', calc: (a, b) => a + b, symbol: '+', name: 'suma' },
+        { op: 'sub', calc: (a, b) => a - b, symbol: '-', name: 'resta' },
+        { op: 'mult', calc: (a, b) => a * b, symbol: '×', name: 'multiplicación' },
+        { op: 'div', calc: (a, b) => Math.round(a / b), symbol: '÷', name: 'división' },
+        { op: 'mixed_add_mult', calc: (a, b, c) => a + (b * c), symbols: ['+', '×'], name: 'suma y multiplicación' },
+        { op: 'mixed_sub_mult', calc: (a, b, c) => a - (b * c), symbols: ['-', '×'], name: 'resta y multiplicación' },
+        { op: 'mixed_mult_div', calc: (a, b, c) => Math.round((a * b) / c), symbols: ['×', '÷'], name: 'multiplicación y división' },
+        { op: 'mixed_add_div', calc: (a, b, c) => a + Math.round(b / c), symbols: ['+', '÷'], name: 'suma y división' }
+      ];
+      
+      const selectedOp = operations[Math.floor(Math.random() * operations.length)];
+      
+      let finalEquation, finalResult;
+      
+      // Ajustar valores para divisiones que den resultados enteros
+      if (selectedOp.op === 'div') {
+        const divisor = value2;
+        const dividend = value1 * divisor; // Asegurar división exacta
+        currentProblem.values[0] = dividend;
+        finalEquation = `${emoji1} ${selectedOp.symbol} ${emoji2}`;
+        finalResult = dividend / divisor;
+      } else if (selectedOp.op.startsWith('mixed_')) {
+        if (selectedOp.op === 'mixed_mult_div') {
+          // Asegurar que la división sea exacta
+          const product = value1 * value2;
+          const divisor = value3;
+          const adjustedProduct = Math.floor(product / divisor) * divisor;
+          finalEquation = `${emoji1} × ${emoji2} ÷ ${emoji3}`;
+          finalResult = adjustedProduct / divisor;
+        } else if (selectedOp.op === 'mixed_add_div') {
+          // Asegurar división exacta
+          const dividend = value2;
+          const divisor = value3;
+          const adjustedDividend = Math.floor(dividend / divisor) * divisor;
+          finalEquation = `${emoji1} + ${emoji2} ÷ ${emoji3}`;
+          finalResult = value1 + (adjustedDividend / divisor);
+        } else {
+          finalEquation = `${emoji1} ${selectedOp.symbols[0]} ${emoji2} ${selectedOp.symbols[1]} ${emoji3}`;
+          finalResult = selectedOp.calc(value1, value2, value3);
+        }
+      } else {
+        finalEquation = `${emoji1} ${selectedOp.symbol} ${emoji2}`;
+        finalResult = selectedOp.calc(value1, value2);
+      }
+      
+      correctAnswer = Math.round(finalResult);
+      currentProblem.finalOperation = selectedOp;
+      currentProblem.finalResult = correctAnswer;
+      currentProblem.equations = [
+        { display: eq1Display, result: eq1Result, type: eq1Type },
+        { display: eq2Type.display, result: eq2Result, type: eq2Type },
+        { display: eq3Type.display, result: eq3Result, type: eq3Type }
+      ];
+      
+      // Mostrar las ecuaciones
+      const equationsDiv = document.getElementById('equations');
+      equationsDiv.innerHTML = `
+        <div class="equation">
+          ${currentProblem.equations[0].display.replace(/×/g, '<span style="color: #e74c3c;">×</span>').replace(/÷/g, '<span style="color: #f39c12;">÷</span>').replace(/-/g, '<span style="color: #9b59b6;">-</span>')} = ${currentProblem.equations[0].result}
+        </div>
+        <div class="equation">
+          ${currentProblem.equations[1].display.replace(/×/g, '<span style="color: #e74c3c;">×</span>').replace(/÷/g, '<span style="color: #f39c12;">÷</span>').replace(/-/g, '<span style="color: #9b59b6;">-</span>')} = ${currentProblem.equations[1].result}
+        </div>
+        <div class="equation">
+          ${currentProblem.equations[2].display.replace(/×/g, '<span style="color: #e74c3c;">×</span>').replace(/÷/g, '<span style="color: #f39c12;">÷</span>').replace(/-/g, '<span style="color: #9b59b6;">-</span>')} = ${currentProblem.equations[2].result}
+        </div>
+        <div class="final-equation">
+          ${finalEquation.replace(/×/g, '<span style="color: #e74c3c;">×</span>').replace(/÷/g, '<span style="color: #f39c12;">÷</span>').replace(/-/g, '<span style="color: #9b59b6;">-</span>')} = ❓
+        </div>
+      `;
+    }
+
+    function verifyAnswer() {
+      const userAnswer = parseInt(document.getElementById('answer').value);
+      const isCorrect = userAnswer === correctAnswer;
+      
+      // Mostrar resultado
+      const container = document.querySelector('.container');
+      container.classList.add('animate-bounce');
+      setTimeout(() => container.classList.remove('animate-bounce'), 1000);
+      
+      // Generar solución paso a paso
+      generateSolution(userAnswer, isCorrect);
+      
+      // Mostrar la solución
+      document.getElementById('solution').style.display = 'block';
+      document.getElementById('solution').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function generateSolution(userAnswer, isCorrect) {
+      const { emojis, values, finalOperation, finalResult, equations } = currentProblem;
+      const [emoji1, emoji2, emoji3] = emojis;
+      const [value1, value2, value3] = values;
+      
+      let steps = '';
+      
+      // Paso 1: Resolver primera ecuación
+      steps += `
+        <div class="step">
+          <div class="step-title">Ecuación 1:</div>
+          <div class="step-calculation">${equations[0].display} = ${equations[0].result}</div>
+          ${generateStepExplanation(1, equations[0], emoji1, value1)}
+        </div>
+      `;
+      
+      // Paso 2: Resolver segunda ecuación
+      steps += `
+        <div class="step">
+          <div class="step-title">Ecuación 2:</div>
+          <div class="step-calculation">${equations[1].display} = ${equations[1].result}</div>
+          ${generateStepExplanation(2, equations[1], emoji2, value2, emoji1, value1)}
+        </div>
+      `;
+      
+      // Paso 3: Resolver tercera ecuación
+      steps += `
+        <div class="step">
+          <div class="step-title">Ecuación 3:</div>
+          <div class="step-calculation">${equations[2].display} = ${equations[2].result}</div>
+          ${generateStepExplanation(3, equations[2], emoji3, value3, emoji2, value2)}
+        </div>
+      `;
+      
+      // Paso 4: Resolver ecuación final
+      steps += generateFinalStepExplanation();
+      
+      // Resultado final
+      const resultDiv = `
+        <div class="result ${isCorrect ? 'correct' : 'incorrect'}">
+          ${isCorrect ? 
+            `¡Excelente! 🎉 Tu respuesta ${userAnswer} es correcta.` : 
+            `Tu respuesta ${userAnswer} es incorrecta. La respuesta correcta es ${correctAnswer}.`
+          }
+        </div>
+      `;
+      
+      document.getElementById('solution').innerHTML = `
+        <h3>🔍 Verificación paso a paso</h3>
+        ${steps}
+        ${resultDiv}
+      `;
+    }
+
+    function generateStepExplanation(step, equation, mainEmoji, mainValue, knownEmoji = null, knownValue = null) {
+      const display = equation.display;
+      
+      if (display.includes('×') && display.includes('3') && !display.includes('+')) {
+        // Multiplicación por 3
+        return `<div>Esto significa que cada ${mainEmoji} vale ${mainValue}:</div>
+                <div class="step-calculation">${mainEmoji} = ${equation.result} ÷ 3 = ${mainValue}</div>`;
+      } else if (display.includes('+') && display.split('+').length === 3) {
+        // Suma de tres términos
+        if (step === 1) {
+          return `<div>Esto significa que cada ${mainEmoji} vale ${mainValue}:</div>
+                  <div class="step-calculation">${mainEmoji} = ${equation.result} ÷ 3 = ${mainValue}</div>`;
+        } else {
+          return `<div>Sabemos que ${knownEmoji} = ${knownValue}:</div>
+                  <div class="step-calculation">2${mainEmoji} + ${knownValue} = ${equation.result}</div>
+                  <div class="step-calculation">2${mainEmoji} = ${equation.result - knownValue}</div>
+                  <div class="step-calculation">${mainEmoji} = ${(equation.result - knownValue)} ÷ 2 = ${mainValue}</div>`;
+        }
+      } else if (display.includes('×') && display.includes('2') && display.includes('+')) {
+        // Multiplicación por 2 más suma
+        return `<div>Sabemos que ${knownEmoji} = ${knownValue}:</div>
+                <div class="step-calculation">${mainEmoji} × 2 + ${knownValue} = ${equation.result}</div>
+                <div class="step-calculation">${mainEmoji} × 2 = ${equation.result - knownValue}</div>
+                <div class="step-calculation">${mainEmoji} = ${(equation.result - knownValue)} ÷ 2 = ${mainValue}</div>`;
+      } else if (display.includes('×') && !display.includes('+') && !display.includes('-')) {
+        // Multiplicación simple
+        if (step === 3) {
+          return `<div>Sabemos que ${knownEmoji} = ${knownValue}:</div>
+                  <div class="step-calculation">${mainEmoji} × ${knownValue} = ${equation.result}</div>
+                  <div class="step-calculation">${mainEmoji} = ${equation.result} ÷ ${knownValue} = ${mainValue}</div>`;
+        }
+      } else if (display.includes('-')) {
+        // Resta
+        return `<div>Sabemos que ${knownEmoji} = ${knownValue}:</div>
+                <div class="step-calculation">${mainEmoji} × 3 - ${knownValue} = ${equation.result}</div>
+                <div class="step-calculation">${mainEmoji} × 3 = ${equation.result + knownValue}</div>
+                <div class="step-calculation">${mainEmoji} = ${(equation.result + knownValue)} ÷ 3 = ${mainValue}</div>`;
+      } else if (display.includes('(') && display.includes(')')) {
+        // Paréntesis
+        return `<div>Sabemos que ${knownEmoji} = ${knownValue}:</div>
+                <div class="step-calculation">(${mainEmoji} + ${knownValue}) × 2 = ${equation.result}</div>
+                <div class="step-calculation">${mainEmoji} + ${knownValue} = ${equation.result} ÷ 2 = ${equation.result / 2}</div>
+                <div class="step-calculation">${mainEmoji} = ${equation.result / 2} - ${knownValue} = ${mainValue}</div>`;
+      }
+      
+      return `<div>Resolviendo para ${mainEmoji} = ${mainValue}</div>`;
+    }
+
+    function generateFinalStepExplanation() {
+      const { emojis, values, finalOperation } = currentProblem;
+      const [emoji1, emoji2, emoji3] = emojis;
+      const [value1, value2, value3] = values;
+      
+      let explanation = `
+        <div class="step">
+          <div class="step-title">Ecuación Final:</div>
+      `;
+      
+      if (finalOperation.op === 'add') {
+        explanation += `
+          <div class="step-calculation">${emoji1} + ${emoji2}</div>
+          <div>Sustituimos: ${emoji1} = ${value1}, ${emoji2} = ${value2}</div>
+          <div class="step-calculation">${value1} + ${value2} = ${correctAnswer}</div>
+        `;
+      } else if (finalOperation.op === 'sub') {
+        explanation += `
+          <div class="step-calculation">${emoji1} - ${emoji2}</div>
+          <div>Sustituimos: ${emoji1} = ${value1}, ${emoji2} = ${value2}</div>
+          <div class="step-calculation">${value1} - ${value2} = ${correctAnswer}</div>
+        `;
+      } else if (finalOperation.op === 'mult') {
+        explanation += `
+          <div class="step-calculation">${emoji1} × ${emoji2}</div>
+          <div>Sustituimos: ${emoji1} = ${value1}, ${emoji2} = ${value2}</div>
+          <div class="step-calculation">${value1} × ${value2} = ${correctAnswer}</div>
+        `;
+      } else if (finalOperation.op === 'div') {
+        explanation += `
+          <div class="step-calculation">${emoji1} ÷ ${emoji2}</div>
+          <div>Sustituimos: ${emoji1} = ${value1}, ${emoji2} = ${value2}</div>
+          <div class="step-calculation">${value1} ÷ ${value2} = ${correctAnswer}</div>
+        `;
+      } else if (finalOperation.op === 'mixed_add_mult') {
+        explanation += `
+          <div class="step-calculation">${emoji1} + ${emoji2} × ${emoji3}</div>
+          <div>Sustituimos: ${emoji1} = ${value1}, ${emoji2} = ${value2}, ${emoji3} = ${value3}</div>
+          <div>Aplicamos orden de operaciones (multiplicación primero):</div>
+          <div class="step-calculation">${emoji2} × ${emoji3} = ${value2} × ${value3} = ${value2 * value3}</div>
+          <div class="step-calculation">${emoji1} + (${emoji2} × ${emoji3}) = ${value1} + ${value2 * value3} = ${correctAnswer}</div>
+        `;
+      } else if (finalOperation.op === 'mixed_sub_mult') {
+        explanation += `
+          <div class="step-calculation">${emoji1} - ${emoji2} × ${emoji3}</div>
+          <div>Sustituimos: ${emoji1} = ${value1}, ${emoji2} = ${value2}, ${emoji3} = ${value3}</div>
+          <div>Aplicamos orden de operaciones (multiplicación primero):</div>
+          <div class="step-calculation">${emoji2} × ${emoji3} = ${value2} × ${value3} = ${value2 * value3}</div>
+          <div class="step-calculation">${emoji1} - (${emoji2} × ${emoji3}) = ${value1} - ${value2 * value3} = ${correctAnswer}</div>
+        `;
+      } else if (finalOperation.op === 'mixed_mult_div') {
+        explanation += `
+          <div class="step-calculation">${emoji1} × ${emoji2} ÷ ${emoji3}</div>
+          <div>Sustituimos: ${emoji1} = ${value1}, ${emoji2} = ${value2}, ${emoji3} = ${value3}</div>
+          <div>Aplicamos orden de operaciones (de izquierda a derecha):</div>
+          <div class="step-calculation">${emoji1} × ${emoji2} = ${value1} × ${value2} = ${value1 * value2}</div>
+          <div class="step-calculation">(${emoji1} × ${emoji2}) ÷ ${emoji3} = ${value1 * value2} ÷ ${value3} = ${correctAnswer}</div>
+        `;
+      } else if (finalOperation.op === 'mixed_add_div') {
+        explanation += `
+          <div class="step-calculation">${emoji1} + ${emoji2} ÷ ${emoji3}</div>
+          <div>Sustituimos: ${emoji1} = ${value1}, ${emoji2} = ${value2}, ${emoji3} = ${value3}</div>
+          <div>Aplicamos orden de operaciones (división primero):</div>
+          <div class="step-calculation">${emoji2} ÷ ${emoji3} = ${value2} ÷ ${value3} = ${Math.round(value2 / value3)}</div>
+          <div class="step-calculation">${emoji1} + (${emoji2} ÷ ${emoji3}) = ${value1} + ${Math.round(value2 / value3)} = ${correctAnswer}</div>
+        `;
+      }
+      
+      explanation += `</div>`;
+      return explanation;
+    }
+
+    // Generar el primer problema al cargar la página
+    generateNewProblem();
+
+    // Permitir Enter para verificar
+    document.getElementById('answer').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        verifyAnswer();
+      }
+    });
+  </script>
+</body>
+</html>

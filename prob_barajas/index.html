@@ -1,1 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Probabilidad con Baraja</title>
+  <style>
+      body, html {
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 20px;
+          background: linear-gradient(135deg, #2d5016 0%, #1a4d2e 100%);
+      }
+      
+      .container {
+          display: flex;
+          gap: 40px;
+          align-items: flex-start;
+          background: white;
+          padding: 30px;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          max-width: 1200px;
+      }
+      
+      .carta-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 30px;
+      }
+      
+      .carta {
+          width: 180px;
+          height: 250px;
+          background: white;
+          border: 3px solid #333;
+          border-radius: 15px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 15px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+          position: relative;
+          transition: transform 0.3s;
+      }
+      
+      .carta.girando {
+          animation: girar 0.5s ease-in-out;
+      }
+      
+      @keyframes girar {
+          0%, 100% { transform: rotateY(0deg); }
+          50% { transform: rotateY(90deg); }
+      }
+      
+      .carta.roja {
+          color: #e74c3c;
+      }
+      
+      .carta.negra {
+          color: #2c3e50;
+      }
+      
+      .carta-esquina {
+          font-size: 28px;
+          font-weight: bold;
+          line-height: 1.2;
+      }
+      
+      .carta-centro {
+          font-size: 80px;
+          text-align: center;
+          align-self: center;
+      }
+      
+      .carta-esquina-inferior {
+          font-size: 28px;
+          font-weight: bold;
+          text-align: right;
+          line-height: 1.2;
+          transform: rotate(180deg);
+      }
+      
+      button {
+          padding: 15px 40px;
+          font-size: 18px;
+          font-weight: bold;
+          cursor: pointer;
+          background: linear-gradient(135deg, #2d5016 0%, #1a4d2e 100%);
+          color: white;
+          border: none;
+          border-radius: 10px;
+          transition: transform 0.2s;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      }
+      
+      button:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      }
+      
+      button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+      }
+      
+      #result {
+          font-size: 20px;
+          color: #333;
+          font-weight: bold;
+          min-height: 30px;
+          text-align: center;
+      }
+      
+      .stats-container {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+      }
+      
+      h2 {
+          margin: 0 0 10px 0;
+          color: #333;
+          text-align: center;
+      }
+      
+      table {
+          border-collapse: collapse;
+          background: white;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      }
+      
+      th, td {
+          padding: 10px 15px;
+          text-align: center;
+          border-bottom: 1px solid #e0e0e0;
+      }
+      
+      th {
+          background: linear-gradient(135deg, #2d5016 0%, #1a4d2e 100%);
+          color: white;
+          font-weight: bold;
+          font-size: 14px;
+      }
+      
+      td {
+          font-size: 15px;
+      }
+      
+      tr:last-child td {
+          border-bottom: none;
+      }
+      
+      tr:hover {
+          background: #f5f5f5;
+      }
+      
+      .palo-col {
+          font-weight: bold;
+          font-size: 16px;
+      }
+      
+      #total-extracciones {
+          text-align: center;
+          font-size: 18px;
+          color: #333;
+          font-weight: bold;
+          padding: 10px;
+          background: #f0f0f0;
+          border-radius: 8px;
+      }
+      
+      .formulas-box {
+          background: #f8f9fa;
+          border: 2px solid #2d5016;
+          border-radius: 10px;
+          padding: 15px;
+          margin-top: 15px;
+      }
+      
+      .formulas-box h3 {
+          margin: 0 0 10px 0;
+          color: #2d5016;
+          font-size: 16px;
+          text-align: center;
+      }
+      
+      .formula {
+          margin: 8px 0;
+          padding: 8px;
+          background: white;
+          border-radius: 5px;
+          font-size: 13px;
+      }
+      
+      .formula strong {
+          color: #1a4d2e;
+      }
+      
+      .formula-math {
+          font-family: 'Courier New', monospace;
+          background: #e9ecef;
+          padding: 2px 6px;
+          border-radius: 3px;
+          margin: 0 3px;
+      }
+      
+      .section-title {
+          font-size: 16px;
+          font-weight: bold;
+          color: #333;
+          margin-top: 20px;
+          margin-bottom: 10px;
+          text-align: center;
+      }
 
+      @media (max-width: 768px) {
+          .container {
+              flex-direction: column;
+              padding: 20px;
+          }
+      }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="carta-container">
+      <div id="carta" class="carta">
+        <div class="carta-esquina">?<br>?</div>
+        <div class="carta-centro">?</div>
+        <div class="carta-esquina-inferior">?<br>?</div>
+      </div>
+      <button onclick="sacarCarta()">Sacar Carta</button>
+      <div id="result"></div>
+    </div>
+    
+    <div class="stats-container">
+      <h2>Estadísticas de Probabilidad con Barajas</h2>
+      
+      <div class="section-title">Por Palo</div>
+      <table>
+        <thead>
+          <tr>
+            <th>PALO</th>
+            <th>FRECUENCIA</th>
+            <th>TEÓRICA</th>
+            <th>EXPERIMENTAL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="palo-col" style="color: #e74c3c;">♥ Corazones</td>
+            <td id="freq-corazones">0</td>
+            <td>25.00%</td>
+            <td id="exp-corazones">0.00%</td>
+          </tr>
+          <tr>
+            <td class="palo-col" style="color: #e74c3c;">♦ Diamantes</td>
+            <td id="freq-diamantes">0</td>
+            <td>25.00%</td>
+            <td id="exp-diamantes">0.00%</td>
+          </tr>
+          <tr>
+            <td class="palo-col" style="color: #2c3e50;">♣ Tréboles</td>
+            <td id="freq-treboles">0</td>
+            <td>25.00%</td>
+            <td id="exp-treboles">0.00%</td>
+          </tr>
+          <tr>
+            <td class="palo-col" style="color: #2c3e50;">♠ Picas</td>
+            <td id="freq-picas">0</td>
+            <td>25.00%</td>
+            <td id="exp-picas">0.00%</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="section-title">Por Color</div>
+      <table>
+        <thead>
+          <tr>
+            <th>COLOR</th>
+            <th>FRECUENCIA</th>
+            <th>TEÓRICA</th>
+            <th>EXPERIMENTAL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="palo-col" style="color: #e74c3c;">Rojas</td>
+            <td id="freq-rojo">0</td>
+            <td>50.00%</td>
+            <td id="exp-rojo">0.00%</td>
+          </tr>
+          <tr>
+            <td class="palo-col" style="color: #2c3e50;">Negras</td>
+            <td id="freq-negro">0</td>
+            <td>50.00%</td>
+            <td id="exp-negro">0.00%</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div id="total-extracciones">Total de extracciones: 0</div>
+      
+      <div class="formulas-box">
+        <h3>Fórmulas de Cálculo</h3>
+        <div class="formula">
+          <strong>Probabilidad Teórica:</strong><br>
+          <span class="formula-math">P(evento) = Casos favorables / Casos totales</span><br>
+          Por palo: 13/52 = 25% | Por color: 26/52 = 50%
+        </div>
+        <div class="formula">
+          <strong>Probabilidad Experimental:</strong><br>
+          <span class="formula-math">P(evento) = Frecuencia / Total × 100%</span><br>
+          Ejemplo: Si salieron 12 corazones en 50 cartas:<br>
+          <span class="formula-math">12/50 × 100% = 24%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const palos = [
+        { nombre: 'corazones', simbolo: '♥', color: 'roja' },
+        { nombre: 'diamantes', simbolo: '♦', color: 'roja' },
+        { nombre: 'treboles', simbolo: '♣', color: 'negra' },
+        { nombre: 'picas', simbolo: '♠', color: 'negra' }
+    ];
+    
+    const valores = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    
+    let frecuenciasPalo = { corazones: 0, diamantes: 0, treboles: 0, picas: 0 };
+    let frecuenciasColor = { rojo: 0, negro: 0 };
+    let totalExtracciones = 0;
+
+    function sacarCarta() {
+        const carta = document.getElementById('carta');
+        const result = document.getElementById('result');
+        const button = document.querySelector('button');
+
+        button.disabled = true;
+        result.textContent = 'Sacando carta...';
+        
+        carta.classList.add('girando');
+
+        setTimeout(() => {
+            const paloAleatorio = palos[Math.floor(Math.random() * 4)];
+            const valorAleatorio = valores[Math.floor(Math.random() * 13)];
+
+            carta.classList.remove('girando');
+            carta.className = `carta ${paloAleatorio.color}`;
+            
+            carta.innerHTML = `
+                <div class="carta-esquina">${valorAleatorio}<br>${paloAleatorio.simbolo}</div>
+                <div class="carta-centro">${paloAleatorio.simbolo}</div>
+                <div class="carta-esquina-inferior">${valorAleatorio}<br>${paloAleatorio.simbolo}</div>
+            `;
+
+            frecuenciasPalo[paloAleatorio.nombre]++;
+            frecuenciasColor[paloAleatorio.color === 'roja' ? 'rojo' : 'negro']++;
+            totalExtracciones++;
+
+            actualizarTablas();
+
+            result.textContent = `${valorAleatorio} de ${paloAleatorio.nombre}`;
+            button.disabled = false;
+        }, 500);
+    }
+
+    function actualizarTablas() {
+        // Actualizar tabla de palos
+        for (let palo in frecuenciasPalo) {
+            document.getElementById(`freq-${palo}`).textContent = frecuenciasPalo[palo];
+            
+            const probExperimental = totalExtracciones > 0 
+                ? ((frecuenciasPalo[palo] / totalExtracciones) * 100).toFixed(2) 
+                : 0;
+            document.getElementById(`exp-${palo}`).textContent = probExperimental + '%';
+        }
+        
+        // Actualizar tabla de colores
+        for (let color in frecuenciasColor) {
+            document.getElementById(`freq-${color}`).textContent = frecuenciasColor[color];
+            
+            const probExperimental = totalExtracciones > 0 
+                ? ((frecuenciasColor[color] / totalExtracciones) * 100).toFixed(2) 
+                : 0;
+            document.getElementById(`exp-${color}`).textContent = probExperimental + '%';
+        }
+        
+        document.getElementById('total-extracciones').textContent = `Total de extracciones: ${totalExtracciones}`;
+    }
+  </script>
+</body>
+</html>

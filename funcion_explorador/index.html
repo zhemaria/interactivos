@@ -1,1 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Interactivo de Funciones - Mejorado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        /* Controles compactos arriba */
+        .controls-section {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 15px;
+        }
+
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .controls-section h2 {
+            color: #2d3748;
+            font-size: 1.4rem;
+            margin: 0;
+        }
+
+        .help-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-button:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
+        }
+
+        .function-selector {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 15px;
+            align-items: start;
+        }
+
+        .function-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .function-tab {
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .function-tab.active {
+            background: #4299e1;
+            color: white;
+            border-color: #4299e1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+
+        .function-tab:hover:not(.active) {
+            background: #edf2f7;
+            transform: translateY(-1px);
+        }
+
+        .function-config {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .current-function {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2b6cb0;
+            text-align: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #ebf8ff;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .sliders-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .slider-container {
+            /* Cada deslizador ocupa una columna */
+        }
+
+        .slider-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4299e1;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            background: #3182ce;
+            transform: scale(1.1);
+        }
+
+        .slider-value {
+            font-weight: bold;
+            color: #2b6cb0;
+            background: #ebf8ff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Layout principal: máquina arriba, gráfico y tabla abajo */
+        .visualizations {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .machine-diagram {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .machine-diagram h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .machine-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 10px 0;
+        }
+
+        .machine-input, .machine-output {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .machine-input {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .machine-output {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .machine-function {
+            background: #4299e1;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+
+        .machine-arrow {
+            width: 25px;
+            height: 3px;
+            background: #4a5568;
+            position: relative;
+        }
+
+        .machine-arrow::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid #4a5568;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        /* Gráfico y tabla lado a lado */
+        .graph-table-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+        }
+
+        .graph-container {
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .graph-container h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        #functionGraph {
+            width: 100%;
+            height: 240px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .table-container h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .values-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .values-table th,
+        .values-table td {
+            padding: 8px 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .values-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .values-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .values-table tr:hover {
+            background: #ebf8ff;
+        }
+
+        .current-value {
+            background: #bee3f8 !important;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 3% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .modal-content h3 {
+            color: #4299e1;
+            margin: 20px 0 10px 0;
+            font-size: 1.3rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .concept-box {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .concept-box h4 {
+            color: #2b6cb0;
+            margin-bottom: 8px;
+        }
+
+        .example-box {
+            background: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #a0aec0;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #4a5568;
+        }
+
+        @media (max-width: 1024px) {
+            .sliders-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .function-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .graph-table-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .machine-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .machine-arrow {
+                transform: rotate(90deg);
+            }
+            
+            .controls-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 Explorador de Funciones</h1>
+            <p>Descubre cómo funcionan las matemáticas de manera visual e interactiva</p>
+        </div>
+
+        <!-- Controles compactos arriba -->
+        <div class="controls-section">
+            <div class="controls-header">
+                <h2>🎛️ Controles Interactivos</h2>
+                <button class="help-button" id="helpButton">
+                    📚 ¿Qué es una función?
+                </button>
+            </div>
+            
+            <div class="function-selector">
+                <div class="function-tabs">
+                    <div class="function-tab active" data-function="linear">f(x) = ax + b</div>
+                    <div class="function-tab" data-function="quadratic">f(x) = ax² + b</div>
+                    <div class="function-tab" data-function="cubic">f(x) = ax³ + b</div>
+                </div>
+                
+                <div class="function-config">
+                    <div class="current-function" id="currentFunction">f(x) = 2x + 1</div>
+                    
+                    <div class="sliders-grid">
+                        <div class="slider-container">
+                            <label class="slider-label">Parámetro 'a':</label>
+                            <div class="slider-wrapper">
+                                <input type="range" class="slider" id="paramA" min="-5" max="5" step="0.1" value="2">
+                                <span class="slider-value" id="valueA">2</span>
+                            </div>
+                        </div>
+                        
+                        <div class="slider-container">
+                            <label class="slider-label">Parámetro 'b':</label>
+                            <div class="slider-wrapper">
+                                <input type="range" class="slider" id="paramB" min="-10" max="10" step="0.1" value="1">
+                                <span class="slider-value" id="valueB">1</span>
+                            </div>
+                        </div>
+                        
+                        <div class="slider-container">
+                            <label class="slider-label">Valor de entrada 'x':</label>
+                            <div class="slider-wrapper">
+                                <input type="range" class="slider" id="inputX" min="-10" max="10" step="0.1" value="0">
+                                <span class="slider-value" id="valueX">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualizations">
+            <!-- Máquina de funciones -->
+            <div class="machine-diagram">
+                <h3>🏭 Máquina de Funciones</h3>
+                <div class="machine-container">
+                    <div class="machine-input" id="machineInput">0</div>
+                    <div class="machine-arrow"></div>
+                    <div class="machine-function" id="machineFunction">f(x) = 2x + 1</div>
+                    <div class="machine-arrow"></div>
+                    <div class="machine-output" id="machineOutput">1</div>
+                </div>
+                <p><strong>Entrada → Procesamiento → Salida</strong></p>
+            </div>
+
+            <!-- Gráfico y tabla lado a lado -->
+            <div class="graph-table-container">
+                <div class="graph-container">
+                    <h3>📈 Gráfica de la Función</h3>
+                    <svg id="functionGraph" viewBox="0 0 400 300">
+                        <!-- Grid pattern -->
+                        <defs>
+                            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)"/>
+                        
+                        <!-- Axes -->
+                        <line x1="200" y1="0" x2="200" y2="300" stroke="#4a5568" stroke-width="2"/>
+                        <line x1="0" y1="150" x2="400" y2="150" stroke="#4a5568" stroke-width="2"/>
+                        
+                        <!-- Function curve -->
+                        <path id="functionCurve" stroke="#4299e1" stroke-width="3" fill="none"/>
+                        
+                        <!-- Current point -->
+                        <circle id="currentPoint" r="6" fill="#f5576c" stroke="white" stroke-width="2"/>
+                        
+                        <!-- Axis labels -->
+                        <text x="390" y="145" fill="#4a5568" font-size="14" font-weight="bold">x</text>
+                        <text x="205" y="15" fill="#4a5568" font-size="14" font-weight="bold">y</text>
+                    </svg>
+                </div>
+
+                <div class="table-container">
+                    <h3>📊 Tabla de Valores</h3>
+                    <table class="values-table">
+                        <thead>
+                            <tr>
+                                <th>x (Entrada)</th>
+                                <th>f(x) (Salida)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="valuesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal educativo mejorado -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>📚 Conceptos Fundamentales de Funciones</h2>
+            
+            <div class="concept-box">
+                <h4>🎯 ¿Qué es una función?</h4>
+                <p>Una función es como una <strong>máquina matemática</strong> que toma un número de entrada (llamado x) y produce exactamente un número de salida (llamado f(x) o y). Es una regla que asigna a cada entrada una única salida.</p>
+            </div>
+
+            <div class="concept-box">
+                <h4>🏠 Dominio de una función</h4>
+                <p>El <strong>dominio</strong> es el conjunto de todos los valores de x (entradas) que puedes introducir en la función. En nuestro explorador, el dominio son todos los números del -10 al 10.</p>
+                <p><strong>En la gráfica:</strong> Son todos los puntos horizontales (eje x) donde existe la curva.</p>
+                <p><strong>En la tabla:</strong> Son todos los valores en la columna "x (Entrada)".</p>
+            </div>
+
+            <div class="concept-box">
+                <h4>🎯 Recorrido (o rango) de una función</h4>
+                <p>El <strong>recorrido</strong> es el conjunto de todos los valores de y (salidas) que la función puede producir. Son todos los resultados posibles.</p>
+                <p><strong>En la gráfica:</strong> Son todos los puntos verticales (eje y) que toca la curva.</p>
+                <p><strong>En la tabla:</strong> Son todos los valores en la columna "f(x) (Salida)".</p>
+            </div>
+
+            <h3>🔍 Cómo interpretar las visualizaciones:</h3>
+            
+            <div class="example-box">
+                <h4>🏭 Máquina de Funciones:</h4>
+                <p>• <strong>Círculo azul:</strong> El valor que introduces (x)</p>
+                <p>• <strong>Rectángulo central:</strong> La regla matemática que se aplica</p>
+                <p>• <strong>Círculo rosado:</strong> El resultado que obtienes f(x)</p>
+            </div>
+
+            <div class="example-box">
+                <h4>📈 Gráfica:</h4>
+                <p>• <strong>Eje horizontal (x):</strong> Representa el dominio (entradas)</p>
+                <p>• <strong>Eje vertical (y):</strong> Representa el recorrido (salidas)</p>
+                <p>• <strong>Curva azul:</strong> Muestra cómo la función transforma cada entrada en salida</p>
+                <p>• <strong>Punto rojo:</strong> El par (x, f(x)) actual que has seleccionado</p>
+            </div>
+
+            <div class="example-box">
+                <h4>📊 Tabla de Valores:</h4>
+                <p>• Muestra pares ordenados (x, f(x)) específicos</p>
+                <p>• La fila resaltada corresponde al punto rojo en la gráfica</p>
+                <p>• Te ayuda a ver exactamente qué número produce cada entrada</p>
+            </div>
+
+            <h3>🎛️ Tipos de funciones y sus características:</h3>
+            
+            <p><strong>📏 Lineal (f(x) = ax + b):</strong> Produce líneas rectas. El parámetro 'a' controla la inclinación (pendiente) y 'b' donde cruza el eje y.</p>
+            
+            <p><strong>🌙 Cuadrática (f(x) = ax² + b):</strong> Produce parábolas (curvas en forma de U). El parámetro 'a' controla si abre hacia arriba o abajo y qué tan "abierta" es.</p>
+            
+            <p><strong>🌊 Cúbica (f(x) = ax³ + b):</strong> Produce curvas en forma de S. Tienen un comportamiento más complejo con posibles puntos de inflexión.</p>
+
+            <div class="concept-box">
+                <h4>💡 Experimenta y observa:</h4>
+                <p>• Cambia los deslizadores y observa cómo se modifica la gráfica</p>
+                <p>• Nota cómo el dominio y recorrido cambian con diferentes funciones</p>
+                <p>• Observa la relación entre la tabla y los puntos en la gráfica</p>
+                <p>• ¡Las matemáticas cobran vida cuando las puedes ver!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado global
+        let currentFunctionType = 'linear';
+        let paramA = 2;
+        let paramB = 1;
+        let inputX = 0;
+
+        // Referencias DOM
+        const functionTabs = document.querySelectorAll('.function-tab');
+        const paramASlider = document.getElementById('paramA');
+        const paramBSlider = document.getElementById('paramB');
+        const inputXSlider = document.getElementById('inputX');
+        const valueASpan = document.getElementById('valueA');
+        const valueBSpan = document.getElementById('valueB');
+        const valueXSpan = document.getElementById('valueX');
+        const currentFunctionDiv = document.getElementById('currentFunction');
+        const machineInput = document.getElementById('machineInput');
+        const machineFunction = document.getElementById('machineFunction');
+        const machineOutput = document.getElementById('machineOutput');
+        const functionCurve = document.getElementById('functionCurve');
+        const currentPoint = document.getElementById('currentPoint');
+        const valuesTableBody = document.getElementById('valuesTableBody');
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = document.getElementById('helpModal');
+        const closeModal = document.querySelector('.close');
+
+        // Función para calcular f(x)
+        function calculateFunction(x) {
+            switch (currentFunctionType) {
+                case 'linear':
+                    return paramA * x + paramB;
+                case 'quadratic':
+                    return paramA * x * x + paramB;
+                case 'cubic':
+                    return paramA * x * x * x + paramB;
+                default:
+                    return paramA * x + paramB;
+            }
+        }
+
+        // Función para obtener la expresión de la función
+        function getFunctionExpression() {
+            const aStr = paramA === 1 ? '' : (paramA === -1 ? '-' : paramA.toString());
+            const bStr = paramB >= 0 ? ` + ${paramB}` : ` - ${Math.abs(paramB)}`;
+            
+            switch (currentFunctionType) {
+                case 'linear':
+                    return `f(x) = ${aStr}x${bStr}`;
+                case 'quadratic':
+                    return `f(x) = ${aStr}x²${bStr}`;
+                case 'cubic':
+                    return `f(x) = ${aStr}x³${bStr}`;
+                default:
+                    return `f(x) = ${aStr}x${bStr}`;
+            }
+        }
+
+        // Actualizar todas las visualizaciones
+        function updateAll() {
+            const output = calculateFunction(inputX);
+            
+            // Actualizar expresión de función
+            const expression = getFunctionExpression();
+            currentFunctionDiv.textContent = expression;
+            machineFunction.textContent = expression;
+            
+            // Actualizar máquina de funciones
+            machineInput.textContent = inputX.toFixed(1);
+            machineOutput.textContent = output.toFixed(1);
+            
+            // Actualizar gráfica
+            updateGraph();
+            
+            // Actualizar tabla
+            updateTable();
+            
+            // Actualizar punto actual
+            updateCurrentPoint();
+        }
+
+        // Actualizar gráfica
+        function updateGraph() {
+            const points = [];
+            const scale = 20; // Escala para el SVG
+            const centerX = 200;
+            const centerY = 150;
+            
+            for (let x = -10; x <= 10; x += 0.1) {
+                const y = calculateFunction(x);
+                const svgX = centerX + x * scale;
+                const svgY = centerY - y * scale;
+                
+                // Verificar que los puntos estén dentro de los límites visibles
+                if (svgY >= -50 && svgY <= 350) {
+                    points.push(`${svgX},${svgY}`);
+                }
+            }
+            
+            if (points.length > 0) {
+                functionCurve.setAttribute('d', `M ${points.join(' L ')}`);
+            }
+        }
+
+        // Actualizar punto actual
+        function updateCurrentPoint() {
+            const scale = 20;
+            const centerX = 200;
+            const centerY = 150;
+            const output = calculateFunction(inputX);
+            
+            const svgX = centerX + inputX * scale;
+            const svgY = centerY - output * scale;
+            
+            currentPoint.setAttribute('cx', svgX);
+            currentPoint.setAttribute('cy', svgY);
+        }
+
+        // Actualizar tabla de valores
+        function updateTable() {
+            valuesTableBody.innerHTML = '';
+            
+            for (let x = -5; x <= 5; x++) {
+                const y = calculateFunction(x);
+                const row = document.createElement('tr');
+                if (Math.abs(x - inputX) < 0.1) {
+                    row.classList.add('current-value');
+                }
+                
+                row.innerHTML = `
+                    <td>${x}</td>
+                    <td>${y.toFixed(2)}</td>
+                `;
+                valuesTableBody.appendChild(row);
+            }
+        }
+
+        // Event listeners para deslizadores
+        paramASlider.addEventListener('input', (e) => {
+            paramA = parseFloat(e.target.value);
+            valueASpan.textContent = paramA.toFixed(1);
+            updateAll();
+        });
+
+        paramBSlider.addEventListener('input', (e) => {
+            paramB = parseFloat(e.target.value);
+            valueBSpan.textContent = paramB.toFixed(1);
+            updateAll();
+        });
+
+        inputXSlider.addEventListener('input', (e) => {
+            inputX = parseFloat(e.target.value);
+            valueXSpan.textContent = inputX.toFixed(1);
+            updateAll();
+        });
+
+        // Event listeners para tabs de funciones
+        functionTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                functionTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                currentFunctionType = tab.dataset.function;
+                updateAll();
+            });
+        });
+
+        // Modal de ayuda
+        helpButton.addEventListener('click', () => {
+            helpModal.style.display = 'block';
+        });
+
+        closeModal.addEventListener('click', () => {
+            helpModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                helpModal.style.display = 'none';
+            }
+        });
+
+        // Inicialización
+        updateAll();
+    </script>
+</body>
+</html>

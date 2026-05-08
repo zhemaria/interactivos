@@ -1,1 +1,903 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Funciones lineales, cuadráticas y racionales</title>
+    <style>
+      :root {
+        --primary-color: #3498db;
+        --secondary-color: #2ecc71;
+        --tertiary-color: #e74c3c;
+        --background-color: #f8f9fa;
+        --dark-color: #2c3e50;
+        --light-color: #ffffff;
+        --text-color: #2c3e50;
+      }
 
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      .container {
+        width: 95%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        background: linear-gradient(135deg, var(--dark-color), #34495e);
+        color: var(--light-color);
+        padding: 30px 0;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 300;
+      }
+
+      header p {
+        margin: 10px 0 0 0;
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .tab-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 0;
+        background-color: #ecf0f1;
+        padding: 5px;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .tab {
+        padding: 15px 25px;
+        background-color: #bdc3c7;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        border: none;
+        outline: none;
+      }
+
+      .tab.active {
+        background-color: var(--light-color);
+        color: var(--dark-color);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .tab:hover:not(.active) {
+        background-color: #95a5a6;
+        transform: translateY(-1px);
+      }
+
+      .tab-content {
+        display: none;
+        background-color: var(--light-color);
+        padding: 30px;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        min-height: 600px;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .graph-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin: 30px 0;
+      }
+
+      @media (min-width: 768px) {
+        .graph-container {
+          flex-direction: row;
+        }
+      }
+
+      .graph {
+        flex: 2;
+        min-height: 450px;
+        border: 2px solid #ecf0f1;
+        border-radius: 10px;
+        background-color: #fdfdfd;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .controls {
+        flex: 1;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .parameter-control {
+        margin-bottom: 25px;
+      }
+
+      .parameter-control label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--dark-color);
+      }
+
+      .parameter-control input[type="range"] {
+        width: 100%;
+        margin-bottom: 8px;
+        appearance: none;
+        height: 6px;
+        border-radius: 5px;
+        background: #ddd;
+        outline: none;
+      }
+
+      .parameter-control input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .parameter-value {
+        font-size: 1.1rem;
+        text-align: center;
+        font-weight: bold;
+        color: var(--primary-color);
+        background-color: rgba(52, 152, 219, 0.1);
+        padding: 8px;
+        border-radius: 5px;
+      }
+
+      .function-form {
+        font-size: 1.4rem;
+        font-weight: bold;
+        text-align: center;
+        margin: 20px 0;
+        padding: 15px;
+        background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+        border-radius: 10px;
+        border-left: 4px solid;
+        font-family: 'Courier New', monospace;
+      }
+
+      .function-linear {
+        border-left-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      .function-quadratic {
+        border-left-color: var(--secondary-color);
+        color: var(--secondary-color);
+      }
+
+      .function-rational {
+        border-left-color: var(--tertiary-color);
+        color: var(--tertiary-color);
+      }
+
+      .info-section {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 25px;
+        border-radius: 10px;
+        margin-top: 30px;
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .info-section h3 {
+        margin-top: 0;
+        color: var(--dark-color);
+        font-size: 1.3rem;
+      }
+
+      .key-points {
+        margin-top: 20px;
+      }
+
+      .key-point {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+      }
+
+      .key-point-icon {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 15px;
+        margin-top: 6px;
+        flex-shrink: 0;
+      }
+
+      .linear-icon { background-color: var(--primary-color); }
+      .quadratic-icon { background-color: var(--secondary-color); }
+      .rational-icon { background-color: var(--tertiary-color); }
+
+      .help-btn {
+        background: linear-gradient(135deg, var(--dark-color), #34495e);
+        color: var(--light-color);
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 15px;
+      }
+
+      .help-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+      }
+
+      .modal-content {
+        background-color: var(--light-color);
+        margin: 5% auto;
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 700px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.3s ease-out;
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .close:hover {
+        color: var(--tertiary-color);
+      }
+
+      .modal h2 {
+        margin-top: 0;
+        color: var(--dark-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+      }
+
+      .modal ul {
+        line-height: 1.8;
+      }
+
+      .modal strong {
+        color: var(--primary-color);
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+        
+        header h1 {
+          font-size: 2rem;
+        }
+        
+        .tab {
+          padding: 10px 15px;
+          font-size: 0.9rem;
+        }
+        
+        .tab-content {
+          padding: 20px;
+        }
+        
+        .modal-content {
+          margin: 10% auto;
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Tipos de Funciones Matemáticas</h1>
+       
+      </header>
+
+      <div class="content">
+        <div class="tab-container">
+          <div class="tab active" data-tab="linear">📈 Función Lineal</div>
+          <div class="tab" data-tab="quadratic">📊 Función Cuadrática</div>
+          <div class="tab" data-tab="rational">📉 Función Racional</div>
+        </div>
+
+        <!-- Función Lineal -->
+        <div class="tab-content active" id="linear-content">
+          <h2>📈 Funciones Lineales: La Constancia del Cambio</h2>
+          
+          <p>Una función lineal representa la relación más simple entre dos variables, caracterizada por un cambio constante. Su ecuación general es:</p>
+          
+          <div class="function-form function-linear">f(x) = mx + b</div>
+          
+          <p><strong>Componentes:</strong></p>
+          <ul>
+            <li><strong>m</strong>: La pendiente que determina la inclinación de la recta</li>
+            <li><strong>b</strong>: La ordenada al origen (intersección con el eje Y)</li>
+            <li><strong>x</strong>: Variable independiente</li>
+            <li><strong>f(x)</strong>: Variable dependiente</li>
+          </ul>
+
+          <div class="graph-container">
+            <div class="graph" id="linear-graph"></div>
+            <div class="controls">
+              <div class="parameter-control">
+                <label for="linear-m">Pendiente (m):</label>
+                <input type="range" id="linear-m" min="-5" max="5" step="0.1" value="1" />
+                <div class="parameter-value" id="linear-m-value">1</div>
+              </div>
+              <div class="parameter-control">
+                <label for="linear-b">Ordenada al origen (b):</label>
+                <input type="range" id="linear-b" min="-5" max="5" step="0.1" value="0" />
+                <div class="parameter-value" id="linear-b-value">0</div>
+              </div>
+              <button class="help-btn" id="linear-help-btn">💡 ¿Cómo interpretar?</button>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3>Características principales</h3>
+            <div class="key-points">
+              <div class="key-point">
+                <div class="key-point-icon linear-icon"></div>
+                <div class="key-point-text">
+                  <strong>Pendiente positiva (m > 0):</strong> La función es creciente
+                </div>
+              </div>
+              <div class="key-point">
+                <div class="key-point-icon linear-icon"></div>
+                <div class="key-point-text">
+                  <strong>Pendiente negativa (m < 0):</strong> La función es decreciente
+                </div>
+              </div>
+              <div class="key-point">
+                <div class="key-point-icon linear-icon"></div>
+                <div class="key-point-text">
+                  <strong>Pendiente cero (m = 0):</strong> Función constante (línea horizontal)
+                </div>
+              </div>
+              <div class="key-point">
+                <div class="key-point-icon linear-icon"></div>
+                <div class="key-point-text">
+                  <strong>Dominio y rango:</strong> Ambos son todos los números reales (ℝ)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Función Cuadrática -->
+        <div class="tab-content" id="quadratic-content">
+          <h2>📊 Funciones Cuadráticas: Las Curvas Parabólicas</h2>
+          
+          <p>Las funciones cuadráticas generan curvas llamadas parábolas, representando relaciones donde la tasa de cambio no es constante. Su forma canónica es:</p>
+          
+          <div class="function-form function-quadratic">f(x) = a(x - h)² + k</div>
+          
+          <p><strong>Componentes:</strong></p>
+          <ul>
+            <li><strong>a</strong>: Determina la apertura y orientación de la parábola</li>
+            <li><strong>h</strong>: Desplazamiento horizontal del vértice</li>
+            <li><strong>k</strong>: Desplazamiento vertical del vértice</li>
+            <li><strong>(h, k)</strong>: Coordenadas del vértice</li>
+          </ul>
+
+          <div class="graph-container">
+            <div class="graph" id="quadratic-graph"></div>
+            <div class="controls">
+              <div class="parameter-control">
+                <label for="quadratic-a">Coeficiente principal (a):</label>
+                <input type="range" id="quadratic-a" min="-2" max="2" step="0.1" value="1" />
+                <div class="parameter-value" id="quadratic-a-value">1</div>
+              </div>
+              <div class="parameter-control">
+                <label for="quadratic-h">Desplazamiento horizontal (h):</label>
+                <input type="range" id="quadratic-h" min="-5" max="5" step="0.1" value="0" />
+                <div class="parameter-value" id="quadratic-h-value">0</div>
+              </div>
+              <div class="parameter-control">
+                <label for="quadratic-k">Desplazamiento vertical (k):</label>
+                <input type="range" id="quadratic-k" min="-5" max="5" step="0.1" value="0" />
+                <div class="parameter-value" id="quadratic-k-value">0</div>
+              </div>
+              <button class="help-btn" id="quadratic-help-btn">💡 ¿Cómo interpretar?</button>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3>Características principales</h3>
+            <div class="key-points">
+              <div class="key-point">
+                <div class="key-point-icon quadratic-icon"></div>
+                <div class="key-point-text">
+                  <strong>a > 0:</strong> Parábola abre hacia arriba (forma de U)
+                </div>
+              </div>
+              <div class="key-point">
+                <div class="key-point-icon quadratic-icon"></div>
+                <div class="key-point-text">
+                  <strong>a < 0:</strong> Parábola abre hacia abajo (forma de U invertida)
+                </div>
+              </div>
+              <div class="key-point">
+                <div class="key-point-icon quadratic-icon"></div>
+                <div class="key-point-text">
+                  <strong>Vértice (h, k):</strong> Punto máximo o mínimo de la función
+                </div>
+              </div>
+              <div class="key-point">
+                <div class="key-point-icon quadratic-icon"></div>
+                <div class="key-point-text">
+                  <strong>Eje de simetría:</strong> Línea vertical x = h
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Función Racional -->
+        <div class="tab-content" id="rational-content">
+          <h2>📉 Funciones Racionales: Comportamiento Asintótico</h2>
+          
+          <p>Las funciones racionales son cocientes de polinomios que exhiben comportamientos únicos cerca de ciertos valores, incluyendo asíntotas. Su forma simple es:</p>
+          
+          <div class="function-form function-rational">f(x) = a/(x - h) + k</div>
+          
+          <p><strong>Componentes:</strong></p>
+          <ul>
+            <li><strong>a</strong>: Controla la "intensidad" de la función</li>
+            <li><strong>h</strong>: Ubicación de la asíntota vertical</li>
+            <li><strong>k</strong>: Ubicación de la asíntota horizontal</li>
+          </ul>
+
+          <div class="graph-container">
+            <div class="graph" id="rational-graph"></div>
+            <div class="controls">
+              <div class="parameter-control">
+                <label for="rational-a">Coeficiente (a):</label>
+                <input type="range" id="rational-a" min="-5" max="5" step="0.1" value="1" />
+                <div class="parameter-value" id="rational-a-value">1</div>
+              </div>
+              <div class="parameter-control">
+                <label for="rational-h">Asíntota vertical (x = h):</label>
+                <input type="range" id="rational-h" min="-5" max="5" step="0.1" value="0" />
+                <div class="parameter-value" id="rational-h-value">0</div>
+              </div>
+              <div class="parameter-control">
+                <label for="rational-k">Asíntota horizontal (y = k):</label>
+                <input type="range" id="rational-k" min="-5" max="5" step="0.1" value="0" />
+                <div class="parameter-value" id="rational-k-value">0</div>
+              </div>
+              <button class="help-btn" id="rational-help-btn">💡 ¿Cómo interpretar?</button>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3>Características principales</h3>
+            <div class="key-points">
+              <div class="key-point">
+                <div class="key-point-icon rational-icon"></div>
+                <div class="key-point-text">
+                  <strong>Asíntota vertical (x = h):</strong> La función no está definida en este punto
+                </div>
+              </div>
+              <div class="key-point">
+                <div class="key-point-icon rational-icon"></div>
+                <div class="key-point-text">
+                  <strong>Asíntota horizontal (y = k):</strong> Valor al que tiende la función en el infinito
+                </div>
+              </div>
+              <div class="key-point">
+                <div class="key-point-icon rational-icon"></div>
+                <div class="key-point-text">
+                  <strong>Dominio:</strong> Todos los reales excepto x = h
+                </div>
+              </div>
+              <div class="key-point">
+                <div class="key-point-icon rational-icon"></div>
+                <div class="key-point-text">
+                  <strong>Comportamiento:</strong> La función se aproxima a las asíntotas sin tocarlas
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modales de ayuda -->
+    <div id="linear-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>🔍 Interpretando la Función Lineal</h2>
+        <p>La función lineal <strong>f(x) = mx + b</strong> representa una línea recta donde:</p>
+        <ul>
+          <li><strong>Pendiente (m):</strong> Indica cuánto cambia y por cada unidad de cambio en x
+            <ul>
+              <li>m > 0: Función creciente (línea asciende)</li>
+              <li>m < 0: Función decreciente (línea desciende)</li>
+              <li>m = 0: Función constante (línea horizontal)</li>
+            </ul>
+          </li>
+          <li><strong>Ordenada al origen (b):</strong> Punto donde la línea cruza el eje Y</li>
+          <li><strong>Intersección con eje X:</strong> Ocurre en x = -b/m (cuando m ≠ 0)</li>
+        </ul>
+        <p><strong>Tip:</strong> Experimenta con los controles para ver cómo cada parámetro afecta la gráfica instantáneamente.</p>
+      </div>
+    </div>
+
+    <div id="quadratic-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>🔍 Interpretando la Función Cuadrática</h2>
+        <p>La función cuadrática <strong>f(x) = a(x - h)² + k</strong> representa una parábola donde:</p>
+        <ul>
+          <li><strong>Coeficiente a:</strong> Controla la apertura y orientación
+            <ul>
+              <li>a > 0: Parábola abre hacia arriba (tiene mínimo)</li>
+              <li>a < 0: Parábola abre hacia abajo (tiene máximo)</li>
+              <li>|a| mayor: Parábola más "cerrada"</li>
+            </ul>
+          </li>
+          <li><strong>Vértice (h, k):</strong> Punto más alto o más bajo de la parábola</li>
+          <li><strong>Eje de simetría:</strong> Línea vertical x = h que divide la parábola por la mitad</li>
+          <li><strong>Intersecciones:</strong> Pueden ser 0, 1 o 2 puntos con el eje X</li>
+        </ul>
+        <p><strong>Aplicaciones:</strong> Trayectorias de proyectiles, optimización, modelado de fenómenos naturales.</p>
+      </div>
+    </div>
+
+    <div id="rational-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>🔍 Interpretando la Función Racional</h2>
+        <p>La función racional <strong>f(x) = a/(x - h) + k</strong> muestra comportamiento asintótico:</p>
+        <ul>
+          <li><strong>Asíntota vertical (x = h):</strong>
+            <ul>
+              <li>La función no está definida en x = h</li>
+              <li>Los valores de y crecen o decrecen sin límite al acercarse a h</li>
+            </ul>
+          </li>
+          <li><strong>Asíntota horizontal (y = k):</strong>
+            <ul>
+              <li>Valor al que tiende la función cuando x → ±∞</li>
+              <li>La función se aproxima pero nunca toca esta línea</li>
+            </ul>
+          </li>
+          <li><strong>Coeficiente a:</strong>
+            <ul>
+              <li>a > 0: Función decrece a la izquierda de h, crece a la derecha</li>
+              <li>a < 0: Función crece a la izquierda de h, decrece a la derecha</li>
+            </ul>
+          </li>
+        </ul>
+        <p><strong>Aplicaciones:</strong> Ley de Ohm, concentraciones químicas, modelos económicos.</p>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+    <script>
+      // Variables globales para configuración
+      let linearConfig = { m: 1, b: 0 };
+      let quadraticConfig = { a: 1, h: 0, k: 0 };
+      let rationalConfig = { a: 1, h: 0, k: 0 };
+
+      // Configuración del layout para todos los gráficos
+      const commonLayout = {
+        showlegend: false,
+        xaxis: {
+          range: [-10, 10],
+          zeroline: true,
+          gridcolor: "#e1e8ed",
+          title: { text: "x", font: { size: 14, color: "#2c3e50" } },
+          tickfont: { color: "#2c3e50" }
+        },
+        yaxis: {
+          range: [-10, 10],
+          zeroline: true,
+          gridcolor: "#e1e8ed",
+          title: { text: "f(x)", font: { size: 14, color: "#2c3e50" } },
+          tickfont: { color: "#2c3e50" }
+        },
+        margin: { l: 60, r: 30, b: 60, t: 30, pad: 4 },
+        dragmode: "pan",
+        hovermode: "closest",
+        plot_bgcolor: "#fdfdfd",
+        paper_bgcolor: "#fdfdfd"
+      };
+
+      // Función para crear gráfico lineal
+      function createLinearPlot() {
+        const x = Array.from({ length: 200 }, (_, i) => -10 + i * 0.1);
+        const y = x.map(val => linearConfig.m * val + linearConfig.b);
+
+        const data = [{
+          x: x,
+          y: y,
+          type: "scatter",
+          mode: "lines",
+          line: { color: "#3498db", width: 3 },
+          name: "Función Lineal"
+        }];
+
+        Plotly.newPlot("linear-graph", data, commonLayout, {responsive: true});
+        document.querySelector("#linear-content .function-form").textContent = 
+          `f(x) = ${linearConfig.m}x + ${linearConfig.b}`;
+      }
+
+      // Función para crear gráfico cuadrático
+      function createQuadraticPlot() {
+        const x = Array.from({ length: 200 }, (_, i) => -10 + i * 0.1);
+        const y = x.map(val => quadraticConfig.a * Math.pow(val - quadraticConfig.h, 2) + quadraticConfig.k);
+
+        const data = [{
+          x: x,
+          y: y,
+          type: "scatter",
+          mode: "lines",
+          line: { color: "#2ecc71", width: 3 },
+          name: "Función Cuadrática"
+        }];
+
+        Plotly.newPlot("quadratic-graph", data, commonLayout, {responsive: true});
+        document.querySelector("#quadratic-content .function-form").textContent = 
+          `f(x) = ${quadraticConfig.a}(x - ${quadraticConfig.h})² + ${quadraticConfig.k}`;
+      }
+
+      // Función para crear gráfico racional
+      function createRationalPlot() {
+        const epsilon = 0.1;
+        const xLeft = Array.from({ length: 100 }, (_, i) => 
+          rationalConfig.h - 10 + (i * (10 - epsilon)) / 99);
+        const xRight = Array.from({ length: 100 }, (_, i) => 
+          rationalConfig.h + epsilon + (i * (10 - epsilon)) / 99);
+
+        const yLeft = xLeft.map(val => rationalConfig.a / (val - rationalConfig.h) + rationalConfig.k);
+        const yRight = xRight.map(val => rationalConfig.a / (val - rationalConfig.h) + rationalConfig.k);
+
+        // Filtrar valores extremos para mejor visualización
+        const filterY = (x, y) => {
+          return y.map((val, i) => Math.abs(val) > 50 ? null : val);
+        };
+
+        const data = [
+          {
+            x: xLeft,
+            y: filterY(xLeft, yLeft),
+            type: "scatter",
+            mode: "lines",
+            line: { color: "#e74c3c", width: 3 },
+            connectgaps: false,
+            name: "Función Racional"
+          },
+          {
+            x: xRight,
+            y: filterY(xRight, yRight),
+            type: "scatter",
+            mode: "lines",
+            line: { color: "#e74c3c", width: 3 },
+            connectgaps: false,
+            showlegend: false
+          },
+          // Asíntota vertical
+          {
+            x: [rationalConfig.h, rationalConfig.h],
+            y: [-10, 10],
+            type: "scatter",
+            mode: "lines",
+            line: { color: "#e74c3c", width: 2, dash: "dash" },
+            showlegend: false
+          },
+          // Asíntota horizontal
+          {
+            x: [-10, 10],
+            y: [rationalConfig.k, rationalConfig.k],
+            type: "scatter",
+            mode: "lines",
+            line: { color: "#e74c3c", width: 2, dash: "dash" },
+            showlegend: false
+          }
+        ];
+
+        Plotly.newPlot("rational-graph", data, commonLayout, {responsive: true});
+        document.querySelector("#rational-content .function-form").textContent = 
+          `f(x) = ${rationalConfig.a}/(x - ${rationalConfig.h}) + ${rationalConfig.k}`;
+      }
+
+      // Función para inicializar controles
+      function setupControls() {
+        // Controles lineales
+        document.getElementById("linear-m").addEventListener("input", function() {
+          const value = parseFloat(this.value);
+          document.getElementById("linear-m-value").textContent = value;
+          linearConfig.m = value;
+          createLinearPlot();
+        });
+
+        document.getElementById("linear-b").addEventListener("input", function() {
+          const value = parseFloat(this.value);
+          document.getElementById("linear-b-value").textContent = value;
+          linearConfig.b = value;
+          createLinearPlot();
+        });
+
+        // Controles cuadráticos
+        document.getElementById("quadratic-a").addEventListener("input", function() {
+          const value = parseFloat(this.value);
+          document.getElementById("quadratic-a-value").textContent = value;
+          quadraticConfig.a = value;
+          createQuadraticPlot();
+        });
+
+        document.getElementById("quadratic-h").addEventListener("input", function() {
+          const value = parseFloat(this.value);
+          document.getElementById("quadratic-h-value").textContent = value;
+          quadraticConfig.h = value;
+          createQuadraticPlot();
+        });
+
+        document.getElementById("quadratic-k").addEventListener("input", function() {
+          const value = parseFloat(this.value);
+          document.getElementById("quadratic-k-value").textContent = value;
+          quadraticConfig.k = value;
+          createQuadraticPlot();
+        });
+
+        // Controles racionales
+        document.getElementById("rational-a").addEventListener("input", function() {
+          const value = parseFloat(this.value);
+          document.getElementById("rational-a-value").textContent = value;
+          rationalConfig.a = value;
+          createRationalPlot();
+        });
+
+        document.getElementById("rational-h").addEventListener("input", function() {
+          const value = parseFloat(this.value);
+          document.getElementById("rational-h-value").textContent = value;
+          rationalConfig.h = value;
+          createRationalPlot();
+        });
+
+        document.getElementById("rational-k").addEventListener("input", function() {
+          const value = parseFloat(this.value);
+          document.getElementById("rational-k-value").textContent = value;
+          rationalConfig.k = value;
+          createRationalPlot();
+        });
+      }
+
+      // Control de pestañas
+      function setupTabs() {
+        document.querySelectorAll(".tab").forEach(tab => {
+          tab.addEventListener("click", function() {
+            // Remover clase active de todas las pestañas y contenidos
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+            // Añadir clase active a la pestaña clickeada y su contenido
+            this.classList.add("active");
+            const tabId = this.getAttribute("data-tab");
+            document.getElementById(`${tabId}-content`).classList.add("active");
+
+            // Redimensionar gráficos después de cambiar pestaña
+            setTimeout(() => {
+              window.dispatchEvent(new Event("resize"));
+            }, 100);
+          });
+        });
+      }
+
+      // Control de modales
+      function setupModals() {
+        const modals = {
+          "linear-help-btn": "linear-modal",
+          "quadratic-help-btn": "quadratic-modal", 
+          "rational-help-btn": "rational-modal"
+        };
+
+        Object.entries(modals).forEach(([btnId, modalId]) => {
+          document.getElementById(btnId).addEventListener("click", () => {
+            document.getElementById(modalId).style.display = "block";
+          });
+        });
+
+        // Cerrar modales
+        document.querySelectorAll(".close").forEach(closeBtn => {
+          closeBtn.addEventListener("click", function() {
+            this.closest(".modal").style.display = "none";
+          });
+        });
+
+        // Cerrar modales al hacer clic fuera
+        window.addEventListener("click", function(event) {
+          if (event.target.classList.contains("modal")) {
+            event.target.style.display = "none";
+          }
+        });
+      }
+
+      // Inicialización completa
+      function initialize() {
+        createLinearPlot();
+        createQuadraticPlot();
+        createRationalPlot();
+        setupControls();
+        setupTabs();
+        setupModals();
+      }
+
+      // Ejecutar cuando el DOM esté listo
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initialize);
+      } else {
+        initialize();
+      }
+
+      // Redimensionar gráficos cuando cambie el tamaño de ventana
+      window.addEventListener("resize", () => {
+        Plotly.Plots.resize("linear-graph");
+        Plotly.Plots.resize("quadratic-graph");
+        Plotly.Plots.resize("rational-graph");
+      });
+    </script>
+  </body>
+</html>

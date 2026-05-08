@@ -1,1 +1,833 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comparación de Números Racionales</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
 
+      .header {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-bottom: 30px;
+        width: 100%;
+        max-width: 800px;
+      }
+
+      .header h1 {
+        color: #2c3e50;
+        margin: 0 0 10px 0;
+        font-size: 2.2em;
+      }
+
+      .header h2 {
+        color: #34495e;
+        margin: 0;
+        font-size: 1.3em;
+        font-weight: normal;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        width: 100%;
+        max-width: 900px;
+        text-align: center;
+      }
+
+      .exercise-title {
+        color: #2c3e50;
+        font-size: 1.8em;
+        margin-bottom: 40px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .help-icon {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+      }
+
+      .help-icon:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+      }
+
+      .modal-content {
+        background: white;
+        margin: 5% auto;
+        padding: 30px;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 700px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #ecf0f1;
+        padding-bottom: 10px;
+      }
+
+      .modal-title {
+        color: #2c3e50;
+        font-size: 1.8em;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .close {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        font-size: 1.5em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .close:hover {
+        background: #c0392b;
+        transform: scale(1.1);
+      }
+
+      .modal-body {
+        line-height: 1.8;
+        color: #2c3e50;
+      }
+
+      .modal-body h3 {
+        color: #3498db;
+        margin: 25px 0 15px 0;
+        font-size: 1.3em;
+      }
+
+      .modal-body p {
+        margin: 15px 0;
+        font-size: 1.1em;
+      }
+
+      .example-box {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 20px 0;
+        font-weight: bold;
+        box-shadow: 0 6px 20px rgba(243, 156, 18, 0.3);
+      }
+
+      .example-step {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-family: "Courier New", monospace;
+        font-size: 1.1em;
+      }
+
+      .fraction-display {
+        font-size: 1.3em;
+        text-align: center;
+        margin: 15px 0;
+      }
+
+      .fraction-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        margin: 40px 0;
+        flex-wrap: wrap;
+      }
+
+      .fraction {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #f1c40f;
+        border: 4px solid #f39c12;
+        border-radius: 15px;
+        padding: 20px;
+        min-width: 120px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        transform: scale(1);
+        transition: transform 0.2s ease;
+      }
+
+      .fraction:hover {
+        transform: scale(1.05);
+      }
+
+      .numerator,
+      .denominator {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #2c3e50;
+        padding: 8px;
+        min-width: 50px;
+        text-align: center;
+      }
+
+      .fraction-line {
+        width: 80px;
+        height: 4px;
+        background: #2c3e50;
+        margin: 5px 0;
+      }
+
+      .comparison-select {
+        background: #f1c40f;
+        border: 4px solid #f39c12;
+        border-radius: 15px;
+        padding: 15px 20px;
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #2c3e50;
+        cursor: pointer;
+        min-width: 80px;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .comparison-select:focus {
+        outline: none;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .buttons {
+        margin: 40px 0;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-new {
+        background: linear-gradient(45deg, #27ae60, #219a52);
+      }
+
+      .result {
+        margin: 30px 0;
+        padding: 25px;
+        border-radius: 15px;
+        font-size: 1.3em;
+        font-weight: bold;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .result.correct {
+        background: linear-gradient(45deg, #2ecc71, #27ae60);
+        color: white;
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+      }
+
+      .result.incorrect {
+        background: linear-gradient(45deg, #cb1a07, #c0392b);
+        color: white;
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+      }
+
+      .explanation {
+        background: rgba(52, 73, 94, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 15px;
+        font-size: 1.1em;
+        line-height: 1.6;
+        text-align: left;
+        box-shadow: 0 15px 35px rgba(149, 147, 147, 0.1);
+      }
+
+      .calculation {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-family: "Courier New", monospace;
+        font-size: 1.2em;
+        color: white;
+        font-weight: bold;
+        border: 2px solid #d35400;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .stats {
+        background: rgba(155, 89, 182, 0.1);
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 2em;
+        font-weight: bold;
+        color: #9b59b6;
+      }
+
+      .stat-label {
+        color: #7f8c8d;
+        font-size: 0.9em;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          padding: 15px;
+          margin-bottom: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.6em;
+        }
+
+        .header h2 {
+          font-size: 1.1em;
+        }
+
+        .container {
+          padding: 20px;
+          margin: 10px;
+        }
+
+        .exercise-title {
+          font-size: 1.4em;
+          margin-bottom: 25px;
+        }
+
+        .help-icon {
+          width: 28px;
+          height: 28px;
+          font-size: 1em;
+        }
+
+        .modal-content {
+          margin: 10% auto;
+          padding: 20px;
+          width: 95%;
+          max-height: 85vh;
+        }
+
+        .modal-title {
+          font-size: 1.4em;
+        }
+
+        .modal-body h3 {
+          font-size: 1.2em;
+        }
+
+        .modal-body p {
+          font-size: 1em;
+        }
+
+        .fraction-container {
+          flex-direction: row;
+          gap: 15px;
+          margin: 25px 0;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .fraction {
+          min-width: 80px;
+          padding: 12px;
+        }
+
+        .numerator,
+        .denominator {
+          font-size: 1.4em;
+          padding: 4px;
+          min-width: 35px;
+        }
+
+        .fraction-line {
+          width: 50px;
+          height: 3px;
+        }
+
+        .comparison-select {
+          font-size: 1.6em;
+          padding: 10px 15px;
+          min-width: 60px;
+        }
+
+        .buttons {
+          margin: 25px 0;
+          gap: 15px;
+        }
+
+        .btn {
+          padding: 12px 20px;
+          font-size: 1em;
+        }
+
+        .result {
+          margin: 20px 0;
+          padding: 20px;
+          font-size: 1.1em;
+        }
+
+        .explanation {
+          padding: 15px;
+          font-size: 1em;
+        }
+
+        .calculation {
+          padding: 12px;
+          font-size: 1em;
+          margin: 8px 0;
+        }
+
+        .stats {
+          padding: 15px;
+          margin-top: 20px;
+          gap: 15px;
+        }
+
+        .stat-number {
+          font-size: 1.5em;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .fraction-container {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .fraction {
+          min-width: 100px;
+          padding: 15px;
+        }
+
+        .numerator,
+        .denominator {
+          font-size: 1.6em;
+          min-width: 40px;
+        }
+
+        .fraction-line {
+          width: 60px;
+        }
+
+        .comparison-select {
+          font-size: 1.8em;
+          padding: 12px 18px;
+          min-width: 70px;
+        }
+
+        .buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .btn {
+          width: 100%;
+          max-width: 300px;
+        }
+
+        .modal-content {
+          margin: 5% auto;
+          padding: 15px;
+          width: 98%;
+          max-height: 90vh;
+        }
+
+        .modal-title {
+          font-size: 1.2em;
+        }
+
+        .example-box {
+          padding: 15px;
+        }
+
+        .example-step {
+          font-size: 1em;
+          padding: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Ordenando números racionales</h1>
+      <h2>Comparación de dos números racionales positivos</h2>
+    </div>
+
+    <div class="container">
+      <div class="exercise-title">
+        Compara los siguientes números:
+        <button
+          class="help-icon"
+          onclick="openModal()"
+          title="¿Cómo comparar fracciones?"
+        >
+          ?
+        </button>
+      </div>
+
+      <div class="fraction-container">
+        <div class="fraction">
+          <div class="numerator" id="num1"></div>
+          <div class="fraction-line"></div>
+          <div class="denominator" id="den1"></div>
+        </div>
+
+        <select class="comparison-select" id="comparison">
+          <option value="">?</option>
+          <option value="<">&lt;</option>
+          <option value="=">=</option>
+          <option value=">">&gt;</option>
+        </select>
+
+        <div class="fraction">
+          <div class="numerator" id="num2"></div>
+          <div class="fraction-line"></div>
+          <div class="denominator" id="den2"></div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn" onclick="checkAnswer()">Verificar Respuesta</button>
+        <button class="btn btn-new" onclick="newExercise()">
+          Otro Ejercicio
+        </button>
+      </div>
+
+      <div class="result" id="result"></div>
+
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-number" id="totalQuestions">0</div>
+          <div class="stat-label">Ejercicios</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="correctAnswers">0</div>
+          <div class="stat-label">Correctas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="percentage">0%</div>
+          <div class="stat-label">Precisión</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Ayuda -->
+    <div id="helpModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">💡 ¿Cómo comparar fracciones?</h2>
+          <button class="close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h3>🎯 Método de Productos Cruzados</h3>
+          <p>
+            Para comparar dos números racionales (fracciones), utilizamos el
+            <strong>método de productos cruzados</strong>, el cual nos permite
+            determinar fácilmente cuál fracción es mayor sin necesidad de
+            convertirlas en decimales.
+          </p>
+
+          <h3>📝 Procedimiento:</h3>
+          <p>
+            Sean las fracciones <strong>a/b</strong> y
+            <strong>c/d</strong> (donde b y d > 0):
+          </p>
+
+          <ol style="font-size: 1.1em; margin: 15px 0; padding-left: 25px">
+            <li>
+              ⚒️ <strong>Multiplicación cruzada:</strong><br />
+              Calcula a × d y b × c
+            </li>
+            <li>
+              📏 <strong>Aplica la regla:</strong><br />El producto mayor indica
+              la fracción mayor
+              <ul style="margin: 10px 0; padding-left: 20px">
+                <li>Si a × d < b × c, entonces a/b < c/d</li>
+                <li>Si a × d > b × c, entonces a/b > c/d</li>
+                <li>Si a × d = b × c, entonces a/b = c/d</li>
+              </ul>
+            </li>
+          </ol>
+
+          <div class="example-box">
+            <h3 style="color: white; margin-top: 0">🔢 Ejemplo práctico:</h3>
+            <div class="fraction-display">
+              Comparemos: <strong>3/4</strong> vs <strong>5/7</strong>
+            </div>
+
+            <div class="example-step">
+              Paso 1: Productos cruzados • 3 × 7 = 21 ⚒️ 4 × 5 = 20
+            </div>
+
+            <div class="example-step">Paso 2: Comparamos 21 > 20</div>
+
+            <div class="example-step">
+              Paso 3: Conclusión Como 21 > 20, entonces 3/4 > 5/7
+            </div>
+          </div>
+
+          <h3>💡 ¿Por qué funciona?</h3>
+          <p>
+            Este método funciona porque al multiplicar cruzado estamos
+            encontrando <strong>fracciones equivalentes</strong> con el mismo
+            denominador (b × d), lo que hace que la comparación sea directa.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentExercise = {};
+      let stats = {
+        total: 0,
+        correct: 0,
+      };
+
+      function generateRandomFraction() {
+        const numerator = Math.floor(Math.random() * 20) + 1; // 1-20
+        const denominator = Math.floor(Math.random() * 20) + 1; // 1-20
+        return { numerator, denominator };
+      }
+
+      function newExercise() {
+        const fraction1 = generateRandomFraction();
+        const fraction2 = generateRandomFraction();
+
+        // Asegurarnos de que las fracciones sean diferentes
+        while (
+          fraction1.numerator * fraction2.denominator ===
+          fraction2.numerator * fraction1.denominator
+        ) {
+          fraction2.numerator = Math.floor(Math.random() * 20) + 1;
+          fraction2.denominator = Math.floor(Math.random() * 20) + 1;
+        }
+
+        currentExercise = {
+          fraction1,
+          fraction2,
+          crossProduct1: fraction1.numerator * fraction2.denominator,
+          crossProduct2: fraction2.numerator * fraction1.denominator,
+        };
+
+        // Determinar la respuesta correcta
+        if (currentExercise.crossProduct1 < currentExercise.crossProduct2) {
+          currentExercise.correctAnswer = "<";
+        } else if (
+          currentExercise.crossProduct1 > currentExercise.crossProduct2
+        ) {
+          currentExercise.correctAnswer = ">";
+        } else {
+          currentExercise.correctAnswer = "=";
+        }
+
+        // Mostrar las fracciones
+        document.getElementById("num1").textContent = fraction1.numerator;
+        document.getElementById("den1").textContent = fraction1.denominator;
+        document.getElementById("num2").textContent = fraction2.numerator;
+        document.getElementById("den2").textContent = fraction2.denominator;
+
+        // Limpiar selección y resultado
+        document.getElementById("comparison").value = "";
+        document.getElementById("result").innerHTML = "";
+        document.getElementById("result").className = "result";
+      }
+
+      function checkAnswer() {
+        const userAnswer = document.getElementById("comparison").value;
+        const resultDiv = document.getElementById("result");
+
+        if (!userAnswer) {
+          resultDiv.innerHTML =
+            "⚠️ Por favor selecciona una opción de comparación.";
+          resultDiv.className = "result";
+          return;
+        }
+
+        stats.total++;
+
+        if (userAnswer === currentExercise.correctAnswer) {
+          stats.correct++;
+          resultDiv.innerHTML = "🎉 ¡Correcto! Excelente trabajo.";
+          resultDiv.className = "result correct";
+        } else {
+          resultDiv.innerHTML = `
+                    ❌ Incorrecto 
+                    <div class="explanation">
+                        <strong>Explicación:</strong><br>
+                        Para comparar fracciones usamos el método de productos cruzados:
+                        <div class="calculation">
+                            ${currentExercise.fraction1.numerator}/${
+            currentExercise.fraction1.denominator
+          } vs ${currentExercise.fraction2.numerator}/${
+            currentExercise.fraction2.denominator
+          }
+                        </div>
+                        <div class="calculation">
+                            Producto cruzado 1: ${
+                              currentExercise.fraction1.numerator
+                            } × ${currentExercise.fraction2.denominator} = ${
+            currentExercise.crossProduct1
+          }
+                        </div>
+                        <div class="calculation">
+                            Producto cruzado 2: ${
+                              currentExercise.fraction1.denominator
+                            } × ${currentExercise.fraction2.numerator} = ${
+            currentExercise.crossProduct2
+          }
+                        </div>
+                        Como ${currentExercise.crossProduct1} ${
+            currentExercise.correctAnswer === "<"
+              ? "<"
+              : currentExercise.correctAnswer === ">"
+              ? ">"
+              : "="
+          } ${currentExercise.crossProduct2}, entonces 
+                        ${currentExercise.fraction1.numerator}/${
+            currentExercise.fraction1.denominator
+          } ${currentExercise.correctAnswer} ${
+            currentExercise.fraction2.numerator
+          }/${currentExercise.fraction2.denominator}
+                    </div>
+                `;
+          resultDiv.className = "result incorrect";
+        }
+
+        updateStats();
+      }
+
+      function updateStats() {
+        document.getElementById("totalQuestions").textContent = stats.total;
+        document.getElementById("correctAnswers").textContent = stats.correct;
+        const percentage =
+          stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+        document.getElementById("percentage").textContent = percentage + "%";
+      }
+
+      function openModal() {
+        document.getElementById("helpModal").style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("helpModal").style.display = "none";
+      }
+
+      // Cerrar modal al hacer clic fuera de él
+      window.onclick = function (event) {
+        const modal = document.getElementById("helpModal");
+        if (event.target === modal) {
+          closeModal();
+        }
+      };
+
+      // Cerrar modal con tecla Escape
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeModal();
+        }
+      });
+
+      // Permitir verificar con Enter
+      document
+        .getElementById("comparison")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            checkAnswer();
+          }
+        });
+
+      // Inicializar primer ejercicio
+      newExercise();
+    </script>
+    <footer>
+      <br />
+      <p style="color: #fafafa; text-align: center">
+        Creado por José M. Fernández con Claude Sonnet 4
+      </p>
+    </footer>
+  </body>
+</html>

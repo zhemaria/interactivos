@@ -1,1 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fracciones equivalentes: ampliar y simplificar</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: #173f52;
+    background-color: #f4fafd;
+    line-height: 1.6;
+    padding: 24px 16px;
+  }
+
+  .contenedor {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #0089cd;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .subtitulo {
+    text-align: center;
+    color: #4a6b7a;
+    font-weight: 400;
+    margin-bottom: 24px;
+    font-size: 0.98rem;
+  }
+
+  .caja-objetivos {
+    background-color: #e8f4fb;
+    border-left: 6px solid #0089cd;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+
+  .caja-objetivos h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #0089cd;
+    margin-bottom: 8px;
+  }
+
+  .caja-objetivos ul {
+    margin-left: 18px;
+    font-size: 0.95rem;
+  }
+
+  .caja-objetivos li { margin-bottom: 4px; }
+
+  /* Pestañas */
+  .pestanas {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+
+  .pestana {
+    flex: 1;
+    text-align: center;
+    padding: 14px 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 10px 10px 0 0;
+    background-color: #d4e9f5;
+    color: #4a6b7a;
+    border: 2px solid transparent;
+    border-bottom: none;
+    user-select: none;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .pestana:hover { background-color: #c2dff0; }
+
+  .pestana.activa {
+    background-color: #ffffff;
+    color: #0089cd;
+    border-color: #b7dcf0;
+  }
+
+  .panel {
+    background-color: #ffffff;
+    border: 2px solid #b7dcf0;
+    border-radius: 0 10px 10px 10px;
+    padding: 24px;
+    box-shadow: 0 4px 14px #dfeef7;
+  }
+
+  .instruccion {
+    font-size: 0.98rem;
+    color: #2c5468;
+    margin-bottom: 18px;
+  }
+
+  /* Fracción mostrada */
+  .fila-fraccion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+
+  .frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1.9rem;
+    font-weight: 600;
+    line-height: 1.1;
+    color: #173f52;
+    min-width: 46px;
+  }
+
+  .frac .num { padding: 0 6px; }
+  .frac .lin {
+    width: 100%;
+    height: 3px;
+    background-color: #173f52;
+    margin: 3px 0;
+    border-radius: 2px;
+  }
+  .frac .den { padding: 0 6px; }
+
+  .frac.destacada { color: #0089cd; }
+  .frac.destacada .lin { background-color: #0089cd; }
+
+  .operador {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #5C3900;
+  }
+
+  /* Controles */
+  .controles {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .controles .etiqueta {
+    font-size: 0.98rem;
+    font-weight: 500;
+    color: #2c5468;
+  }
+
+  input[type="number"] {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    width: 80px;
+    padding: 8px 10px;
+    text-align: center;
+    border: 2px solid #b7dcf0;
+    border-radius: 8px;
+    color: #173f52;
+    background-color: #f4fafd;
+  }
+
+  input[type="number"]:focus {
+    outline: none;
+    border-color: #0089cd;
+    background-color: #ffffff;
+  }
+
+  .boton {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #ffffff;
+    background-color: #0089cd;
+    transition: background-color 0.2s;
+  }
+
+  .boton:hover { background-color: #006fa6; }
+
+  .boton.secundario {
+    background-color: #ffffff;
+    color: #0089cd;
+    border: 2px solid #0089cd;
+    padding: 8px 16px;
+  }
+
+  .boton.secundario:hover { background-color: #e8f4fb; }
+
+  /* Visualización */
+  .visual {
+    margin-top: 8px;
+    padding: 18px;
+    background-color: #f4fafd;
+    border-radius: 10px;
+    border: 1px solid #dfeef7;
+  }
+
+  .bloque-barra {
+    margin-bottom: 18px;
+    opacity: 1;
+    animation: aparecer 0.45s ease both;
+  }
+
+  .bloque-barra:last-child { margin-bottom: 0; }
+
+  @keyframes aparecer {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .etiqueta-barra {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4a6b7a;
+    margin-bottom: 6px;
+  }
+
+  .etiqueta-barra strong { color: #173f52; }
+
+  svg { display: block; width: 100%; height: auto; }
+
+  /* Mensajes */
+  .mensaje {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 0.96rem;
+    font-weight: 500;
+    display: none;
+  }
+
+  .mensaje.exito {
+    display: block;
+    background-color: #e6f4ea;
+    border-left: 5px solid #2e7d32;
+    color: #1b5e20;
+  }
+
+  .mensaje.aviso {
+    display: block;
+    background-color: #fdf3e3;
+    border-left: 5px solid #5C3900;
+    color: #5C3900;
+  }
+
+  .resultado-ecuacion {
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #0089cd;
+    margin-top: 14px;
+    min-height: 1.4em;
+  }
+
+  .pie {
+    text-align: center;
+    font-size: 0.82rem;
+    color: #8aa4b1;
+    margin-top: 22px;
+  }
+</style>
+</head>
+<body>
+<div class="contenedor">
+
+  <h1>Fracciones equivalentes: ampliar y simplificar</h1>
+  <p class="subtitulo">Observe cómo la región pintada se mantiene igual aunque cambien los números.</p>
+
+  <div class="caja-objetivos">
+    <h2>Objetivos de la clase</h2>
+    <ul>
+      <li>Construir fracciones equivalentes multiplicando el numerador y el denominador por un mismo número.</li>
+      <li>Simplificar fracciones dividiendo el numerador y el denominador por un divisor común.</li>
+      <li>Comprender que dos fracciones equivalentes representan la misma cantidad.</li>
+    </ul>
+  </div>
+
+  <div class="pestanas">
+    <div class="pestana activa" id="tab-ampliar">Ampliar</div>
+    <div class="pestana" id="tab-simplificar">Simplificar</div>
+  </div>
+
+  <div class="panel">
+
+    <!-- PANEL AMPLIAR -->
+    <div id="panel-ampliar">
+      <p class="instruccion">Para crear una fracción equivalente, multiplique el numerador y el denominador por el mismo número. Escriba un número y pulse <strong>Ampliar</strong>.</p>
+
+      <div class="fila-fraccion">
+        <div class="frac destacada">
+          <span class="num" id="amp-num">2</span>
+          <span class="lin"></span>
+          <span class="den" id="amp-den">3</span>
+        </div>
+        <span class="operador">×</span>
+        <div class="frac">
+          <span class="num"><span id="amp-factor-vista">n</span></span>
+          <span class="lin"></span>
+          <span class="den" id="amp-factor-vista2">n</span>
+        </div>
+      </div>
+
+      <div class="controles">
+        <span class="etiqueta">Multiplicar por:</span>
+        <input type="number" id="amp-input" min="2" max="12" step="1" value="2">
+        <button class="boton" id="amp-btn">Ampliar</button>
+        <button class="boton secundario" id="amp-nueva">Nueva fracción</button>
+      </div>
+
+      <div class="visual" id="amp-visual"></div>
+      <div class="resultado-ecuacion" id="amp-ecuacion"></div>
+      <div class="mensaje" id="amp-mensaje"></div>
+    </div>
+
+    <!-- PANEL SIMPLIFICAR -->
+    <div id="panel-simplificar" style="display:none;">
+      <p class="instruccion">Para simplificar, divida el numerador y el denominador por un mismo número que entre exacto en ambos. Escriba ese número y pulse <strong>Simplificar</strong>.</p>
+
+      <div class="fila-fraccion">
+        <div class="frac destacada">
+          <span class="num" id="sim-num">8</span>
+          <span class="lin"></span>
+          <span class="den" id="sim-den">12</span>
+        </div>
+        <span class="operador">÷</span>
+        <div class="frac">
+          <span class="num"><span id="sim-factor-vista">n</span></span>
+          <span class="lin"></span>
+          <span class="den" id="sim-factor-vista2">n</span>
+        </div>
+      </div>
+
+      <div class="controles">
+        <span class="etiqueta">Dividir entre:</span>
+        <input type="number" id="sim-input" min="2" max="20" step="1" value="2">
+        <button class="boton" id="sim-btn">Simplificar</button>
+        <button class="boton secundario" id="sim-nueva">Nueva fracción</button>
+      </div>
+
+      <div class="visual" id="sim-visual"></div>
+      <div class="resultado-ecuacion" id="sim-ecuacion"></div>
+      <div class="mensaje" id="sim-mensaje"></div>
+    </div>
+
+  </div>
+
+  <p class="pie">El área coloreada nunca cambia: esa es la prueba de que las fracciones son equivalentes.</p>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- utilidades ---------- */
+  function mcd(a, b) { return b === 0 ? a : mcd(b, a % b); }
+
+  var BARRA_ANCHO = 640;
+  var BARRA_ALTO = 64;
+  var PINTADO = "#0089cd";
+  var VACIO = "#ffffff";
+  var BORDE_FINO = "#9cc7e0";
+  var BORDE_GRUESO = "#005a87";
+  var MARCO = "#173f52";
+
+  /* Dibuja una barra de fracción dividida en "partes" columnas,
+     con "pintadas" pintadas. "grupo" marca con línea gruesa cada
+     "grupo" columnas (0 = sin marcas de grupo). */
+  function barraSVG(partes, pintadas, grupo) {
+    var w = BARRA_ANCHO, h = BARRA_ALTO;
+    var anchoCol = w / partes;
+    var s = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg" role="img">';
+    var i, x;
+    // columnas
+    for (i = 0; i < partes; i++) {
+      x = i * anchoCol;
+      var color = i < pintadas ? PINTADO : VACIO;
+      s += '<rect x="' + x.toFixed(2) + '" y="0" width="' + anchoCol.toFixed(2) +
+           '" height="' + h + '" fill="' + color + '" stroke="' + BORDE_FINO +
+           '" stroke-width="1"/>';
+    }
+    // líneas de grupo (más gruesas)
+    if (grupo && grupo > 1) {
+      for (i = grupo; i < partes; i += grupo) {
+        x = i * anchoCol;
+        s += '<line x1="' + x.toFixed(2) + '" y1="0" x2="' + x.toFixed(2) +
+             '" y2="' + h + '" stroke="' + BORDE_GRUESO + '" stroke-width="3"/>';
+      }
+    }
+    // marco exterior
+    s += '<rect x="1" y="1" width="' + (w - 2) + '" height="' + (h - 2) +
+         '" fill="none" stroke="' + MARCO + '" stroke-width="2"/>';
+    s += '</svg>';
+    return s;
+  }
+
+  function bloque(etiquetaHTML, svg) {
+    return '<div class="bloque-barra"><div class="etiqueta-barra">' +
+           etiquetaHTML + '</div>' + svg + '</div>';
+  }
+
+  function fracTexto(n, d) {
+    return '<strong>' + n + '/' + d + '</strong>';
+  }
+
+  /* ================= AMPLIAR ================= */
+  var ampNum = 2, ampDen = 3;
+
+  function nuevaAmpliar() {
+    ampDen = 2 + Math.floor(Math.random() * 5);      // 2..6
+    ampNum = 1 + Math.floor(Math.random() * (ampDen - 1)); // 1..den-1
+    document.getElementById("amp-num").textContent = ampNum;
+    document.getElementById("amp-den").textContent = ampDen;
+    document.getElementById("amp-input").value = 2;
+    document.getElementById("amp-factor-vista").textContent = "n";
+    document.getElementById("amp-factor-vista2").textContent = "n";
+    document.getElementById("amp-ecuacion").textContent = "";
+    document.getElementById("amp-mensaje").className = "mensaje";
+    document.getElementById("amp-visual").innerHTML =
+      bloque("Fracción de partida: " + fracTexto(ampNum, ampDen),
+             barraSVG(ampDen, ampNum, 0));
+  }
+
+  function hacerAmpliar() {
+    var n = parseInt(document.getElementById("amp-input").value, 10);
+    var msg = document.getElementById("amp-mensaje");
+    if (isNaN(n) || n < 2) {
+      msg.className = "mensaje aviso";
+      msg.textContent = "Escriba un número entero igual o mayor que 2 para ampliar la fracción.";
+      return;
+    }
+    if (n > 12) {
+      msg.className = "mensaje aviso";
+      msg.textContent = "Use un número hasta 12 para que la barra se vea con claridad.";
+      return;
+    }
+    var nNum = ampNum * n, nDen = ampDen * n;
+    document.getElementById("amp-factor-vista").textContent = n;
+    document.getElementById("amp-factor-vista2").textContent = n;
+
+    var vis = document.getElementById("amp-visual");
+    vis.innerHTML =
+      bloque("Fracción de partida: " + fracTexto(ampNum, ampDen),
+             barraSVG(ampDen, ampNum, 0)) +
+      bloque("Cada parte se divide en " + n + " — resultado: " + fracTexto(nNum, nDen),
+             barraSVG(nDen, nNum, n));
+
+    document.getElementById("amp-ecuacion").innerHTML =
+      ampNum + "/" + ampDen + "  =  (" + ampNum + "×" + n + ") / (" + ampDen + "×" + n +
+      ")  =  " + nNum + "/" + nDen;
+
+    msg.className = "mensaje exito";
+    msg.innerHTML = "¡Correcto! " + ampNum + "/" + ampDen + " y " + nNum + "/" + nDen +
+      " son fracciones equivalentes: la región coloreada ocupa exactamente lo mismo en las dos barras.";
+  }
+
+  /* ================= SIMPLIFICAR ================= */
+  var simNum = 8, simDen = 12;
+
+  function nuevaSimplificar() {
+    // fracción base reducida y luego se amplía por un factor, para garantizar que se pueda simplificar
+    var bd = 2 + Math.floor(Math.random() * 4);        // 2..5
+    var bn = 1 + Math.floor(Math.random() * (bd - 1)); // 1..bd-1
+    var g = mcd(bn, bd);
+    bn = bn / g; bd = bd / g;
+    var f = 2 + Math.floor(Math.random() * 3);         // factor 2..4
+    simNum = bn * f;
+    simDen = bd * f;
+    document.getElementById("sim-num").textContent = simNum;
+    document.getElementById("sim-den").textContent = simDen;
+    document.getElementById("sim-input").value = 2;
+    document.getElementById("sim-factor-vista").textContent = "n";
+    document.getElementById("sim-factor-vista2").textContent = "n";
+    document.getElementById("sim-ecuacion").textContent = "";
+    document.getElementById("sim-mensaje").className = "mensaje";
+    document.getElementById("sim-visual").innerHTML =
+      bloque("Fracción de partida: " + fracTexto(simNum, simDen),
+             barraSVG(simDen, simNum, 0));
+  }
+
+  function hacerSimplificar() {
+    var n = parseInt(document.getElementById("sim-input").value, 10);
+    var msg = document.getElementById("sim-mensaje");
+    if (isNaN(n) || n < 2) {
+      msg.className = "mensaje aviso";
+      msg.textContent = "Escriba un número entero igual o mayor que 2 para simplificar.";
+      return;
+    }
+    if (simNum % n !== 0 || simDen % n !== 0) {
+      msg.className = "mensaje aviso";
+      msg.innerHTML = "El " + n + " no entra exacto en el numerador y el denominador a la vez. " +
+        "Busque un número que divida sin dejar resto tanto a " + simNum + " como a " + simDen + ".";
+      return;
+    }
+    var nNum = simNum / n, nDen = simDen / n;
+    document.getElementById("sim-factor-vista").textContent = n;
+    document.getElementById("sim-factor-vista2").textContent = n;
+
+    var vis = document.getElementById("sim-visual");
+    vis.innerHTML =
+      bloque("Fracción de partida (agrupada de " + n + " en " + n + "): " + fracTexto(simNum, simDen),
+             barraSVG(simDen, simNum, n)) +
+      bloque("Cada grupo de " + n + " pasa a ser una parte — resultado: " + fracTexto(nNum, nDen),
+             barraSVG(nDen, nNum, 0));
+
+    document.getElementById("sim-ecuacion").innerHTML =
+      simNum + "/" + simDen + "  =  (" + simNum + "÷" + n + ") / (" + simDen + "÷" + n +
+      ")  =  " + nNum + "/" + nDen;
+
+    var irreducible = mcd(nNum, nDen) === 1;
+    if (irreducible) {
+      msg.className = "mensaje exito";
+      msg.innerHTML = "¡Excelente! " + nNum + "/" + nDen +
+        " ya es la fracción irreducible: no se puede simplificar más. La región coloreada no ha cambiado.";
+    } else {
+      msg.className = "mensaje aviso";
+      msg.innerHTML = "¡Bien! Quedó " + nNum + "/" + nDen +
+        ", pero todavía se puede simplificar más. Tome esa nueva fracción y vuelva a dividir.";
+      // preparar la nueva fracción para que el estudiante siga
+      simNum = nNum; simDen = nDen;
+      document.getElementById("sim-num").textContent = simNum;
+      document.getElementById("sim-den").textContent = simDen;
+      document.getElementById("sim-input").value = 2;
+    }
+  }
+
+  /* ================= PESTAÑAS ================= */
+  function activar(cual) {
+    var esAmp = cual === "ampliar";
+    document.getElementById("tab-ampliar").className = "pestana" + (esAmp ? " activa" : "");
+    document.getElementById("tab-simplificar").className = "pestana" + (esAmp ? "" : " activa");
+    document.getElementById("panel-ampliar").style.display = esAmp ? "block" : "none";
+    document.getElementById("panel-simplificar").style.display = esAmp ? "none" : "block";
+  }
+
+  /* ================= EVENTOS ================= */
+  document.getElementById("tab-ampliar").addEventListener("click", function () { activar("ampliar"); });
+  document.getElementById("tab-simplificar").addEventListener("click", function () { activar("simplificar"); });
+  document.getElementById("amp-btn").addEventListener("click", hacerAmpliar);
+  document.getElementById("amp-nueva").addEventListener("click", nuevaAmpliar);
+  document.getElementById("sim-btn").addEventListener("click", hacerSimplificar);
+  document.getElementById("sim-nueva").addEventListener("click", nuevaSimplificar);
+
+  document.getElementById("amp-input").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") hacerAmpliar();
+  });
+  document.getElementById("sim-input").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") hacerSimplificar();
+  });
+
+  /* ================= INICIO ================= */
+  nuevaAmpliar();
+  nuevaSimplificar();
+})();
+</script>
+</body>
+</html>

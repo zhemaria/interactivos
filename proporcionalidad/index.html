@@ -1,1 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proporcionalidad directa e inversa: la construcción de una casa</title>
+<style>
+  :root{
+    --tinta:#1f2430;
+    --tinta-suave:#4b5563;
+    --papel:#fbf8f1;
+    --tarjeta:#ffffff;
+    --borde:#e7e2d6;
 
+    /* Directa = verde esmeralda */
+    --dir:#059669;
+    --dir-oscuro:#065f46;
+    --dir-claro:#d1fae5;
+    --dir-vidrio:#ecfdf5;
+
+    /* Inversa = índigo */
+    --inv:#4f46e5;
+    --inv-oscuro:#3730a3;
+    --inv-claro:#e0e7ff;
+    --inv-vidrio:#eef2ff;
+
+    --sombra:0 10px 30px rgba(31,36,48,.08);
+    --sombra-suave:0 3px 12px rgba(31,36,48,.06);
+    --radio:18px;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",Tahoma,Geneva,Verdana,system-ui,sans-serif;
+    color:var(--tinta);
+    background:
+      radial-gradient(1200px 500px at 15% -10%, #fff7e6 0%, transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, #eef3ff 0%, transparent 55%),
+      var(--papel);
+    line-height:1.55;
+    padding:clamp(14px,3vw,40px);
+  }
+  .lienzo{max-width:1080px;margin:0 auto;}
+
+  header.principal{
+    text-align:center;
+    margin-bottom:26px;
+  }
+  header.principal .etiqueta{
+    display:inline-block;
+    font-size:.78rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--tinta-suave);
+    background:#fff;
+    border:1px solid var(--borde);
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:14px;
+  }
+  header.principal h1{
+    font-size:clamp(1.5rem,3.6vw,2.3rem);
+    margin:.1em 0 .25em;
+    line-height:1.18;
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  header.principal p{
+    max-width:680px;margin:0 auto;
+    color:var(--tinta-suave);
+    font-size:clamp(1rem,2vw,1.08rem);
+  }
+
+  .escenario{
+    background:var(--tarjeta);
+    border:1px solid var(--borde);
+    border-radius:var(--radio);
+    padding:18px 22px;
+    margin:22px 0;
+    box-shadow:var(--sombra-suave);
+    display:flex;gap:16px;align-items:center;
+  }
+  .escenario .icono{font-size:2.4rem;line-height:1;}
+  .escenario p{margin:0;color:var(--tinta-suave);}
+  .escenario strong{color:var(--tinta);}
+
+  /* ---- Rejilla de los dos contenedores ---- */
+  .contenedores{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+  }
+  @media (max-width:760px){
+    .contenedores{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--tarjeta);
+    border-radius:var(--radio);
+    box-shadow:var(--sombra);
+    overflow:hidden;
+    border:1px solid var(--borde);
+    display:flex;flex-direction:column;
+  }
+  .panel .cabecera{
+    padding:18px 20px;
+    color:#fff;
+    position:relative;
+  }
+  .panel.directa .cabecera{background:linear-gradient(135deg,var(--dir) 0%,var(--dir-oscuro) 100%);}
+  .panel.inversa .cabecera{background:linear-gradient(135deg,var(--inv) 0%,var(--inv-oscuro) 100%);}
+  .panel .cabecera .tipo{
+    font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.9;
+  }
+  .panel .cabecera h2{
+    margin:.15em 0 0;font-size:1.22rem;font-weight:800;
+  }
+  .panel .cabecera .formula{
+    position:absolute;top:16px;right:18px;
+    font-size:.82rem;background:rgba(255,255,255,.18);
+    padding:5px 11px;border-radius:999px;font-weight:700;
+    backdrop-filter:blur(2px);
+  }
+
+  .cuerpo{padding:20px;display:flex;flex-direction:column;gap:16px;flex:1;}
+
+  /* ---- Control deslizante ---- */
+  .control{
+    display:flex;align-items:center;gap:14px;
+    background:var(--papel);border-radius:14px;padding:12px 14px;
+    border:1px solid var(--borde);
+  }
+  .control .titulo-control{font-weight:700;font-size:.95rem;flex:1;}
+  .control .valor{
+    font-weight:800;font-size:1.35rem;min-width:34px;text-align:center;
+    padding:2px 10px;border-radius:10px;
+  }
+  .panel.directa .control .valor{color:var(--dir-oscuro);background:var(--dir-claro);}
+  .panel.inversa .control .valor{color:var(--inv-oscuro);background:var(--inv-claro);}
+
+  input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:8px;border-radius:999px;background:#e5e1d6;outline:none;margin:0;cursor:pointer;}
+  .panel.directa input[type=range]{background:linear-gradient(90deg,var(--dir) 0%,var(--dir) var(--relleno,30%),#e5e1d6 var(--relleno,30%));}
+  .panel.inversa input[type=range]{background:linear-gradient(90deg,var(--inv) 0%,var(--inv) var(--relleno,30%),#e5e1d6 var(--relleno,30%));}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--dir);box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer;}
+  .panel.inversa input[type=range]::-webkit-slider-thumb{border-color:var(--inv);}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--dir);cursor:pointer;}
+  .panel.inversa input[type=range]::-moz-range-thumb{border-color:var(--inv);}
+
+  /* ---- Escena visual ---- */
+  .escena{
+    background:var(--papel);
+    border:1px solid var(--borde);
+    border-radius:14px;
+    padding:14px;
+    min-height:230px;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .fila-iconos{font-size:1.7rem;line-height:1.35;letter-spacing:2px;text-align:center;min-height:1.6em;}
+  .barra-mat{
+    margin-top:14px;height:30px;border-radius:8px;background:#eee7d6;overflow:hidden;position:relative;
+  }
+  .barra-mat .relleno-mat{
+    height:100%;background:repeating-linear-gradient(45deg,var(--dir) 0 12px,var(--dir-oscuro) 12px 24px);
+    width:0;transition:width .4s cubic-bezier(.22,1,.36,1);border-radius:8px;
+  }
+  .leyenda-escena{font-size:.85rem;color:var(--tinta-suave);text-align:center;margin-top:8px;}
+
+  /* ---- Indicador de la constante (concepto clave) ---- */
+  .constante{
+    border-radius:14px;padding:14px 16px;text-align:center;
+    border:2px dashed;
+  }
+  .panel.directa .constante{background:var(--dir-vidrio);border-color:var(--dir);}
+  .panel.inversa .constante{background:var(--inv-vidrio);border-color:var(--inv);}
+  .constante .micro{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);}
+  .constante .calculo{font-size:1.05rem;margin:6px 0 4px;font-weight:600;}
+  .constante .resultado{font-weight:800;font-size:1.35rem;}
+  .panel.directa .constante .resultado{color:var(--dir-oscuro);}
+  .panel.inversa .constante .resultado{color:var(--inv-oscuro);}
+  .constante .nota{font-size:.82rem;color:var(--tinta-suave);margin-top:4px;}
+
+  /* ---- Mini gráfico ---- */
+  .grafico-caja{background:#fff;border:1px solid var(--borde);border-radius:14px;padding:10px 6px 4px;}
+  .grafico-caja .titulo-g{font-size:.78rem;text-align:center;color:var(--tinta-suave);font-weight:600;margin-bottom:2px;}
+  svg{display:block;width:100%;height:auto;}
+
+  /* ---- Comparación ---- */
+  .comparacion{
+    margin:26px 0 8px;background:var(--tarjeta);border:1px solid var(--borde);
+    border-radius:var(--radio);padding:18px 22px;box-shadow:var(--sombra-suave);
+  }
+  .comparacion h3{margin:0 0 6px;font-size:1.05rem;}
+  .comparacion .dos{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px;}
+  @media (max-width:640px){.comparacion .dos{grid-template-columns:1fr;}}
+  .mini-tarjeta{border-radius:12px;padding:12px 14px;font-size:.92rem;}
+  .mini-tarjeta.d{background:var(--dir-vidrio);border:1px solid var(--dir-claro);}
+  .mini-tarjeta.i{background:var(--inv-vidrio);border:1px solid var(--inv-claro);}
+  .mini-tarjeta b.d{color:var(--dir-oscuro);}
+  .mini-tarjeta b.i{color:var(--inv-oscuro);}
+
+  /* ---- Preguntas guía ---- */
+  .seccion{margin:26px 0;}
+  .seccion > h3{font-size:1.15rem;margin:0 0 14px;display:flex;align-items:center;gap:8px;}
+  .pregunta{
+    background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;
+    margin-bottom:12px;box-shadow:var(--sombra-suave);overflow:hidden;
+  }
+  .pregunta .texto{padding:15px 18px;font-weight:600;}
+  .boton-revelar{
+    cursor:pointer;user-select:none;
+    padding:11px 18px;background:var(--papel);border-top:1px solid var(--borde);
+    color:var(--tinta-suave);font-weight:700;font-size:.9rem;
+    display:flex;align-items:center;gap:8px;transition:background .2s;
+  }
+  .boton-revelar:hover{background:#f1ece0;}
+  .boton-revelar .flecha{transition:transform .25s;}
+  .pregunta.abierta .boton-revelar .flecha{transform:rotate(90deg);}
+  .respuesta{
+    max-height:0;overflow:hidden;transition:max-height .35s ease;
+    background:#fff;
+  }
+  .pregunta.abierta .respuesta{max-height:240px;}
+  .respuesta .interior{padding:14px 18px;border-top:1px solid var(--borde);font-size:.95rem;}
+  .pildora{display:inline-block;font-weight:800;padding:2px 10px;border-radius:999px;font-size:.82rem;}
+  .pildora.d{background:var(--dir-claro);color:var(--dir-oscuro);}
+  .pildora.i{background:var(--inv-claro);color:var(--inv-oscuro);}
+
+  /* ---- Juego de clasificar ---- */
+  .juego{
+    background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);
+    padding:20px 22px;box-shadow:var(--sombra);
+  }
+  .marcador{
+    float:right;font-weight:800;background:var(--papel);border:1px solid var(--borde);
+    padding:5px 14px;border-radius:999px;font-size:.92rem;
+  }
+  .caso{
+    border:1px solid var(--borde);border-radius:14px;padding:14px 16px;margin:12px 0;
+    background:var(--papel);
+  }
+  .caso .enunciado{font-weight:600;margin-bottom:10px;}
+  .opciones{display:flex;gap:10px;flex-wrap:wrap;}
+  .opcion{
+    cursor:pointer;user-select:none;flex:1;min-width:140px;text-align:center;
+    padding:11px 14px;border-radius:11px;font-weight:700;border:2px solid var(--borde);
+    background:#fff;transition:all .15s;
+  }
+  .opcion[data-tipo="d"]:hover{border-color:var(--dir);color:var(--dir-oscuro);}
+  .opcion[data-tipo="i"]:hover{border-color:var(--inv);color:var(--inv-oscuro);}
+  .opcion.bien{background:var(--dir-claro);border-color:var(--dir);color:var(--dir-oscuro);}
+  .opcion.mal{background:#fee2e2;border-color:#dc2626;color:#991b1b;}
+  .opcion.bloqueada{cursor:default;}
+  .retro{margin-top:10px;font-size:.9rem;display:none;}
+  .caso.resuelto .retro{display:block;}
+
+  footer{margin-top:30px;text-align:center;color:var(--tinta-suave);font-size:.85rem;}
+</style>
+</head>
+<body>
+<div class="lienzo">
+
+  <header class="principal">
+    <span class="etiqueta">Matemáticas · Razones y proporciones</span>
+    <h1>Proporcionalidad directa e inversa</h1>
+    <p>Construir una casa nos enseña dos formas distintas en que se relacionan las cantidades. Mueve los controles, observa qué crece y qué disminuye, y descubre cuál es cada proporción.</p>
+  </header>
+
+  <div class="escenario">
+    <span class="icono" aria-hidden="true">🏗️</span>
+    <p><strong>El proyecto:</strong> vamos a construir casas. Para cada casa hace falta una cantidad fija de materiales, y el tiempo de obra depende de cuántos obreros trabajen. Observa con atención los dos tableros de abajo.</p>
+  </div>
+
+  <div class="contenedores">
+
+    <!-- ================= DIRECTA ================= -->
+    <section class="panel directa" aria-labelledby="t-directa">
+      <div class="cabecera">
+        <div class="tipo">Tablero 1</div>
+        <h2 id="t-directa">Casas y materiales</h2>
+        <span class="formula">crecen juntas ↑↑</span>
+      </div>
+      <div class="cuerpo">
+        <div class="control">
+          <span class="titulo-control">🏠 Número de casas</span>
+          <input type="range" id="rangoCasas" min="1" max="6" value="2" step="1" aria-label="Número de casas a construir">
+          <span class="valor" id="valCasas">2</span>
+        </div>
+
+        <div class="escena">
+          <div class="fila-iconos" id="iconosCasas" aria-hidden="true"></div>
+          <div class="barra-mat" aria-hidden="true"><div class="relleno-mat" id="rellenoMat"></div></div>
+          <div class="leyenda-escena" id="leyendaMat">Materiales necesarios</div>
+        </div>
+
+        <div class="constante">
+          <div class="micro">Lo que se mantiene constante</div>
+          <div class="calculo" id="calcDir">40 sacos ÷ 2 casas</div>
+          <div class="resultado" id="resDir">= 20 sacos por casa</div>
+          <div class="nota">El <strong>cociente</strong> (la razón) no cambia.</div>
+        </div>
+
+        <div class="grafico-caja">
+          <div class="titulo-g">Casas → sacos de cemento</div>
+          <svg id="svgDir" viewBox="0 0 260 180" role="img" aria-label="Gráfico de línea recta que pasa por el origen"></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INVERSA ================= -->
+    <section class="panel inversa" aria-labelledby="t-inversa">
+      <div class="cabecera">
+        <div class="tipo">Tablero 2</div>
+        <h2 id="t-inversa">Obreros y tiempo</h2>
+        <span class="formula">una sube, otra baja ↑↓</span>
+      </div>
+      <div class="cuerpo">
+        <div class="control">
+          <span class="titulo-control">👷 Número de obreros</span>
+          <input type="range" id="rangoObreros" min="1" max="6" value="2" step="1" aria-label="Número de obreros que trabajan">
+          <span class="valor" id="valObreros">2</span>
+        </div>
+
+        <div class="escena">
+          <div class="fila-iconos" id="iconosObreros" aria-hidden="true" style="margin-bottom:6px"></div>
+          <svg id="svgArea" viewBox="0 0 260 200" role="img" aria-label="Rectángulo de área constante: al aumentar los obreros disminuyen los días"></svg>
+        </div>
+
+        <div class="constante">
+          <div class="micro">Lo que se mantiene constante</div>
+          <div class="calculo" id="calcInv">2 obreros × 30 días</div>
+          <div class="resultado" id="resInv">= 60 días-obrero de trabajo</div>
+          <div class="nota">El <strong>producto</strong> no cambia.</div>
+        </div>
+
+        <div class="grafico-caja">
+          <div class="titulo-g">Obreros → días de obra</div>
+          <svg id="svgInv" viewBox="0 0 260 180" role="img" aria-label="Gráfico de curva que desciende: a más obreros, menos días"></svg>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ================= COMPARACIÓN ================= -->
+  <div class="comparacion">
+    <h3>👀 ¿Qué notaste?</h3>
+    <div class="dos">
+      <div class="mini-tarjeta d">
+        <b class="d">Proporción directa</b> — al aumentar las casas, los materiales <b>también aumentan</b>. Si una se duplica, la otra se duplica. La <b>razón</b> (sacos por casa) se mantiene igual.
+      </div>
+      <div class="mini-tarjeta i">
+        <b class="i">Proporción inversa</b> — al aumentar los obreros, los días <b>disminuyen</b>. Si una se duplica, la otra se reduce a la mitad. El <b>producto</b> (días-obrero) se mantiene igual.
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PREGUNTAS GUÍA ================= -->
+  <div class="seccion">
+    <h3>🤔 Preguntas para pensar</h3>
+
+    <div class="pregunta">
+      <div class="texto">Si <strong>duplicas</strong> el número de casas, ¿qué le ocurre a la cantidad de materiales?</div>
+      <div class="boton-revelar"><span class="flecha">▶</span> Pensar y revelar</div>
+      <div class="respuesta"><div class="interior">Los materiales <strong>también se duplican</strong>. Ambas cantidades suben en la misma proporción: eso es la <span class="pildora d">proporción directa</span>.</div></div>
+    </div>
+
+    <div class="pregunta">
+      <div class="texto">Si <strong>duplicas</strong> el número de obreros, ¿qué le ocurre al tiempo de obra?</div>
+      <div class="boton-revelar"><span class="flecha">▶</span> Pensar y revelar</div>
+      <div class="respuesta"><div class="interior">El tiempo se <strong>reduce a la mitad</strong>. Una sube y la otra baja: eso es la <span class="pildora i">proporción inversa</span>.</div></div>
+    </div>
+
+    <div class="pregunta">
+      <div class="texto">¿En cuál de los dos tableros el <strong>cociente</strong> (dividir una cantidad entre la otra) se mantiene constante?</div>
+      <div class="boton-revelar"><span class="flecha">▶</span> Pensar y revelar</div>
+      <div class="respuesta"><div class="interior">En el de casas y materiales: sacos ÷ casas = 20, siempre. El cociente constante es la huella de la <span class="pildora d">proporción directa</span>.</div></div>
+    </div>
+
+    <div class="pregunta">
+      <div class="texto">¿En cuál de los dos tableros el <strong>producto</strong> (multiplicar una cantidad por la otra) se mantiene constante?</div>
+      <div class="boton-revelar"><span class="flecha">▶</span> Pensar y revelar</div>
+      <div class="respuesta"><div class="interior">En el de obreros y días: obreros × días = 60, siempre. El producto constante es la huella de la <span class="pildora i">proporción inversa</span>.</div></div>
+    </div>
+  </div>
+
+  <!-- ================= JUEGO CLASIFICAR ================= -->
+  <div class="juego seccion">
+    <span class="marcador" id="marcador">Aciertos: 0 / 4</span>
+    <h3>🎯 Ahora clasifica tú</h3>
+    <p style="color:var(--tinta-suave);margin-top:0">Para cada situación, decide si la relación entre las dos cantidades es directa o inversa.</p>
+    <div id="casos"></div>
+  </div>
+
+  <footer>
+    Mueve los controles cuantas veces quieras. Lo importante no es el número, sino <em>ver</em> cómo se comportan las cantidades.
+  </footer>
+
+</div>
+
+<script>
+/* ============ DATOS DEL MODELO ============ */
+const SACOS_POR_CASA = 20;      // proporción directa: cociente constante
+const TRABAJO_TOTAL  = 60;      // proporción inversa: producto constante (días-obrero)
+
+/* ============ PANEL DIRECTA ============ */
+const rangoCasas = document.getElementById('rangoCasas');
+const valCasas   = document.getElementById('valCasas');
+const iconosCasas= document.getElementById('iconosCasas');
+const rellenoMat = document.getElementById('rellenoMat');
+const leyendaMat = document.getElementById('leyendaMat');
+const calcDir    = document.getElementById('calcDir');
+const resDir     = document.getElementById('resDir');
+const svgDir     = document.getElementById('svgDir');
+
+function pintarDirecta(){
+  const casas = +rangoCasas.value;
+  const sacos = casas * SACOS_POR_CASA;
+  valCasas.textContent = casas;
+  rangoCasas.style.setProperty('--relleno', ((casas-1)/5*100)+'%');
+
+  iconosCasas.textContent = '🏠'.repeat(casas);
+  rellenoMat.style.width = (sacos/ (6*SACOS_POR_CASA) *100)+'%';
+  leyendaMat.innerHTML = '<strong>'+sacos+'</strong> sacos de cemento';
+
+  calcDir.textContent = sacos+' sacos ÷ '+casas+' casas';
+  resDir.textContent  = '= '+SACOS_POR_CASA+' sacos por casa';
+
+  dibujarLineaDirecta(casas, sacos);
+}
+
+function dibujarLineaDirecta(casas, sacos){
+  const W=260,H=180, mx=34, my=20, x0=mx, y0=H-26;
+  const ancho=W-mx-14, alto=y0-my;
+  const maxX=6, maxY=6*SACOS_POR_CASA;
+  const px = c => x0 + (c/maxX)*ancho;
+  const py = s => y0 - (s/maxY)*alto;
+  let svg='';
+  // ejes
+  svg+=`<line x1="${x0}" y1="${my}" x2="${x0}" y2="${y0}" stroke="#cfc8b8" stroke-width="1.5"/>`;
+  svg+=`<line x1="${x0}" y1="${y0}" x2="${W-8}" y2="${y0}" stroke="#cfc8b8" stroke-width="1.5"/>`;
+  // línea por el origen
+  svg+=`<line x1="${px(0)}" y1="${py(0)}" x2="${px(maxX)}" y2="${py(maxY)}" stroke="var(--dir)" stroke-width="3" stroke-linecap="round" opacity=".5"/>`;
+  // puntos hasta el actual
+  for(let c=1;c<=casas;c++){
+    const s=c*SACOS_POR_CASA;
+    svg+=`<line x1="${px(c)}" y1="${y0}" x2="${px(c)}" y2="${py(s)}" stroke="var(--dir)" stroke-width="1" stroke-dasharray="3 3" opacity=".4"/>`;
+    svg+=`<circle cx="${px(c)}" cy="${py(s)}" r="${c===casas?6:4}" fill="var(--dir)" ${c===casas?'stroke="#fff" stroke-width="2"':''}/>`;
+  }
+  svg+=`<text x="${W-8}" y="${y0+18}" font-size="10" fill="#8a8475" text-anchor="end">casas</text>`;
+  svg+=`<text x="${x0-6}" y="${my+4}" font-size="10" fill="#8a8475" text-anchor="end">sacos</text>`;
+  svgDir.innerHTML=svg;
+}
+
+/* ============ PANEL INVERSA ============ */
+const rangoObreros = document.getElementById('rangoObreros');
+const valObreros   = document.getElementById('valObreros');
+const iconosObreros= document.getElementById('iconosObreros');
+const calcInv      = document.getElementById('calcInv');
+const resInv       = document.getElementById('resInv');
+const svgArea      = document.getElementById('svgArea');
+const svgInv       = document.getElementById('svgInv');
+
+function pintarInversa(){
+  const obreros = +rangoObreros.value;
+  const dias = TRABAJO_TOTAL / obreros;
+  valObreros.textContent = obreros;
+  rangoObreros.style.setProperty('--relleno', ((obreros-1)/5*100)+'%');
+  iconosObreros.textContent = '👷'.repeat(obreros);
+
+  calcInv.textContent = obreros+' obreros × '+dias+' días';
+  resInv.textContent  = '= '+TRABAJO_TOTAL+' días-obrero de trabajo';
+
+  dibujarAreaConstante(obreros, dias);
+  dibujarCurvaInversa(obreros, dias);
+}
+
+/* Rectángulo de ÁREA CONSTANTE: ancho ∝ obreros, alto ∝ días.
+   Como ancho*alto = (obreros*wU)*(dias*hU) = TRABAJO_TOTAL*wU*hU → área en píxeles constante */
+function dibujarAreaConstante(obreros, dias){
+  const W=260,H=200;
+  const wU=35, hU=2.6;            // unidades de escala (área en píxeles constante)
+  const ancho = obreros*wU;
+  const alto  = dias*hU;
+  const x0 = 30;                  // esquina inferior izquierda
+  const y0 = H-26;
+  let svg='';
+  // rejilla tenue para "ver" el área
+  svg+=`<defs><pattern id="rej" width="11" height="11" patternUnits="userSpaceOnUse">
+        <rect width="11" height="11" fill="none"/><path d="M11 0H0V11" stroke="#ffffff" stroke-width="1" opacity=".5"/></pattern></defs>`;
+  // rectángulo
+  svg+=`<rect x="${x0}" y="${y0-alto}" width="${ancho}" height="${alto}" rx="4"
+         fill="var(--inv)" opacity=".22" stroke="var(--inv)" stroke-width="2"/>`;
+  svg+=`<rect x="${x0}" y="${y0-alto}" width="${ancho}" height="${alto}" rx="4" fill="url(#rej)"/>`;
+  // etiqueta ancho (obreros)
+  svg+=`<line x1="${x0}" y1="${y0+8}" x2="${x0+ancho}" y2="${y0+8}" stroke="var(--inv)" stroke-width="1.5"/>`;
+  svg+=`<text x="${x0+ancho/2}" y="${y0+20}" font-size="10" fill="var(--inv-oscuro)" text-anchor="middle">${obreros} obreros</text>`;
+  // etiqueta alto (días)
+  svg+=`<line x1="${x0-8}" y1="${y0}" x2="${x0-8}" y2="${y0-alto}" stroke="var(--inv)" stroke-width="1.5"/>`;
+  svg+=`<text x="${x0-12}" y="${y0-alto/2}" font-size="10" fill="var(--inv-oscuro)" text-anchor="middle" transform="rotate(-90 ${x0-12} ${y0-alto/2})">${dias} días</text>`;
+  // texto central
+  svg+=`<text x="${x0+ancho/2}" y="${y0-alto/2}" font-size="11" font-weight="700" fill="var(--inv-oscuro)" text-anchor="middle" dominant-baseline="middle" opacity="${ancho>56&&alto>30?1:0}">misma área</text>`;
+  svgArea.innerHTML=svg;
+}
+
+function dibujarCurvaInversa(obreros, dias){
+  const W=260,H=180, mx=34, my=18, x0=mx, y0=H-26;
+  const ancho=W-mx-14, alto=y0-my;
+  const maxX=6, maxY=TRABAJO_TOTAL;   // 1 obrero -> 60 días (máximo)
+  const px = o => x0 + (o/maxX)*ancho;
+  const py = d => y0 - (d/maxY)*alto;
+  let svg='';
+  svg+=`<line x1="${x0}" y1="${my}" x2="${x0}" y2="${y0}" stroke="#cfc8b8" stroke-width="1.5"/>`;
+  svg+=`<line x1="${x0}" y1="${y0}" x2="${W-8}" y2="${y0}" stroke="#cfc8b8" stroke-width="1.5"/>`;
+  // curva hiperbólica d = 60/o
+  let d='';
+  for(let o=1;o<=maxX;o+=0.1){
+    const X=px(o), Y=py(TRABAJO_TOTAL/o);
+    d += (o===1?'M':'L')+X.toFixed(1)+' '+Y.toFixed(1)+' ';
+  }
+  svg+=`<path d="${d}" fill="none" stroke="var(--inv)" stroke-width="3" stroke-linecap="round" opacity=".55"/>`;
+  // punto actual
+  svg+=`<line x1="${px(obreros)}" y1="${y0}" x2="${px(obreros)}" y2="${py(dias)}" stroke="var(--inv)" stroke-width="1" stroke-dasharray="3 3" opacity=".4"/>`;
+  svg+=`<circle cx="${px(obreros)}" cy="${py(dias)}" r="6" fill="var(--inv)" stroke="#fff" stroke-width="2"/>`;
+  svg+=`<text x="${W-8}" y="${y0+18}" font-size="10" fill="#8a8475" text-anchor="end">obreros</text>`;
+  svg+=`<text x="${x0-6}" y="${my+4}" font-size="10" fill="#8a8475" text-anchor="end">días</text>`;
+  svgInv.innerHTML=svg;
+}
+
+/* ============ PREGUNTAS GUÍA ============ */
+document.querySelectorAll('.pregunta .boton-revelar').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    btn.closest('.pregunta').classList.toggle('abierta');
+  });
+});
+
+/* ============ JUEGO CLASIFICAR ============ */
+const CASOS=[
+  {t:'Por cada kilo de arroz pagas un precio fijo. Relación entre <b>kilos comprados</b> y <b>precio total</b>.',r:'d',e:'A más kilos, más precio, en la misma proporción. El precio por kilo (cociente) es constante → directa.'},
+  {t:'Para recorrer una distancia fija, relación entre la <b>velocidad</b> del auto y el <b>tiempo</b> del viaje.',r:'i',e:'A más velocidad, menos tiempo. Velocidad × tiempo = distancia (producto constante) → inversa.'},
+  {t:'Relación entre las <b>horas trabajadas</b> y el <b>salario</b> ganado, con paga por hora.',r:'d',e:'A más horas, más salario, en la misma proporción → directa.'},
+  {t:'Una tarea fija de pintura: relación entre el <b>número de pintores</b> y los <b>días</b> que tardan.',r:'i',e:'A más pintores, menos días. Pintores × días = trabajo total (constante) → inversa.'}
+];
+let aciertos=0, resueltos=0;
+const cont=document.getElementById('casos');
+const marcador=document.getElementById('marcador');
+
+CASOS.forEach((c,i)=>{
+  const div=document.createElement('div');
+  div.className='caso';
+  div.innerHTML=`
+    <div class="enunciado">${i+1}. ${c.t}</div>
+    <div class="opciones">
+      <div class="opcion" data-tipo="d" role="button" tabindex="0">Directa ↑↑</div>
+      <div class="opcion" data-tipo="i" role="button" tabindex="0">Inversa ↑↓</div>
+    </div>
+    <div class="retro"></div>`;
+  cont.appendChild(div);
+
+  const opciones=div.querySelectorAll('.opcion');
+  const retro=div.querySelector('.retro');
+
+  function responder(op){
+    if(div.classList.contains('resuelto')) return;
+    const elegido=op.dataset.tipo;
+    div.classList.add('resuelto');
+    opciones.forEach(o=>o.classList.add('bloqueada'));
+    if(elegido===c.r){
+      op.classList.add('bien'); aciertos++;
+      retro.innerHTML='✅ <strong>¡Correcto!</strong> '+c.e;
+    }else{
+      op.classList.add('mal');
+      div.querySelector(`.opcion[data-tipo="${c.r}"]`).classList.add('bien');
+      retro.innerHTML='❌ Era la otra. '+c.e;
+    }
+    resueltos++;
+    marcador.textContent='Aciertos: '+aciertos+' / 4';
+    if(resueltos===CASOS.length){
+      marcador.textContent='Aciertos: '+aciertos+' / 4 '+(aciertos===4?'🏆':'');
+    }
+  }
+  opciones.forEach(op=>{
+    op.addEventListener('click',()=>responder(op));
+    op.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();responder(op);}});
+  });
+});
+
+/* ============ INICIO ============ */
+rangoCasas.addEventListener('input', pintarDirecta);
+rangoObreros.addEventListener('input', pintarInversa);
+pintarDirecta();
+pintarInversa();
+</script>
+</body>
+</html>

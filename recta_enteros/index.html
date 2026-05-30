@@ -1,311 +1,514 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero de Operaciones con Enteros</title>
-    <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #34495e;
-            --accent: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --light: #ecf0f1;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recta numérica interactiva: suma de enteros</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
+  .rni-wrap {
+    font-family: 'Poppins', sans-serif;
+    max-width: 860px;
+    margin: 0 auto;
+    color: #2b2b2b;
+    line-height: 1.55;
+  }
+  .rni-wrap h1 {
+    font-size: 1.7rem;
+    color: #00567f;
+    border-bottom: 3px solid #0089cd;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+  }
+  .rni-wrap h2 { font-size: 1.25rem; color: #00567f; margin-top: 6px; }
+  .rni-wrap h3 { font-size: 1.05rem; color: #00567f; }
 
-        .tablero-container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
+  details.caja-objetivos {
+    background: #e8f4fb;
+    border: none;
+    border-left: 6px solid #0089cd;
+    border-radius: 8px;
+    margin-bottom: 22px;
+    overflow: hidden;
+  }
+  details.caja-objetivos > summary {
+    background: #e8f4fb;
+    padding: 12px 20px;
+    color: #00567f;
+  }
+  details.caja-objetivos > summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 1.2rem;
+    vertical-align: middle;
+  }
+  details.caja-objetivos .rni-cuerpo { padding: 2px 22px 14px; }
+  details.caja-objetivos ul { margin: 6px 0 4px; padding-left: 22px; }
+  details.caja-objetivos li { margin-bottom: 5px; }
 
-        h2 {
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
+  .rni-card {
+    border: 2px solid #d4e6f1;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 14px #d9e6ee;
+    background: #ffffff;
+  }
 
-        .menu-operaciones {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
+  .rni-expresion {
+    text-align: center;
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin: 4px 0 14px;
+  }
+  .rni-pos { color: #1e7a46; }
+  .rni-neg { color: #c0392b; }
+  .rni-op  { color: #2b2b2b; }
+  .rni-incog { color: #5C3900; }
 
-        .btn-op {
-            padding: 10px 20px;
-            border: 2px solid var(--accent);
-            background: transparent;
-            color: var(--accent);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
+  .rni-svgbox {
+    width: 100%;
+    overflow-x: auto;
+    background: #fbfdff;
+    border: 1px solid #e3eef5;
+    border-radius: 10px;
+    padding: 6px 0;
+  }
+  .rni-svgbox svg { display: block; margin: 0 auto; }
 
-        .btn-op.active, .btn-op:hover {
-            background: var(--accent);
-            color: white;
-        }
+  .rni-leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    margin: 14px 0 4px;
+    font-size: 0.92rem;
+  }
+  .rni-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .rni-chip-pos { background: #1e7a46; }
+  .rni-chip-neg { background: #c0392b; }
+  .rni-chip-res { background: #5C3900; }
+  .rni-dot {
+    width: 11px; height: 11px; border-radius: 50%; background: #ffffff;
+    display: inline-block;
+  }
 
-        .pizarra {
-            background: var(--primary);
-            color: white;
-            padding: 40px 20px;
-            border-radius: 10px;
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 30px;
-            letter-spacing: 2px;
-            min-height: 70px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+  .rni-controles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 18px;
+  }
+  .rni-prompt {
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    color: #00567f;
+    margin-bottom: 2px;
+  }
+  .rni-input {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-align: center;
+    width: 110px;
+    padding: 8px 6px;
+    border: 2px solid #0089cd;
+    border-radius: 8px;
+    color: #00567f;
+  }
+  .rni-input:focus { outline: 3px solid #b9dcef; }
 
-        .panel-interactivo {
-            background: var(--light);
-            padding: 20px;
-            border-radius: 10px;
-            min-height: 150px;
-        }
+  .rni-btn {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: #00567f;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: background 0.18s ease;
+  }
+  .rni-btn:hover { background: #003f5e; }
+  .rni-btn-sec {
+    background: #ffffff;
+    color: #00567f;
+    border: 2px solid #0089cd;
+  }
+  .rni-btn-sec:hover { background: #e8f4fb; }
 
-        .fichas-signos {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
-        }
+  .rni-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.92rem;
+    color: #00567f;
+    font-weight: 600;
+    padding: 8px 12px;
+    border: 2px solid #d4e6f1;
+    border-radius: 8px;
+  }
+  .rni-switch {
+    width: 38px; height: 20px; border-radius: 20px;
+    background: #c2d4de; position: relative; transition: background 0.18s ease;
+    flex: 0 0 auto;
+  }
+  .rni-switch::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; border-radius: 50%; background: #ffffff;
+    transition: left 0.18s ease;
+  }
+  .rni-toggle[data-on="true"] .rni-switch { background: #1e7a46; }
+  .rni-toggle[data-on="true"] .rni-switch::after { left: 20px; }
 
-        .ficha {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: none;
-            font-size: 2.5rem;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            transition: transform 0.2s, background 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+  .rni-feedback {
+    min-height: 30px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-top: 16px;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .rni-ok  { background: #e8f5ee; color: #1e7a46; }
+  .rni-bad { background: #fdecea; color: #c0392b; }
 
-        .ficha:hover {
-            transform: scale(1.1);
-        }
+  .rni-narracion {
+    text-align: center;
+    color: #5b5b5b;
+    font-size: 0.95rem;
+    min-height: 24px;
+    margin-top: 6px;
+  }
 
-        .ficha.positiva { background-color: var(--success); }
-        .ficha.negativa { background-color: var(--danger); }
+  details {
+    margin-top: 22px;
+    border: 2px solid #d4e6f1;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  details > summary {
+    cursor: pointer;
+    padding: 12px 18px;
+    background: #e8f4fb;
+    color: #00567f;
+    font-weight: 600;
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before { content: '▸ '; color: #0089cd; }
+  details[open] > summary::before { content: '▾ '; }
+  details .rni-cuerpo { padding: 14px 20px; }
+  details .rni-cuerpo ol { padding-left: 22px; }
+  details .rni-cuerpo li { margin-bottom: 6px; }
 
-        .entrada-numero {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        input[type="number"] {
-            padding: 12px;
-            font-size: 1.5rem;
-            width: 100px;
-            border: 2px solid #bdc3c7;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .btn-verificar {
-            padding: 12px 25px;
-            font-size: 1.2rem;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .feedback {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            min-height: 30px;
-        }
-
-        .oculto { display: none !important; }
-    </style>
+  .rni-marcador { font-weight: 700; }
+</style>
 </head>
 <body>
+<div class="rni-wrap">
 
-<div class="tablero-container">
-    <h2>Práctica de Enteros: Regla de los Signos</h2>
-    
-    <div class="menu-operaciones">
-        <button class="btn-op active" onclick="cambiarOperacion('suma')">Suma</button>
-        <button class="btn-op" onclick="cambiarOperacion('multiplicacion')">Multiplicación</button>
-        <button class="btn-op" onclick="cambiarOperacion('division')">División</button>
+  <h1>Recta numérica interactiva: suma de enteros</h1>
+
+  <details class="caja-objetivos">
+    <summary><h2>Objetivos de la clase</h2></summary>
+    <div class="rni-cuerpo">
+      <ul>
+        <li>Representar la suma de dos números enteros como desplazamientos sobre la recta numérica.</li>
+        <li>Reconocer que un número positivo avanza hacia la derecha y un número negativo retrocede hacia la izquierda.</li>
+        <li>Determinar el resultado de una suma algebraica contando posiciones sobre la recta.</li>
+      </ul>
+    </div>
+  </details>
+
+  <h2>Practica el recorrido</h2>
+
+  <div class="rni-card">
+    <div class="rni-expresion" id="rniExpr" aria-live="polite"></div>
+
+    <div class="rni-svgbox">
+      <svg id="rniSvg" viewBox="0 0 800 180" role="img" aria-label="Recta numérica con los dos desplazamientos"></svg>
     </div>
 
-    <div class="pizarra" id="pantalla-problema">
-        </div>
-
-    <div class="panel-interactivo">
-        <div id="paso-signo">
-            <h3>Paso 1: ¿Cuál es el signo del resultado?</h3>
-            <div class="fichas-signos">
-                <button class="ficha positiva" onclick="verificarSigno(1)">+</button>
-                <button class="ficha negativa" onclick="verificarSigno(-1)">-</button>
-            </div>
-        </div>
-
-        <div id="paso-numero" class="oculto">
-            <h3>Paso 2: ¿Cuál es el valor numérico (sin signo)?</h3>
-            <div class="entrada-numero">
-                <input type="number" id="input-magnitud" min="0" placeholder="0">
-                <button class="btn-verificar" onclick="verificarMagnitud()">Comprobar</button>
-            </div>
-        </div>
+    <div class="rni-leyenda">
+      <span class="rni-chip rni-chip-pos"><span class="rni-dot"></span>Avanza (positivo) →</span>
+      <span class="rni-chip rni-chip-neg"><span class="rni-dot"></span>← Retrocede (negativo)</span>
+      <span class="rni-chip rni-chip-res"><span class="rni-dot"></span>Punto de llegada</span>
     </div>
 
-    <div id="mensaje-feedback" class="feedback"></div>
+    <div class="rni-narracion" id="rniNarra" aria-live="polite"></div>
+
+    <div class="rni-controles">
+      <div class="rni-prompt">¿En qué número se detiene el recorrido?</div>
+      <input class="rni-input" id="rniInput" type="text" inputmode="numeric" autocomplete="off" placeholder="?">
+      <button class="rni-btn" id="rniCheck" type="button">Comprobar</button>
+      <button class="rni-btn rni-btn-sec" id="rniReplay" type="button">Ver el recorrido</button>
+      <button class="rni-btn rni-btn-sec" id="rniNew" type="button">Nuevo problema</button>
+      <div class="rni-toggle" id="rniToggle" data-on="true" role="button" tabindex="0" aria-pressed="true">
+        <span class="rni-switch"></span><span>Mostrar los saltos</span>
+      </div>
+    </div>
+
+    <div class="rni-feedback" id="rniFeedback" aria-live="polite"></div>
+  </div>
+
+  <details>
+    <summary>Regla del recorrido (cómo pensar la suma)</summary>
+    <div class="rni-cuerpo">
+      <p>Toda suma de enteros se puede leer como un recorrido que comienza en el cero:</p>
+      <ol>
+        <li>Sitúa el punto de partida en el <strong>0</strong>.</li>
+        <li>El <span class="rni-pos">primer número</span> indica el primer salto: si es positivo, avanzas hacia la derecha; si es negativo, retrocedes hacia la izquierda.</li>
+        <li>Desde donde quedaste, aplica el <span class="rni-neg">segundo número</span> con la misma regla de signos.</li>
+        <li>El número sobre el que te detienes es el <span class="rni-incog">resultado</span> de la suma.</li>
+      </ol>
+      <p><strong>Atajo:</strong> si los dos números tienen el mismo signo, suma sus valores y conserva el signo. Si tienen signos distintos, resta el menor del mayor y conserva el signo del de mayor valor.</p>
+    </div>
+  </details>
+
 </div>
 
 <script>
-    let operacionActual = 'suma';
-    let respuestaCorrecta = 0;
-    let signoSeleccionado = 0;
+(function () {
+  "use strict";
 
-    // Generar número aleatorio entre min y max (excluyendo el cero si es necesario)
-    function generarEntero(min, max, excluirCero = true) {
-        let num = 0;
-        while (num === 0 && excluirCero) {
-            num = Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-        return num;
+  var svg = document.getElementById("rniSvg");
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var exprEl = document.getElementById("rniExpr");
+  var narraEl = document.getElementById("rniNarra");
+  var feedbackEl = document.getElementById("rniFeedback");
+  var inputEl = document.getElementById("rniInput");
+  var toggleEl = document.getElementById("rniToggle");
+
+  var POS = "#1e7a46", NEG = "#c0392b", RES = "#5C3900", AXIS = "#456575", BLUE = "#0089cd";
+
+  var W = 800, H = 180, axisY = 120, padX = 40;
+  var state = { n1: 0, n2: 0, res: 0, min: 0, max: 0, scale: 1, x0: 0, anim: null };
+  var showJumps = true;
+
+  function el(name, attrs) {
+    var e = document.createElementNS(SVGNS, name);
+    for (var k in attrs) { e.setAttribute(k, attrs[k]); }
+    return e;
+  }
+  function clear(node) { while (node.firstChild) { node.removeChild(node.firstChild); } }
+  function xOf(n) { return state.x0 + (n - state.min) * state.scale; }
+  function signClass(n) { return n > 0 ? "rni-pos" : "rni-neg"; }
+  function fmt(n) { return n > 0 ? ("+" + n) : ("" + n); }
+
+  function randInt() {
+    var v = 0;
+    while (v === 0) { v = Math.floor(Math.random() * 19) - 9; }
+    return v;
+  }
+
+  function buildExpression() {
+    exprEl.innerHTML =
+      '<span class="' + signClass(state.n1) + '">(' + fmt(state.n1) + ')</span> ' +
+      '<span class="rni-op">+</span> ' +
+      '<span class="' + signClass(state.n2) + '">(' + fmt(state.n2) + ')</span> ' +
+      '<span class="rni-op">=</span> ' +
+      '<span class="rni-incog">?</span>';
+  }
+
+  function drawAxis() {
+    clear(svg);
+    var values = [0, state.n1, state.res];
+    state.min = Math.min.apply(null, values) - 1;
+    state.max = Math.max.apply(null, values) + 1;
+    if (state.max - state.min < 6) {
+      var grow = 6 - (state.max - state.min);
+      state.min -= Math.ceil(grow / 2);
+      state.max += Math.floor(grow / 2);
     }
+    state.x0 = padX;
+    state.scale = (W - 2 * padX) / (state.max - state.min);
 
-    // Formatear números negativos con paréntesis para mayor claridad pedagógica
-    function formatearNumero(num) {
-        return num < 0 ? `(${num})` : num;
+    // main line
+    svg.appendChild(el("line", { x1: xOf(state.min), y1: axisY, x2: xOf(state.max), y2: axisY, stroke: AXIS, "stroke-width": 3 }));
+    // arrow ends
+    var aL = xOf(state.min), aR = xOf(state.max);
+    svg.appendChild(el("polygon", { points: (aL) + "," + axisY + " " + (aL + 10) + "," + (axisY - 6) + " " + (aL + 10) + "," + (axisY + 6), fill: AXIS }));
+    svg.appendChild(el("polygon", { points: (aR) + "," + axisY + " " + (aR - 10) + "," + (axisY - 6) + " " + (aR - 10) + "," + (axisY + 6), fill: AXIS }));
+
+    // ticks + labels
+    for (var n = state.min; n <= state.max; n++) {
+      var x = xOf(n);
+      var big = (n === 0);
+      svg.appendChild(el("line", { x1: x, y1: axisY - (big ? 12 : 7), x2: x, y2: axisY + (big ? 12 : 7), stroke: big ? "#2b2b2b" : AXIS, "stroke-width": big ? 3 : 2 }));
+      var t = el("text", { x: x, y: axisY + 30, "text-anchor": "middle", "font-family": "Poppins, sans-serif", "font-size": big ? 16 : 13, "font-weight": big ? 700 : 500, fill: big ? "#2b2b2b" : "#5b5b5b" });
+      t.textContent = n;
+      svg.appendChild(t);
     }
+  }
 
-    function generarProblema() {
-        let num1, num2, textoProblema;
-
-        // Limpiar interfaz
-        document.getElementById('paso-signo').classList.remove('oculto');
-        document.getElementById('paso-numero').classList.add('oculto');
-        document.getElementById('input-magnitud').value = '';
-        mostrarMensaje('', '');
-
-        if (operacionActual === 'suma') {
-            // Nivel 2: Números entre -20 y 20
-            num1 = generarEntero(-20, 20);
-            num2 = generarEntero(-20, 20);
-            respuestaCorrecta = num1 + num2;
-            textoProblema = `${formatearNumero(num1)} + ${formatearNumero(num2)}`;
-            
-            // Evitar resultados cero en esta práctica de signos para no confundir
-            if(respuestaCorrecta === 0) return generarProblema();
-
-        } else if (operacionActual === 'multiplicacion') {
-            // Nivel 2: Tablas extendidas (-12 a 12)
-            num1 = generarEntero(-12, 12);
-            num2 = generarEntero(-12, 12);
-            respuestaCorrecta = num1 * num2;
-            textoProblema = `${formatearNumero(num1)} &times; ${formatearNumero(num2)}`;
-
-        } else if (operacionActual === 'division') {
-            // Nivel 2: Divisiones exactas
-            num2 = generarEntero(-12, 12); // Divisor
-            let cociente = generarEntero(-12, 12); // Resultado
-            num1 = num2 * cociente; // Dividendo
-            respuestaCorrecta = cociente;
-            textoProblema = `${formatearNumero(num1)} &divide; ${formatearNumero(num2)}`;
-        }
-
-        document.getElementById('pantalla-problema').innerHTML = `${textoProblema} = ?`;
-    }
-
-    function cambiarOperacion(op) {
-        operacionActual = op;
-        
-        // Actualizar botones visualmente
-        document.querySelectorAll('.btn-op').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        
-        generarProblema();
-    }
-
-    function verificarSigno(eleccion) {
-        let signoCorrecto = Math.sign(respuestaCorrecta);
-        
-        if (eleccion === signoCorrecto) {
-            signoSeleccionado = eleccion;
-            mostrarMensaje("¡Excelente! Signo correcto. Ahora, ingresa el valor.", "var(--success)");
-            document.getElementById('paso-signo').classList.add('oculto');
-            document.getElementById('paso-numero').classList.remove('oculto');
-            document.getElementById('input-magnitud').focus();
-            
-            // Mostrar la primera parte de la respuesta
-            let signoTxt = signoSeleccionado === 1 ? "+" : "-";
-            let eqActual = document.getElementById('pantalla-problema').innerHTML.split('=')[0];
-            document.getElementById('pantalla-problema').innerHTML = `${eqActual} = ${signoTxt} ?`;
-        } else {
-            mostrarMensaje("Revisa la regla de los signos e inténtalo de nuevo.", "var(--danger)");
-        }
-    }
-
-    function verificarMagnitud() {
-        let input = document.getElementById('input-magnitud').value;
-        let magnitudCorrecta = Math.abs(respuestaCorrecta);
-        
-        if (parseInt(input) === magnitudCorrecta) {
-            let eqActual = document.getElementById('pantalla-problema').innerHTML.split('=')[0];
-            document.getElementById('pantalla-problema').innerHTML = `${eqActual} = ${respuestaCorrecta}`;
-            mostrarMensaje("¡Perfecto! Operación completada correctamente.", "var(--success)");
-            
-            // Generar nuevo problema después de 2.5 segundos
-            setTimeout(() => {
-                generarProblema();
-            }, 2500);
-        } else {
-            mostrarMensaje("El valor numérico no es correcto. Intenta de nuevo.", "var(--danger)");
-        }
-    }
-
-    function mostrarMensaje(texto, color) {
-        let msj = document.getElementById('mensaje-feedback');
-        msj.textContent = texto;
-        msj.style.color = color;
-    }
-
-    // Soporte para presionar "Enter" en el input
-    document.getElementById('input-magnitud').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            verificarMagnitud();
-        }
+  function makeArc(from, to, color, id) {
+    var x1 = xOf(from), x2 = xOf(to);
+    var midX = (x1 + x2) / 2;
+    var span = Math.abs(x2 - x1);
+    var height = Math.min(70, 26 + span * 0.35);
+    var ctrlY = axisY - height;
+    var p = el("path", {
+      d: "M " + x1 + " " + axisY + " Q " + midX + " " + ctrlY + " " + x2 + " " + axisY,
+      fill: "none", stroke: color, "stroke-width": 4, "stroke-linecap": "round",
+      id: id
     });
+    svg.appendChild(p);
+    return p;
+  }
 
-    // Iniciar con el primer problema
-    generarProblema();
+  function makeArrowhead(to, dir, color) {
+    var x = xOf(to);
+    var y = axisY;
+    var s = 9;
+    var pts = dir > 0
+      ? x + "," + y + " " + (x - s) + "," + (y - s) + " " + (x - s) + "," + (y + s)
+      : x + "," + y + " " + (x + s) + "," + (y - s) + " " + (x + s) + "," + (y + s);
+    var poly = el("polygon", { points: pts, fill: color, opacity: 0 });
+    svg.appendChild(poly);
+    return poly;
+  }
+
+  function makeToken() {
+    var g = el("g", {});
+    g.appendChild(el("circle", { cx: 0, cy: 0, r: 9, fill: "#ffffff", stroke: BLUE, "stroke-width": 3 }));
+    g.appendChild(el("circle", { cx: 0, cy: 0, r: 3.5, fill: BLUE }));
+    g.setAttribute("transform", "translate(" + xOf(0) + "," + axisY + ")");
+    svg.appendChild(g);
+    return g;
+  }
+
+  function makeResultMarker() {
+    var x = xOf(state.res);
+    var g = el("g", { opacity: 0, id: "rniResMark" });
+    g.appendChild(el("circle", { cx: x, cy: axisY, r: 9, fill: RES }));
+    var t = el("text", { x: x, y: axisY - 22, "text-anchor": "middle", "font-family": "Poppins, sans-serif", "font-size": 15, "font-weight": 700, fill: RES });
+    t.textContent = state.res;
+    g.appendChild(t);
+    svg.appendChild(g);
+    return g;
+  }
+
+  function cancelAnim() {
+    if (state.anim) { cancelAnimationFrame(state.anim); state.anim = null; }
+  }
+
+  function tweenAlong(pathEl, token, dur, done) {
+    var total = pathEl.getTotalLength();
+    pathEl.setAttribute("stroke-dasharray", total);
+    pathEl.setAttribute("stroke-dashoffset", total);
+    var start = null;
+    function step(ts) {
+      if (start === null) { start = ts; }
+      var t = Math.min((ts - start) / dur, 1);
+      var eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+      pathEl.setAttribute("stroke-dashoffset", total * (1 - eased));
+      var pt = pathEl.getPointAtLength(total * eased);
+      token.setAttribute("transform", "translate(" + pt.x + "," + pt.y + ")");
+      if (t < 1) { state.anim = requestAnimationFrame(step); }
+      else { state.anim = null; if (done) { done(); } }
+    }
+    state.anim = requestAnimationFrame(step);
+  }
+
+  function playRecorrido() {
+    cancelAnim();
+    drawAxis();
+    feedbackEl.textContent = ""; feedbackEl.className = "rni-feedback";
+
+    if (!showJumps) {
+      makeToken();
+      narraEl.textContent = "Calcula mentalmente el recorrido y escribe el número de llegada.";
+      return;
+    }
+
+    var token = makeToken();
+    var arc1 = makeArc(0, state.n1, state.n1 > 0 ? POS : NEG, "rniArc1");
+    var head1 = makeArrowhead(state.n1, state.n1 > 0 ? 1 : -1, state.n1 > 0 ? POS : NEG);
+    var arc2 = makeArc(state.n1, state.res, state.n2 > 0 ? POS : NEG, "rniArc2");
+    var head2 = makeArrowhead(state.res, state.n2 > 0 ? 1 : -1, state.n2 > 0 ? POS : NEG);
+    var resMark = makeResultMarker();
+    arc2.setAttribute("opacity", 0);
+
+    var d1 = state.n1 > 0 ? "avanza " + state.n1 + " a la derecha" : "retrocede " + Math.abs(state.n1) + " a la izquierda";
+    var d2 = state.n2 > 0 ? "avanza " + state.n2 + " a la derecha" : "retrocede " + Math.abs(state.n2) + " a la izquierda";
+
+    narraEl.textContent = "Parte del 0. Primer salto: " + d1 + ".";
+    tweenAlong(arc1, token, 900, function () {
+      head1.setAttribute("opacity", 1);
+      narraEl.textContent = "Llega al " + state.n1 + ". Segundo salto: " + d2 + ".";
+      arc2.setAttribute("opacity", 1);
+      tweenAlong(arc2, token, 900, function () {
+        head2.setAttribute("opacity", 1);
+        resMark.setAttribute("opacity", 1);
+        narraEl.textContent = "El recorrido se detiene en " + state.res + ".";
+      });
+    });
+  }
+
+  function newProblem() {
+    cancelAnim();
+    state.n1 = randInt();
+    state.n2 = randInt();
+    state.res = state.n1 + state.n2;
+    inputEl.value = "";
+    feedbackEl.textContent = ""; feedbackEl.className = "rni-feedback";
+    buildExpression();
+    playRecorrido();
+    inputEl.focus();
+  }
+
+  function check() {
+    var raw = inputEl.value.trim().replace(/\s+/g, "");
+    if (raw === "" || !/^[+-]?\d+$/.test(raw)) {
+      feedbackEl.textContent = "Escribe un número entero (puede llevar signo).";
+      feedbackEl.className = "rni-feedback rni-bad";
+      return;
+    }
+    var val = parseInt(raw, 10);
+    if (val === state.res) {
+      feedbackEl.textContent = "¡Correcto! (" + fmt(state.n1) + ") + (" + fmt(state.n2) + ") = " + state.res + ".";
+      feedbackEl.className = "rni-feedback rni-ok";
+    } else {
+      feedbackEl.textContent = "Aún no. Observa el recorrido en la recta y vuelve a intentarlo.";
+      feedbackEl.className = "rni-feedback rni-bad";
+      if (showJumps) { playRecorrido(); }
+    }
+  }
+
+  function setToggle(on) {
+    showJumps = on;
+    toggleEl.setAttribute("data-on", on ? "true" : "false");
+    toggleEl.setAttribute("aria-pressed", on ? "true" : "false");
+    playRecorrido();
+  }
+
+  document.getElementById("rniCheck").addEventListener("click", check);
+  document.getElementById("rniReplay").addEventListener("click", playRecorrido);
+  document.getElementById("rniNew").addEventListener("click", newProblem);
+  toggleEl.addEventListener("click", function () { setToggle(!showJumps); });
+  toggleEl.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setToggle(!showJumps); }
+  });
+  inputEl.addEventListener("keydown", function (e) { if (e.key === "Enter") { check(); } });
+
+  newProblem();
+})();
 </script>
-
 </body>
 </html>

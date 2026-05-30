@@ -1,1 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero de operaciones con enteros</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
+  .tablero-wrap {
+    font-family: 'Poppins', sans-serif;
+    color: #2b2b2b;
+    line-height: 1.55;
+    max-width: 640px;
+    margin: 24px auto;
+  }
+  .tablero-wrap * { box-sizing: border-box; }
+
+  .tablero-card {
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 14px;
+    border: 2px solid #d4e6f1;
+    box-shadow: 0 8px 20px #0000001a;
+    text-align: center;
+  }
+
+  .tablero-wrap h1 {
+    font-size: 1.55rem;
+    color: #00567f;
+    border-bottom: 3px solid #0089cd;
+    padding-bottom: 8px;
+    margin: 0 0 22px;
+  }
+  .tablero-wrap h2 {
+    font-size: 1.05rem;
+    color: #00567f;
+    margin: 0 0 12px;
+  }
+
+  .menu-operaciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 26px;
+  }
+  .btn-op {
+    font-family: 'Poppins', sans-serif;
+    padding: 9px 20px;
+    border: 2px solid #0089cd;
+    background: #ffffff;
+    color: #00567f;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.98rem;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-op:hover { background: #e8f4fb; }
+  .btn-op.active { background: #00567f; color: #ffffff; }
+
+  .pizarra {
+    background: #00567f;
+    color: #ffffff;
+    padding: 34px 18px;
+    border-radius: 10px;
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 26px;
+    letter-spacing: 1px;
+    min-height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .panel-interactivo {
+    background: #eef6fb;
+    padding: 22px;
+    border-radius: 10px;
+    min-height: 150px;
+  }
+
+  .fichas-signos {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    margin-top: 14px;
+  }
+  .ficha {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    border: none;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 4px 6px #00000033;
+    transition: transform 0.18s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .ficha:hover { transform: scale(1.08); }
+  .ficha:focus { outline: 3px solid #b9dcef; }
+  .ficha.positiva { background-color: #1e7a46; }
+  .ficha.negativa { background-color: #c0392b; }
+
+  .entrada-numero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .tablero-wrap input.input-magnitud {
+    font-family: 'Poppins', sans-serif;
+    padding: 11px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    width: 110px;
+    border: 2px solid #0089cd;
+    border-radius: 8px;
+    text-align: center;
+    color: #00567f;
+  }
+  .tablero-wrap input.input-magnitud:focus { outline: 3px solid #b9dcef; }
+
+  .btn-accion {
+    font-family: 'Poppins', sans-serif;
+    padding: 11px 22px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    background: #00567f;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .btn-accion:hover { background: #003f5e; }
+  .btn-accion.sec {
+    background: #ffffff;
+    color: #00567f;
+    border: 2px solid #0089cd;
+  }
+  .btn-accion.sec:hover { background: #e8f4fb; }
+
+  .barra-inferior {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+  }
+
+  .feedback {
+    margin-top: 18px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    min-height: 28px;
+    padding: 8px;
+    border-radius: 8px;
+  }
+  .feedback.ok  { background: #e8f5ee; color: #1e7a46; }
+  .feedback.bad { background: #fdecea; color: #c0392b; }
+
+  .oculto { display: none !important; }
+
+  details {
+    margin-top: 22px;
+    border: 2px solid #d4e6f1;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: left;
+  }
+  details > summary {
+    cursor: pointer;
+    padding: 12px 18px;
+    background: #e8f4fb;
+    color: #00567f;
+    font-weight: 600;
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before { content: '\25B8  '; color: #0089cd; }
+  details[open] > summary::before { content: '\25BE  '; }
+  details .cuerpo { padding: 14px 20px; }
+  details .cuerpo ul { padding-left: 20px; margin: 8px 0; }
+  details .cuerpo li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="tablero-wrap">
+  <div class="tablero-card">
+
+    <h1>Práctica de enteros: la regla de los signos</h1>
+
+    <div class="menu-operaciones" id="menuOps">
+      <button class="btn-op active" type="button" data-op="suma">Suma</button>
+      <button class="btn-op" type="button" data-op="multiplicacion">Multiplicación</button>
+      <button class="btn-op" type="button" data-op="division">División</button>
+    </div>
+
+    <div class="pizarra" id="pantallaProblema" aria-live="polite"></div>
+
+    <div class="panel-interactivo">
+      <div id="pasoSigno">
+        <h2>Paso 1: ¿cuál es el signo del resultado?</h2>
+        <div class="fichas-signos">
+          <button class="ficha positiva" type="button" data-signo="1" aria-label="Signo positivo">+</button>
+          <button class="ficha negativa" type="button" data-signo="-1" aria-label="Signo negativo">&minus;</button>
+        </div>
+      </div>
+
+      <div id="pasoNumero" class="oculto">
+        <h2>Paso 2: ¿cuál es el valor numérico (sin signo)?</h2>
+        <div class="entrada-numero">
+          <input class="input-magnitud" id="inputMagnitud" type="text" inputmode="numeric" autocomplete="off" placeholder="0">
+          <button class="btn-accion" id="btnComprobar" type="button">Comprobar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="mensajeFeedback" class="feedback" aria-live="polite"></div>
+
+    <div class="barra-inferior">
+      <button class="btn-accion sec" id="btnNuevo" type="button">Nuevo problema</button>
+    </div>
+
+    <details>
+      <summary>Regla de los signos (recordatorio)</summary>
+      <div class="cuerpo">
+        <p><strong>Suma:</strong></p>
+        <ul>
+          <li>Si los dos sumandos tienen el mismo signo, suma sus valores y conserva ese signo.</li>
+          <li>Si tienen signos distintos, resta el menor del mayor y conserva el signo del de mayor valor absoluto.</li>
+        </ul>
+        <p><strong>Multiplicación y división:</strong></p>
+        <ul>
+          <li>Signos iguales producen un resultado positivo.</li>
+          <li>Signos distintos producen un resultado negativo.</li>
+        </ul>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var pantalla = document.getElementById("pantallaProblema");
+  var feedbackEl = document.getElementById("mensajeFeedback");
+  var pasoSigno = document.getElementById("pasoSigno");
+  var pasoNumero = document.getElementById("pasoNumero");
+  var inputEl = document.getElementById("inputMagnitud");
+  var menuOps = document.getElementById("menuOps");
+
+  var operacion = "suma";
+  var resultado = 0;
+  var expresionBase = "";
+
+  function entero(min, max, excluirCero) {
+    var n = 0;
+    do { n = Math.floor(Math.random() * (max - min + 1)) + min; }
+    while (excluirCero && n === 0);
+    return n;
+  }
+
+  function fmt(n) { return n < 0 ? "(" + n + ")" : ("" + n); }
+
+  function mensaje(texto, tipo) {
+    feedbackEl.textContent = texto || "";
+    feedbackEl.className = "feedback" + (tipo ? " " + tipo : "");
+  }
+
+  function generarProblema() {
+    pasoSigno.classList.remove("oculto");
+    pasoNumero.classList.add("oculto");
+    inputEl.value = "";
+    mensaje("", "");
+
+    var a, b, c, op;
+    if (operacion === "suma") {
+      a = entero(-20, 20, true);
+      b = entero(-20, 20, true);
+      resultado = a + b;
+      if (resultado === 0) { return generarProblema(); }
+      op = "+";
+      expresionBase = fmt(a) + " " + op + " " + fmt(b);
+    } else if (operacion === "multiplicacion") {
+      a = entero(-12, 12, true);
+      b = entero(-12, 12, true);
+      resultado = a * b;
+      expresionBase = fmt(a) + " \u00D7 " + fmt(b);
+    } else {
+      b = entero(-12, 12, true);
+      c = entero(-12, 12, true);
+      a = b * c;
+      resultado = c;
+      expresionBase = fmt(a) + " \u00F7 " + fmt(b);
+    }
+    pantalla.textContent = expresionBase + " = ?";
+  }
+
+  function verificarSigno(eleccion) {
+    var correcto = Math.sign(resultado);
+    if (eleccion === correcto) {
+      var signoTxt = eleccion === 1 ? "+" : "\u2212";
+      pantalla.textContent = expresionBase + " = " + signoTxt + " ?";
+      mensaje("¡Correcto! Ahora escribe el valor numérico.", "ok");
+      pasoSigno.classList.add("oculto");
+      pasoNumero.classList.remove("oculto");
+      inputEl.focus();
+    } else {
+      mensaje("Revisa la regla de los signos e inténtalo de nuevo.", "bad");
+    }
+  }
+
+  function verificarMagnitud() {
+    var raw = inputEl.value.trim();
+    if (raw === "" || !/^\d+$/.test(raw)) {
+      mensaje("Escribe el valor numérico sin signo (solo dígitos).", "bad");
+      return;
+    }
+    if (parseInt(raw, 10) === Math.abs(resultado)) {
+      pantalla.textContent = expresionBase + " = " + resultado;
+      mensaje("¡Perfecto! Operación completada correctamente.", "ok");
+      setTimeout(generarProblema, 2500);
+    } else {
+      mensaje("El valor numérico no es correcto. Inténtalo de nuevo.", "bad");
+    }
+  }
+
+  menuOps.addEventListener("click", function (e) {
+    var btn = e.target.closest(".btn-op");
+    if (!btn) { return; }
+    operacion = btn.getAttribute("data-op");
+    var todos = menuOps.querySelectorAll(".btn-op");
+    for (var i = 0; i < todos.length; i++) { todos[i].classList.remove("active"); }
+    btn.classList.add("active");
+    generarProblema();
+  });
+
+  document.querySelector(".fichas-signos").addEventListener("click", function (e) {
+    var btn = e.target.closest(".ficha");
+    if (!btn) { return; }
+    verificarSigno(parseInt(btn.getAttribute("data-signo"), 10));
+  });
+
+  document.getElementById("btnComprobar").addEventListener("click", verificarMagnitud);
+  document.getElementById("btnNuevo").addEventListener("click", generarProblema);
+  inputEl.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { verificarMagnitud(); }
+  });
+
+  generarProblema();
+})();
+</script>
+</body>
+</html>

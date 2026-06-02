@@ -118,7 +118,7 @@ button {
 <h1>Resolver ecuaciones como una balanza</h1>
 
 <p>
-La <span style="font-size: 1.4rem;">📦</span>span> representa la incógnita: el número que queremos encontrar.
+La <span style="font-size: 1.4rem;">🎁</span>span> representa la incógnita: el número que queremos encontrar.
 </p>
 
 <div class="balance">
@@ -128,7 +128,7 @@ La <span style="font-size: 1.4rem;">📦</span>span> representa la incógnita: e
 
 <p><strong>Ecuación:</strong> <span id="ecuacionTexto"></span></p>
 
-<label>¿Cuánto vale la 📦?</label><br><br>
+<label>¿Cuánto vale la 🎁?</label><br><br>
 <input type="number" id="respuesta">
 <br>
 <button class="check-btn" onclick="verificar()">Verificar</button>
@@ -159,15 +159,15 @@ function nuevaEcuacion() {
     const resultado = numeroCaja + numeroSuma;
 
     document.getElementById("ladoIzq").innerHTML =
-        `<span class="box" id="box">📦</span> + ${numeroSuma}`;
+        `<span class="box" id="box">🎁</span> + ${numeroSuma}`;
     document.getElementById("ladoDer").innerHTML = resultado;
 
     document.getElementById("ecuacionTexto").innerHTML =
-        `📦 + ${numeroSuma} = ${resultado}`;
+        `🎁 + ${numeroSuma} = ${resultado}`;
 
     document.getElementById("pista").innerHTML =
         `<strong>Pista:</strong><br>
-        Para aislar la 📦 debemos restar ${numeroSuma}.<br>
+        Para aislar la 🎁 debemos restar ${numeroSuma}.<br>
         Entonces hacemos: ${resultado} − ${numeroSuma}`;
 }
 

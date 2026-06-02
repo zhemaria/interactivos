@@ -1,1 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiempo y Temperatura</title>
 
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fb;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+button {
+    padding: 10px 15px;
+    margin: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.main-btn {
+    background-color: #1f3c88;
+    color: white;
+}
+
+.check-btn {
+    background-color: #198754;
+    color: white;
+}
+
+.feedback {
+    margin-top: 15px;
+    font-weight: bold;
+    min-height: 30px;
+}
+
+.hidden {
+    display: none;
+}
+
+.card {
+    background-color: #eef3ff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Matemática en la vida diaria</h1>
+
+<button class="main-btn" onclick="mostrar('bus')">🚌 El viaje en autobús</button>
+<button class="main-btn" onclick="mostrar('ropa')">🌤 ¿Qué ropa me pongo hoy?</button>
+
+<!-- SECCIÓN AUTOBÚS -->
+
+<div id="bus" class="hidden">
+
+<h2>🚌 El viaje en autobús</h2>
+
+<div class="card" id="itinerario"></div>
+
+<p>¿Cuánto dura el viaje?</p>
+<label>Horas:</label>
+<input type="number" id="horas" style="width:60px;">
+<label>Minutos:</label>
+<input type="number" id="minutos" style="width:60px;">
+<br>
+<button class="check-btn" onclick="verificarBus()">Verificar</button>
+
+<div class="feedback" id="feedbackBus"></div>
+
+</div>
+
+<!-- SECCIÓN TEMPERATURA -->
+
+<div id="ropa" class="hidden">
+
+<h2>🌤 ¿Qué ropa me pongo hoy?</h2>
+
+<div class="card" id="temperatura"></div>
+
+<div class="card" id="formula"></div>
+
+<p>Escribe el resultado de la conversión:</p>
+<input type="number" id="tempRespuesta" style="width:100px;">
+<span id="unidadObjetivo"></span>
+<br>
+<button class="check-btn" onclick="verificarTemp()">Verificar</button>
+
+<div class="feedback" id="feedbackTemp"></div>
+<div class="card hidden" id="ropaSugerida"></div>
+
+</div>
+
+</div>
+
+<script>
+
+// MOSTRAR SECCIÓN
+function mostrar(seccion) {
+    document.getElementById("bus").classList.add("hidden");
+    document.getElementById("ropa").classList.add("hidden");
+    document.getElementById(seccion).classList.remove("hidden");
+
+    if (seccion === "bus") nuevaRuta();
+    if (seccion === "ropa") nuevaTemp();
+}
+
+// ---------------- AUTOBÚS ----------------
+
+let duracionTotal;
+
+function nuevaRuta() {
+
+    const ciudades = ["Miami", "Orlando", "Tampa", "Jacksonville", "Tallahassee"];
+    const destino = ciudades[Math.floor(Math.random()*ciudades.length)];
+
+    let inicioHora = Math.floor(Math.random() * 5) + 6;
+    let inicioMin = [0,15,30,45][Math.floor(Math.random()*4)];
+    duracionTotal = Math.floor(Math.random()*120)+30;
+
+    let totalInicio = inicioHora*60 + inicioMin;
+    let totalFin = totalInicio + duracionTotal;
+
+    let finHora = Math.floor(totalFin/60);
+    let finMin = totalFin % 60;
+
+    document.getElementById("itinerario").innerHTML =
+    `🚌 Destino: ${destino} | Sale: ${formato(inicioHora,inicioMin)} | Llega: ${formato(finHora,finMin)}`;
+}
+
+function verificarBus() {
+    let h = parseInt(document.getElementById("horas").value);
+    let m = parseInt(document.getElementById("minutos").value);
+
+    let total = h*60 + m;
+
+    if (total === duracionTotal) {
+        document.getElementById("feedbackBus").innerHTML =
+        "✅ Correcto. Has calculado la duración correctamente.";
+        document.getElementById("feedbackBus").style.color="green";
+    } else {
+        document.getElementById("feedbackBus").innerHTML =
+        "❌ Convierte ambos horarios a minutos y resta.";
+        document.getElementById("feedbackBus").style.color="darkred";
+    }
+}
+
+function formato(h,m) {
+    return `${h}:${m.toString().padStart(2,'0')}`;
+}
+
+// ---------------- TEMPERATURA ----------------
+
+let tempOriginal, esFahrenheit;
+
+function nuevaTemp() {
+
+    document.getElementById("ropaSugerida").classList.add("hidden");
+
+    esFahrenheit = Math.random() < 0.5;
+
+    if (esFahrenheit) {
+        tempOriginal = Math.floor(Math.random()*40)+40;
+        document.getElementById("temperatura").innerHTML =
+        `Hoy la temperatura es ${tempOriginal}°F`;
+        document.getElementById("unidadObjetivo").innerHTML = "°C";
+        document.getElementById("formula").innerHTML =
+        `<strong>Fórmula:</strong> °C = (°F − 32) × 5/9`;
+    } else {
+        tempOriginal = Math.floor(Math.random()*25)+5;
+        document.getElementById("temperatura").innerHTML =
+        `Hoy la temperatura es ${tempOriginal}°C`;
+        document.getElementById("unidadObjetivo").innerHTML = "°F";
+        document.getElementById("formula").innerHTML =
+        `<strong>Fórmula:</strong> °F = (°C × 9/5) + 32`;
+    }
+}
+
+function verificarTemp() {
+
+    let respuesta = parseFloat(document.getElementById("tempRespuesta").value);
+    let correcta;
+
+    if (esFahrenheit) {
+        correcta = (tempOriginal - 32) * 5/9;
+    } else {
+        correcta = (tempOriginal * 9/5) + 32;
+    }
+
+    if (Math.abs(respuesta - correcta) < 1) {
+        document.getElementById("feedbackTemp").innerHTML =
+        "✅ Conversión correcta.";
+        document.getElementById("feedbackTemp").style.color="green";
+        sugerirRopa(correcta);
+    } else {
+        document.getElementById("feedbackTemp").innerHTML =
+        "❌ Revisa la fórmula y aplica paso a paso.";
+        document.getElementById("feedbackTemp").style.color="darkred";
+    }
+}
+
+function sugerirRopa(tempC) {
+
+    let celsius = esFahrenheit ? tempC : tempOriginal;
+
+    let mensaje;
+
+    if (celsius < 10)
+        mensaje = "🧥 Hace frío. Lleva abrigo.";
+    else if (celsius < 20)
+        mensaje = "🧥🌤 Clima fresco. Una chaqueta ligera.";
+    else
+        mensaje = "👕 Hace calor. Ropa ligera es suficiente.";
+
+    let box = document.getElementById("ropaSugerida");
+    box.innerHTML = "<strong>Recomendación:</strong><br>"+mensaje;
+    box.classList.remove("hidden");
+}
+
+</script>
+
+</body>
+</html>

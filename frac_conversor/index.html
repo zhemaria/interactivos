@@ -1,1 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica: Fracciones y Decimales</title>
+    <!-- Se usa Tailwind CSS para asegurar un diseño responsivo y de alto contraste rápidamente -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos adicionales para asegurar que el input sea muy visible */
+        input[type="text"] {
+            caret-color: #1d4ed8; /* Color azul fuerte para el cursor */
+        }
+        .animacion-correcta {
+            animation: saltar 0.5s ease-in-out;
+        }
+        @keyframes saltar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans min-h-screen flex items-center justify-center p-4">
 
+    <!-- Contenedor Principal (Alto contraste: borde oscuro, fondo blanco) -->
+    <main class="bg-white max-w-2xl w-full rounded-2xl shadow-2xl border-4 border-slate-800 overflow-hidden">
+        
+        <!-- Encabezado -->
+        <header class="bg-slate-800 text-white p-6 text-center">
+            <h1 class="text-3xl font-extrabold mb-2">Equivalencias Matemáticas</h1>
+            <p class="text-lg">Convierte la fracción a decimal o el decimal a fracción.</p>
+            <p class="text-sm text-slate-300 mt-1">Usa la fracción más simple (ej: 1/2) o hasta 3 decimales (ej: 0.125).</p>
+        </header>
+
+        <div class="p-8">
+            <!-- Marcador de Puntuación -->
+            <div class="flex justify-between items-center mb-6 font-bold text-xl border-b-2 border-slate-200 pb-4">
+                <div>Puntuación: <span id="puntuacion" class="text-blue-700 text-2xl">0</span></div>
+                <div>Racha: <span id="racha" class="text-emerald-600 text-2xl">0</span> 🔥</div>
+            </div>
+
+            <!-- Tarjeta Interactiva -->
+            <div class="flex flex-col items-center mb-8">
+                <label for="respuesta" class="sr-only">Escribe tu respuesta equivalente</label>
+                
+                <!-- La Tarjeta (Fondo oscuro, texto blanco muy grande para máxima legibilidad) -->
+                <div id="tarjeta-pregunta" class="bg-blue-900 text-white text-6xl md:text-8xl font-black py-16 px-8 rounded-xl shadow-inner w-full text-center tracking-widest mb-6 transition-transform duration-300">
+                    <!-- El número aparecerá aquí -->
+                    1/2
+                </div>
+
+                <!-- Campo de entrada -->
+                <input 
+                    type="text" 
+                    id="respuesta" 
+                    autocomplete="off"
+                    placeholder="Escribe aquí..." 
+                    class="w-full text-center text-4xl p-4 border-4 border-slate-400 rounded-xl text-slate-900 focus:outline-none focus:border-blue-700 focus:ring-4 focus:ring-blue-200 transition-all placeholder:text-slate-400"
+                >
+            </div>
+
+            <!-- Mensajes de Retroalimentación (Región ARIA para lectores de pantalla) -->
+            <div aria-live="polite" id="mensaje-feedback" class="text-center text-xl font-bold min-h-[3rem] mb-6 flex items-center justify-center rounded-lg p-2">
+                <!-- Los mensajes aparecerán aquí -->
+            </div>
+
+            <!-- Controles/Botones -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button 
+                    id="btn-comprobar" 
+                    class="bg-blue-700 hover:bg-blue-800 text-white text-xl font-bold py-4 px-6 rounded-xl shadow-lg transition-transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    Comprobar Respuesta
+                </button>
+                <button 
+                    id="btn-ayuda" 
+                    class="bg-slate-200 hover:bg-slate-300 text-slate-800 text-xl font-bold py-4 px-6 rounded-xl shadow transition-transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-slate-400">
+                    No lo sé (Mostrar)
+                </button>
+                <button 
+                    id="btn-siguiente" 
+                    class="hidden col-span-1 md:col-span-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xl font-bold py-4 px-6 rounded-xl shadow-lg transition-transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-emerald-300">
+                    Siguiente Pregunta ➔
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Base de datos de equivalencias comunes
+        // Se incluyen múltiples formatos de decimales para ser tolerantes con la entrada del estudiante
+        const equivalencias = [
+            { fraccion: "1/2", decimales: ["0.5", "0.50", ".5", ".50", "0,5", "0,50", ",5", ",50"] },
+            { fraccion: "1/4", decimales: ["0.25", ".25", "0,25", ",25"] },
+            { fraccion: "3/4", decimales: ["0.75", ".75", "0,75", ",75"] },
+            { fraccion: "1/3", decimales: ["0.33", ".33", "0,33", ",33", "0.333", ".333", "0,333", ",333"] },
+            { fraccion: "2/3", decimales: ["0.66", ".66", "0,66", ",66", "0.67", ".67", "0,67", ",67", "0.666", ".666", "0,666", ",666", "0.667", ".667", "0,667", ",667"] },
+            { fraccion: "1/5", decimales: ["0.2", "0.20", ".2", ".20", "0,2", "0,20", ",2", ",20"] },
+            { fraccion: "2/5", decimales: ["0.4", "0.40", ".4", ".40", "0,4", "0,40", ",4", ",40"] },
+            { fraccion: "3/5", decimales: ["0.6", "0.60", ".6", ".60", "0,6", "0,60", ",6", ",60"] },
+            { fraccion: "4/5", decimales: ["0.8", "0.80", ".8", ".80", "0,8", "0,80", ",8", ",80"] },
+            { fraccion: "1/10", decimales: ["0.1", "0.10", ".1", ".10", "0,1", "0,10", ",1", ",10"] },
+            { fraccion: "1/8", decimales: ["0.125", ".125", "0,125", ",125"] },
+            { fraccion: "3/8", decimales: ["0.375", ".375", "0,375", ",375"] }
+        ];
+
+        // Estado del juego
+        let preguntaActual = {};
+        let tipoPregunta = ""; // "a_decimal" o "a_fraccion"
+        let puntuacion = 0;
+        let racha = 0;
+        let respondido = false;
+
+        // Elementos del DOM
+        const elTarjeta = document.getElementById('tarjeta-pregunta');
+        const elRespuesta = document.getElementById('respuesta');
+        const elFeedback = document.getElementById('mensaje-feedback');
+        const elPuntuacion = document.getElementById('puntuacion');
+        const elRacha = document.getElementById('racha');
+        
+        const btnComprobar = document.getElementById('btn-comprobar');
+        const btnAyuda = document.getElementById('btn-ayuda');
+        const btnSiguiente = document.getElementById('btn-siguiente');
+
+        // Función para generar una nueva pregunta aleatoria
+        function generarPregunta() {
+            respondido = false;
+            elRespuesta.value = "";
+            elRespuesta.disabled = false;
+            elFeedback.textContent = "";
+            elFeedback.className = "text-center text-xl font-bold min-h-[3rem] mb-6 flex items-center justify-center rounded-lg p-2";
+            
+            // Ocultar/Mostrar botones
+            btnComprobar.classList.remove('hidden');
+            btnAyuda.classList.remove('hidden');
+            btnSiguiente.classList.add('hidden');
+            elTarjeta.classList.remove('animacion-correcta');
+
+            // Seleccionar equivalencia aleatoria
+            const indiceAleatorio = Math.floor(Math.random() * equivalencias.length);
+            preguntaActual = equivalencias[indiceAleatorio];
+
+            // Decidir aleatoriamente si se pregunta por fracción o por decimal
+            tipoPregunta = Math.random() > 0.5 ? "a_decimal" : "a_fraccion";
+
+            if (tipoPregunta === "a_decimal") {
+                elTarjeta.textContent = preguntaActual.fraccion;
+            } else {
+                // Mostrar la primera opción de decimal (la más estándar)
+                elTarjeta.textContent = preguntaActual.decimales[0];
+            }
+
+            elRespuesta.focus();
+        }
+
+        // Función para validar la respuesta
+        function comprobarRespuesta() {
+            if (respondido) return;
+
+            let inputUsuario = elRespuesta.value.trim().toLowerCase();
+            if (inputUsuario === "") return;
+
+            let esCorrecto = false;
+
+            if (tipoPregunta === "a_decimal") {
+                // Comprobar si el input coincide con alguno de los decimales válidos
+                esCorrecto = preguntaActual.decimales.includes(inputUsuario);
+            } else {
+                // Comprobar si coincide con la fracción
+                esCorrecto = (inputUsuario === preguntaActual.fraccion);
+            }
+
+            mostrarResultado(esCorrecto);
+        }
+
+        // Función para mostrar el resultado visual y en texto (DUA: múltiples representaciones)
+        function mostrarResultado(esCorrecto) {
+            respondido = true;
+            elRespuesta.disabled = true;
+            
+            btnComprobar.classList.add('hidden');
+            btnAyuda.classList.add('hidden');
+            btnSiguiente.classList.remove('hidden');
+            btnSiguiente.focus();
+
+            if (esCorrecto) {
+                puntuacion += 10;
+                racha += 1;
+                elFeedback.innerHTML = "✅ ¡Excelente! Respuesta correcta.";
+                elFeedback.classList.add("bg-emerald-100", "text-emerald-800", "border-2", "border-emerald-300");
+                elTarjeta.classList.add('animacion-correcta');
+            } else {
+                racha = 0; // Reiniciar racha
+                let respuestaCorrecta = tipoPregunta === "a_decimal" ? preguntaActual.decimales[0] : preguntaActual.fraccion;
+                elFeedback.innerHTML = `❌ Inténtalo de nuevo. La respuesta correcta era: <strong>${respuestaCorrecta}</strong>`;
+                elFeedback.classList.add("bg-red-100", "text-red-800", "border-2", "border-red-300");
+            }
+
+            actualizarMarcador();
+        }
+
+        // Función para el botón de ayuda (mostrar respuesta sin sumar puntos)
+        function mostrarAyuda() {
+            if (respondido) return;
+            racha = 0; // Se pierde la racha por pedir ayuda
+            mostrarResultado(false); // Tratado visualmente como incorrecto para mostrar la respuesta
+            elFeedback.innerHTML = `💡 La respuesta es: <strong>${tipoPregunta === "a_decimal" ? preguntaActual.decimales[0] : preguntaActual.fraccion}</strong>. ¡A la próxima lo harás mejor!`;
+            elFeedback.classList.replace("bg-red-100", "bg-yellow-100");
+            elFeedback.classList.replace("text-red-800", "text-yellow-800");
+            elFeedback.classList.replace("border-red-300", "border-yellow-300");
+            actualizarMarcador();
+        }
+
+        function actualizarMarcador() {
+            elPuntuacion.textContent = puntuacion;
+            elRacha.textContent = racha;
+        }
+
+        // Event Listeners
+        btnComprobar.addEventListener('click', comprobarRespuesta);
+        btnAyuda.addEventListener('click', mostrarAyuda);
+        btnSiguiente.addEventListener('click', generarPregunta);
+
+        // Permitir el uso de la tecla Enter (Accesibilidad)
+        elRespuesta.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                comprobarRespuesta();
+            }
+        });
+
+        // Iniciar el juego al cargar
+        generarPregunta();
+
+    </script>
+</body>
+</html>

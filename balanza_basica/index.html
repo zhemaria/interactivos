@@ -1,1 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecuaciones como Balanza</title>
 
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fb;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    color: #1f3c88;
+}
+
+.container {
+    max-width: 750px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.balance {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 30px 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.side {
+    padding: 20px;
+    border: 2px solid #1f3c88;
+    border-radius: 10px;
+    width: 40%;
+    background-color: #e8f0fe;
+}
+
+.box {
+    font-size: 40px;
+    transition: 0.3s;
+}
+
+.correct {
+    color: green;
+    transform: scale(1.2);
+}
+
+input {
+    padding: 8px;
+    font-size: 16px;
+    width: 80px;
+    text-align: center;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 8px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.check-btn {
+    background-color: #1f3c88;
+    color: white;
+}
+
+.hint-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.new-btn {
+    background-color: #198754;
+    color: white;
+}
+
+.feedback {
+    margin-top: 15px;
+    font-weight: bold;
+    min-height: 40px;
+}
+
+.step-box {
+    background-color: #f1f3f5;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+@media (max-width: 600px) {
+    .balance {
+        flex-direction: column;
+    }
+    .side {
+        width: 80%;
+        margin-bottom: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Resolver ecuaciones como una balanza</h1>
+
+<p>
+La 📦 representa la incógnita: el número que queremos encontrar.
+</p>
+
+<div class="balance">
+    <div class="side" id="ladoIzq"></div>
+    <div class="side" id="ladoDer"></div>
+</div>
+
+<p><strong>Ecuación:</strong> <span id="ecuacionTexto"></span></p>
+
+<label>¿Cuánto vale la 📦?</label><br><br>
+<input type="number" id="respuesta">
+<br>
+<button class="check-btn" onclick="verificar()">Verificar</button>
+<button class="hint-btn" onclick="mostrarPista()">Mostrar pista</button>
+<button class="new-btn" onclick="nuevaEcuacion()">Nuevo ejercicio</button>
+
+<div class="feedback" id="feedback"></div>
+
+<div class="step-box" id="pista" style="display:none;"></div>
+<div class="step-box" id="verificacion" style="display:none;"></div>
+
+</div>
+
+<script>
+
+let numeroCaja;
+let numeroSuma;
+
+function nuevaEcuacion() {
+    document.getElementById("respuesta").value = "";
+    document.getElementById("feedback").innerHTML = "";
+    document.getElementById("verificacion").style.display = "none";
+    document.getElementById("pista").style.display = "none";
+
+    numeroCaja = Math.floor(Math.random() * 9) + 1; // 1–9
+    numeroSuma = Math.floor(Math.random() * 9) + 1;
+
+    const resultado = numeroCaja + numeroSuma;
+
+    document.getElementById("ladoIzq").innerHTML =
+        `<span class="box" id="box">📦</span> + ${numeroSuma}`;
+    document.getElementById("ladoDer").innerHTML = resultado;
+
+    document.getElementById("ecuacionTexto").innerHTML =
+        `📦 + ${numeroSuma} = ${resultado}`;
+
+    document.getElementById("pista").innerHTML =
+        `<strong>Pista:</strong><br>
+        Para aislar la 📦 debemos restar ${numeroSuma}.<br>
+        Entonces hacemos: ${resultado} − ${numeroSuma}`;
+}
+
+function verificar() {
+    const respuesta = parseInt(document.getElementById("respuesta").value);
+    const feedback = document.getElementById("feedback");
+    const box = document.getElementById("box");
+
+    if (isNaN(respuesta)) {
+        feedback.innerHTML = "Escribe un número antes de verificar.";
+        feedback.style.color = "darkred";
+        return;
+    }
+
+    if (respuesta === numeroCaja) {
+        feedback.innerHTML = "✅ ¡Correcto! Has usado la operación inversa.";
+        feedback.style.color = "green";
+        box.classList.add("correct");
+
+        document.getElementById("verificacion").style.display = "block";
+        document.getElementById("verificacion").innerHTML =
+            `<strong>Verificación:</strong><br>
+            Sustituimos el valor encontrado:<br>
+            ${numeroCaja} + ${numeroSuma} = ${numeroCaja + numeroSuma} ✔`;
+    } else {
+        feedback.innerHTML = "❌ Intenta nuevamente. Usa la operación inversa.";
+        feedback.style.color = "darkred";
+        box.classList.remove("correct");
+    }
+}
+
+function mostrarPista() {
+    document.getElementById("pista").style.display = "block";
+}
+
+nuevaEcuacion();
+
+</script>
+
+</body>
+</html>

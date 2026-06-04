@@ -1,1 +1,283 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulacro GED PRO</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 1.4rem;
+        margin: 0;
+        padding: 20px;
+        background: #eef2f7;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 8px 14px;
+        border: none;
+        border-radius: 6px;
+        background: #2563eb;
+        color: white;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #1e40af;
+      }
+
+      .question {
+        margin-top: 15px;
+        padding: 10px;
+        background: #f8fafc;
+        border-radius: 8px;
+      }
+
+      .option-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 10px;
+      }
+
+      .option {
+        padding: 10px 18px;
+        border: 2px solid #1f2937;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #111827;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        min-width: 80px;
+      }
+
+      .option:hover {
+        background: #1f2937;
+        color: white;
+      }
+
+      .option.correct {
+        background: #15803d !important;
+        color: white !important;
+        border-color: #15803d !important;
+      }
+
+      .option.incorrect {
+        background: #b91c1c !important;
+        color: white !important;
+        border-color: #b91c1c !important;
+      }
+
+      .feedback {
+        margin-top: 5px;
+        font-weight: bold;
+      }
+
+      #graph {
+        width: 100%;
+        height: 400px;
+        margin-top: 15px;
+      }
+
+      .score {
+        margin-top: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Ejemplo de Simulacro</h1>
+
+      <div class="controls">
+        <button onclick="setLanguage('es')">Español</button>
+        <button onclick="setLanguage('en')">English</button>
+        <button onclick="loadScenario(1)">Pelota</button>
+        <button onclick="loadScenario(2)">Jardín</button>
+        <button onclick="loadScenario(3)">Aceleración</button>
+        <button onclick="loadScenario(4)">Interés</button>
+        <button onclick="toggleTeacher()">Modo Docente</button>
+      </div>
+
+      <div id="content"></div>
+      <div id="graph"></div>
+      <div id="questions"></div>
+      <div class="score" id="score"></div>
+    </div>
+
+    <script>
+      let language = 'es';
+      let teacherMode = false;
+      let total = 0;
+      let correct = 0;
+
+      function setLanguage(lang) {
+        language = lang;
+        loadScenario(1);
+      }
+
+      function toggleTeacher() {
+        teacherMode = !teacherMode;
+        alert(teacherMode ? 'Modo docente activado' : 'Modo docente desactivado');
+      }
+
+      function resetScore() {
+        total = 0;
+        correct = 0;
+        updateScore();
+      }
+
+      function updateScore() {
+        document.getElementById('score').innerHTML = (language === 'es' ? 'Puntaje: ' : 'Score: ') + correct + ' / ' + total;
+      }
+
+      function loadScenario(option) {
+        resetScore();
+
+        let content = document.getElementById('content');
+        let questions = document.getElementById('questions');
+        questions.innerHTML = '';
+
+        if (option === 1) {
+          content.innerHTML = language === 'es' ? '<h2>Trayectoria de una pelota</h2><p>h<sub>(t)</sub>=-5t²+20t</p>' : '<h2>Ball trajectory</h2><p>h<sub>(t)</sub>=-5t²+20t</p>';
+
+          graphQuadratic(-5, 20, 0, 0, 5, 'Tiempo', 'Altura');
+
+          addMCQ(language === 'es' ? '¿En qué segundo alcanza la altura máxima?' : 'At what time does the ball reach maximum height?', ['1', '2', '3', '4'], 1);
+        }
+
+        if (option === 2) {
+          content.innerHTML = language === 'es' ? '<h2>Área máxima del jardín</h2><p>A<sub>(x)</sub>=x(20-x)</p>' : '<h2>Maximum garden area</h2><p>A<sub>(x)</sub=x(20-x)</p>';
+
+          graphGarden();
+
+          addMCQ(language === 'es' ? '¿Qué valor produce el área máxima?' : 'Which value produces maximum area?', ['5', '10', '15', '20'], 1);
+        }
+
+        if (option === 3) {
+          content.innerHTML = language === 'es' ? '<h2>Distancia con aceleración</h3><p>d<sub>(t)</sub>=2t²+5t</p>' : '<h2>Distance with acceleration</h3><p>d<sub>(t)</sub>=2t²+5t</p>';
+
+          graphQuadratic(2, 5, 0, 0, 10, 'Tiempo', 'Distancia');
+
+          addMCQ(language === 'es' ? '¿Cuánta distancia recorre en 3 segundos?' : 'How far after 3 seconds?', ['21', '33', '39', '45'], 1);
+        }
+
+        if (option === 4) {
+          content.innerHTML = language === 'es' ? '<h2>Interés compuesto</h2><p>A<sub>(t)</sub>=1000(1.05)<sup>t</sup></p>' : '<h2>Compound interest</h2><p>A<sub>(t)</sub>=1000(1.05)<sup>t</sup></p>';
+
+          graphExponential();
+
+          addMCQ(language === 'es' ? '¿Cuánto dinero habrá después de 2 años?' : 'How much after 2 years?', ['1050', '1102.5', '1200', '1500'], 1);
+        }
+      }
+
+      function addMCQ(question, options, correctIndex) {
+        total++;
+        let qDiv = document.createElement('div');
+        qDiv.className = 'question';
+        qDiv.innerHTML = '<p>' + question + '</p>';
+
+        let container = document.createElement('div');
+        container.className = 'option-container';
+
+        options.forEach((opt, i) => {
+          let btn = document.createElement('button');
+          btn.className = 'option';
+          btn.innerHTML = opt;
+
+          btn.onclick = function () {
+            // Desactivar todos los botones después de elegir
+            Array.from(container.children).forEach(b => (b.disabled = true));
+
+            if (i === correctIndex) {
+              correct++;
+              btn.style.background = 'green';
+              btn.style.color = 'white';
+            } else {
+              btn.style.background = 'red';
+              btn.style.color = 'white';
+              container.children[correctIndex].style.background = 'green';
+              container.children[correctIndex].style.color = 'white';
+            }
+
+            updateScore();
+          };
+
+          container.appendChild(btn);
+        });
+
+        qDiv.appendChild(container);
+
+        if (teacherMode) {
+          let answer = document.createElement('div');
+          answer.innerHTML = (language === 'es' ? 'Respuesta correcta: ' : 'Correct answer: ') + options[correctIndex];
+          answer.style.marginTop = '5px';
+          answer.style.color = 'blue';
+          qDiv.appendChild(answer);
+        }
+
+        document.getElementById('questions').appendChild(qDiv);
+        updateScore();
+      }
+
+      function graphQuadratic(a, b, c, min, max, xLabel, yLabel) {
+        let x = [],
+          y = [];
+        for (let i = min; i <= max; i += 0.1) {
+          x.push(i);
+          y.push(a * i * i + b * i + c);
+        }
+        Plotly.newPlot('graph', [{x: x, y: y, mode: 'lines'}], {xaxis: {title: xLabel}, yaxis: {title: yLabel}});
+      }
+
+      function graphGarden() {
+        let x = [],
+          y = [];
+        for (let i = 0; i <= 20; i += 0.2) {
+          x.push(i);
+          y.push(i * (20 - i));
+        }
+        Plotly.newPlot('graph', [{x: x, y: y, mode: 'lines'}], {xaxis: {title: 'Lado'}, yaxis: {title: 'Área'}});
+      }
+
+      function graphExponential() {
+        let x = [],
+          y = [];
+        for (let i = 0; i <= 10; i += 0.2) {
+          x.push(i);
+          y.push(1000 * Math.pow(1.05, i));
+        }
+        Plotly.newPlot('graph', [{x: x, y: y, mode: 'lines'}], {xaxis: {title: 'Tiempo'}, yaxis: {title: 'Dinero'}});
+      }
+
+      loadScenario(1);
+    </script>
+  </body>
+</html>
 

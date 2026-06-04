@@ -1,31 +1,77 @@
 <!doctype html>
+<!--
+  Plantilla del proyecto final y simulacro interactivo — Modelado con funciones
+  Autor: José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago
+  Año: 2026
+  Licencia: Creative Commons CC BY-NC-SA 4.0 (Atribución – No comercial – Compartir igual)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/
+  Resumen: Recurso de doble función para el proyecto final. Parte 1 presenta un simulacro
+  interactivo (ejemplo modelo). Parte 2 lista los requisitos. Parte 3 es la plantilla
+  donde el estudiante construye su propio proyecto (situación, función con gráfica en vivo,
+  pregunta de opción múltiple interactiva y conclusión) y lo exporta a PDF.
+-->
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simulacro GED PRO</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+    <meta name="license" content="CC BY-NC-SA 4.0" />
+    <link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" />
+    <title>Plantilla del proyecto y simulacro interactivo</title>
 
     <style>
+      :root {
+        --azul: #1e40af;
+        --azul-oscuro: #1e3a8a;
+        --verde: #1b5e20;
+        --rojo: #b91c1c;
+        --ambar: #5c3900;
+        --texto: #111827;
+        --muted: #555;
+      }
+
       body {
-        font-family: Arial, sans-serif;
-        font-size: 1.4rem;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 1.15rem;
+        line-height: 1.55;
         margin: 0;
         padding: 20px;
         background: #eef2f7;
+        color: var(--texto);
       }
 
       .container {
         max-width: 1100px;
         margin: auto;
         background: white;
-        padding: 20px;
+        padding: 24px;
         border-radius: 12px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       }
 
       h1 {
         text-align: center;
+        color: var(--azul-oscuro);
+        font-size: 1.9rem;
+      }
+
+      h2 {
+        color: var(--azul-oscuro);
+        border-bottom: 3px solid #cbd5e1;
+        padding-bottom: 6px;
+        margin-top: 36px;
+      }
+
+      h3 {
+        color: var(--azul-oscuro);
+        margin-top: 24px;
+      }
+
+      .lema {
+        text-align: center;
+        color: var(--muted);
+        margin-top: -6px;
+        font-size: 1rem;
       }
 
       .controls {
@@ -33,26 +79,56 @@
         flex-wrap: wrap;
         gap: 10px;
         justify-content: center;
-        margin-bottom: 20px;
+        margin: 18px 0 8px;
       }
 
       button {
-        padding: 8px 14px;
+        padding: 9px 16px;
         border: none;
         border-radius: 6px;
-        background: #2563eb;
+        background: var(--azul);
         color: white;
+        font-weight: 600;
+        font-size: 1rem;
         cursor: pointer;
+        transition: 0.2s;
       }
 
-      button:hover {
-        background: #1e40af;
+      button:hover,
+      button:focus {
+        background: var(--azul-oscuro);
+        outline: 3px solid #93c5fd;
+      }
+
+      .caja-objetivos {
+        background: #eff6ff;
+        border-left: 6px solid var(--azul);
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin: 18px 0;
+      }
+
+      .caja-objetivos h2 {
+        margin-top: 0;
+        border: none;
+        font-size: 1.3rem;
+      }
+
+      .caja-atencion {
+        background: #fdf6ec;
+        border-left: 6px solid var(--ambar);
+        color: var(--ambar);
+        border-radius: 8px;
+        padding: 12px 18px;
+        margin: 16px 0;
+        font-weight: 600;
       }
 
       .question {
         margin-top: 15px;
-        padding: 10px;
+        padding: 12px;
         background: #f8fafc;
+        border: 1px solid #e2e8f0;
         border-radius: 8px;
       }
 
@@ -70,6 +146,7 @@
         background: #ffffff;
         color: #111827;
         font-weight: 600;
+        font-size: 1rem;
         cursor: pointer;
         transition: 0.2s;
         min-width: 80px;
@@ -81,203 +158,728 @@
       }
 
       .option.correct {
-        background: #15803d !important;
+        background: var(--verde) !important;
         color: white !important;
-        border-color: #15803d !important;
+        border-color: var(--verde) !important;
       }
 
       .option.incorrect {
-        background: #b91c1c !important;
+        background: var(--rojo) !important;
         color: white !important;
-        border-color: #b91c1c !important;
+        border-color: var(--rojo) !important;
       }
 
       .feedback {
-        margin-top: 5px;
+        margin-top: 8px;
         font-weight: bold;
       }
 
-      #graph {
+      .graph {
         width: 100%;
-        height: 400px;
+        height: 380px;
         margin-top: 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
       }
 
       .score {
-        margin-top: 15px;
-        font-size: 18px;
+        margin-top: 14px;
+        font-size: 1.1rem;
         font-weight: bold;
         text-align: center;
+        color: var(--verde);
+      }
+
+      /* --- Plantilla (campos del estudiante) --- */
+      .campo {
+        margin: 14px 0;
+      }
+
+      .campo > .etiqueta {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .pista {
+        font-size: 0.92rem;
+        color: var(--muted);
+        font-weight: 400;
+      }
+
+      input[type='text'],
+      input[type='number'],
+      textarea,
+      select {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        font-size: 1rem;
+        font-family: inherit;
+        border: 2px solid #94a3b8;
+        border-radius: 6px;
+        background: #fff;
+        color: var(--texto);
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: 3px solid #93c5fd;
+        border-color: var(--azul);
+      }
+
+      textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+
+      .fila {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .fila .campo {
+        flex: 1;
+        min-width: 140px;
+      }
+
+      .checklist {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .checklist li {
+        padding: 8px 0;
+        border-bottom: 1px dashed #cbd5e1;
+      }
+
+      .checklist input[type='checkbox'] {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+
+      footer {
+        margin-top: 40px;
+        padding-top: 16px;
+        border-top: 2px solid #cbd5e1;
+        font-size: 0.9rem;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      footer a {
+        color: var(--muted);
+      }
+
+      /* --- Impresión: el alumno entrega solo SU proyecto --- */
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+        }
+        .container {
+          box-shadow: none;
+        }
+        .no-print {
+          display: none !important;
+        }
+        input,
+        textarea,
+        select {
+          border: 1px solid #999;
+        }
       }
     </style>
   </head>
+
   <body>
     <div class="container">
-      <h1>Ejemplo de Simulacro</h1>
+      <h1 data-es="Plantilla del proyecto final y simulacro interactivo" data-en="Final project template and interactive practice">Plantilla del proyecto final y simulacro interactivo</h1>
+      <p class="lema" data-es="Modelado de situaciones reales con funciones" data-en="Modeling real-life situations with functions">Modelado de situaciones reales con funciones</p>
 
-      <div class="controls">
-        <button onclick="setLanguage('es')">Español</button>
-        <button onclick="setLanguage('en')">English</button>
-        <button onclick="loadScenario(1)">Pelota</button>
-        <button onclick="loadScenario(2)">Jardín</button>
-        <button onclick="loadScenario(3)">Aceleración</button>
-        <button onclick="loadScenario(4)">Interés</button>
-        <button onclick="toggleTeacher()">Modo Docente</button>
+      <div class="controls no-print">
+        <button onclick="setLanguage('es')" aria-label="Cambiar a español">Español</button>
+        <button onclick="setLanguage('en')" aria-label="Switch to English">English</button>
+        <button onclick="imprimirProyecto()" data-es="Guardar / Imprimir PDF" data-en="Save / Print PDF">Guardar / Imprimir PDF</button>
       </div>
 
-      <div id="content"></div>
-      <div id="graph"></div>
-      <div id="questions"></div>
-      <div class="score" id="score"></div>
+      <div class="caja-objetivos">
+        <h2 data-es="Antes de comenzar" data-en="Before you begin">Antes de comenzar</h2>
+        <p data-es="En este proyecto usted elegirá una situación de la vida real, la representará con una función matemática, dibujará su gráfica y redactará una pregunta sobre ella. Siga estos tres pasos:" data-en="In this project you will choose a real-life situation, represent it with a mathematical function, draw its graph, and write a question about it. Follow these three steps:">En este proyecto usted elegirá una situación de la vida real, la representará con una función matemática, dibujará su gráfica y redactará una pregunta sobre ella. Siga estos tres pasos:</p>
+        <ol>
+          <li data-es="Parte 1: Estudie el ejemplo interactivo (el simulacro)." data-en="Part 1: Study the interactive example (the practice activity).">Parte 1: Estudie el ejemplo interactivo (el simulacro).</li>
+          <li data-es="Parte 2: Revise los requisitos de su proyecto." data-en="Part 2: Review your project requirements.">Parte 2: Revise los requisitos de su proyecto.</li>
+          <li data-es="Parte 3: Construya su propio proyecto en la plantilla y entréguelo en PDF." data-en="Part 3: Build your own project in the template and submit it as a PDF.">Parte 3: Construya su propio proyecto en la plantilla y entréguelo en PDF.</li>
+        </ol>
+      </div>
+
+      <!-- ============ PARTE 1: EL EJEMPLO (SIMULACRO) ============ -->
+      <section class="no-print">
+        <h2 data-es="Parte 1 · Estudie el ejemplo (simulacro)" data-en="Part 1 · Study the example (practice)">Parte 1 · Estudie el ejemplo (simulacro)</h2>
+        <p data-es="Seleccione un escenario, observe su función y su gráfica, y responda la pregunta. Así funcionará su propio proyecto." data-en="Select a scenario, observe its function and graph, and answer the question. Your own project will work the same way.">Seleccione un escenario, observe su función y su gráfica, y responda la pregunta. Así funcionará su propio proyecto.</p>
+
+        <div class="controls">
+          <button onclick="loadScenario(1)" data-es="Pelota" data-en="Ball">Pelota</button>
+          <button onclick="loadScenario(2)" data-es="Jardín" data-en="Garden">Jardín</button>
+          <button onclick="loadScenario(3)" data-es="Aceleración" data-en="Acceleration">Aceleración</button>
+          <button onclick="loadScenario(4)" data-es="Interés" data-en="Interest">Interés</button>
+        </div>
+
+        <div id="content"></div>
+        <div id="graph" class="graph"></div>
+        <div id="questions"></div>
+        <div class="score" id="score"></div>
+      </section>
+
+      <!-- ============ PARTE 2: REQUISITOS ============ -->
+      <section>
+        <h2 data-es="Parte 2 · Requisitos de su proyecto" data-en="Part 2 · Your project requirements">Parte 2 · Requisitos de su proyecto</h2>
+        <p data-es="Su proyecto debe incluir todos los elementos siguientes. Marque cada casilla a medida que los complete." data-en="Your project must include all of the following elements. Check each box as you complete it.">Su proyecto debe incluir todos los elementos siguientes. Marque cada casilla a medida que los complete.</p>
+        <ul class="checklist">
+          <li><input type="checkbox" aria-label="Requisito 1" /><span data-es="Un título y una situación real explicada con claridad." data-en="A title and a clearly explained real-life situation.">Un título y una situación real explicada con claridad.</span></li>
+          <li><input type="checkbox" aria-label="Requisito 2" /><span data-es="Una función matemática que representa la situación." data-en="A mathematical function that represents the situation.">Una función matemática que representa la situación.</span></li>
+          <li><input type="checkbox" aria-label="Requisito 3" /><span data-es="Una gráfica generada a partir de su función." data-en="A graph generated from your function.">Una gráfica generada a partir de su función.</span></li>
+          <li><input type="checkbox" aria-label="Requisito 4" /><span data-es="Una pregunta de opción múltiple con su respuesta correcta." data-en="A multiple-choice question with its correct answer.">Una pregunta de opción múltiple con su respuesta correcta.</span></li>
+          <li><input type="checkbox" aria-label="Requisito 5" /><span data-es="Una conclusión que interprete el resultado." data-en="A conclusion that interprets the result.">Una conclusión que interprete el resultado.</span></li>
+        </ul>
+      </section>
+
+      <!-- ============ PARTE 3: LA PLANTILLA ============ -->
+      <section>
+        <h2 data-es="Parte 3 · Construya su proyecto" data-en="Part 3 · Build your project">Parte 3 · Construya su proyecto</h2>
+
+        <div class="campo">
+          <span class="etiqueta" data-es="Nombre del estudiante" data-en="Student name">Nombre del estudiante</span>
+          <input type="text" aria-label="Nombre del estudiante" data-es-ph="Escriba su nombre completo" data-en-ph="Type your full name" placeholder="Escriba su nombre completo" />
+        </div>
+
+        <div class="campo">
+          <span class="etiqueta" data-es="Título de su proyecto" data-en="Project title">Título de su proyecto</span>
+          <input type="text" aria-label="Título del proyecto" data-es-ph="Ejemplo: La caída de un objeto" data-en-ph="Example: The fall of an object" placeholder="Ejemplo: La caída de un objeto" />
+        </div>
+
+        <div class="campo">
+          <span class="etiqueta" data-es="Describa la situación real" data-en="Describe the real-life situation">Describa la situación real</span>
+          <span class="pista" data-es="¿Qué sucede? ¿Qué cambia con el tiempo o con otra cantidad?" data-en="What happens? What changes over time or with another quantity?">¿Qué sucede? ¿Qué cambia con el tiempo o con otra cantidad?</span>
+          <textarea aria-label="Descripción de la situación" data-es-ph="Explique su situación en dos o tres oraciones." data-en-ph="Explain your situation in two or three sentences." placeholder="Explique su situación en dos o tres oraciones."></textarea>
+        </div>
+
+        <h3 data-es="Su función y su gráfica" data-en="Your function and graph">Su función y su gráfica</h3>
+        <p class="pista" data-es="Elija el tipo de función, escriba sus números y presione «Generar mi gráfica»." data-en="Choose the function type, enter your numbers, and press “Generate my graph”.">Elija el tipo de función, escriba sus números y presione «Generar mi gráfica».</p>
+
+        <div class="campo">
+          <span class="etiqueta" data-es="Tipo de función" data-en="Function type">Tipo de función</span>
+          <select id="tipoFuncion" aria-label="Tipo de función" onchange="actualizarCampos()">
+            <option value="cuadratica" data-es="Cuadrática:  a·x² + b·x + c" data-en="Quadratic:  a·x² + b·x + c">Cuadrática:  a·x² + b·x + c</option>
+            <option value="lineal" data-es="Lineal:  a·x + b" data-en="Linear:  a·x + b">Lineal:  a·x + b</option>
+            <option value="exponencial" data-es="Exponencial:  a·(b)^x" data-en="Exponential:  a·(b)^x">Exponencial:  a·(b)^x</option>
+          </select>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <span class="etiqueta" id="lblA">a</span>
+            <input type="number" id="coefA" step="any" value="-5" aria-label="Coeficiente a" />
+          </div>
+          <div class="campo">
+            <span class="etiqueta" id="lblB">b</span>
+            <input type="number" id="coefB" step="any" value="20" aria-label="Coeficiente b" />
+          </div>
+          <div class="campo" id="campoC">
+            <span class="etiqueta" id="lblC">c</span>
+            <input type="number" id="coefC" step="any" value="0" aria-label="Coeficiente c" />
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <span class="etiqueta" data-es="Valor mínimo de x" data-en="Minimum x value">Valor mínimo de x</span>
+            <input type="number" id="xMin" step="any" value="0" aria-label="x mínimo" />
+          </div>
+          <div class="campo">
+            <span class="etiqueta" data-es="Valor máximo de x" data-en="Maximum x value">Valor máximo de x</span>
+            <input type="number" id="xMax" step="any" value="5" aria-label="x máximo" />
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <span class="etiqueta" data-es="Nombre del eje X" data-en="X-axis label">Nombre del eje X</span>
+            <input type="text" id="ejeX" value="Tiempo" aria-label="Etiqueta del eje X" />
+          </div>
+          <div class="campo">
+            <span class="etiqueta" data-es="Nombre del eje Y" data-en="Y-axis label">Nombre del eje Y</span>
+            <input type="text" id="ejeY" value="Altura" aria-label="Etiqueta del eje Y" />
+          </div>
+        </div>
+
+        <div class="controls no-print" style="justify-content: flex-start">
+          <button onclick="generarGraficaPlantilla()" data-es="Generar mi gráfica" data-en="Generate my graph">Generar mi gráfica</button>
+        </div>
+        <div id="graph-plantilla" class="graph"></div>
+
+        <h3 data-es="Su pregunta de opción múltiple" data-en="Your multiple-choice question">Su pregunta de opción múltiple</h3>
+
+        <div class="campo">
+          <span class="etiqueta" data-es="Escriba su pregunta" data-en="Write your question">Escriba su pregunta</span>
+          <input type="text" id="preguntaTexto" aria-label="Texto de la pregunta" data-es-ph="Ejemplo: ¿En qué segundo alcanza la altura máxima?" data-en-ph="Example: At what time does it reach maximum height?" placeholder="Ejemplo: ¿En qué segundo alcanza la altura máxima?" />
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <span class="etiqueta" data-es="Opción 1" data-en="Option 1">Opción 1</span>
+            <input type="text" id="op1" aria-label="Opción 1" />
+          </div>
+          <div class="campo">
+            <span class="etiqueta" data-es="Opción 2" data-en="Option 2">Opción 2</span>
+            <input type="text" id="op2" aria-label="Opción 2" />
+          </div>
+        </div>
+        <div class="fila">
+          <div class="campo">
+            <span class="etiqueta" data-es="Opción 3" data-en="Option 3">Opción 3</span>
+            <input type="text" id="op3" aria-label="Opción 3" />
+          </div>
+          <div class="campo">
+            <span class="etiqueta" data-es="Opción 4" data-en="Option 4">Opción 4</span>
+            <input type="text" id="op4" aria-label="Opción 4" />
+          </div>
+        </div>
+
+        <div class="campo">
+          <span class="etiqueta" data-es="¿Cuál opción es la correcta?" data-en="Which option is correct?">¿Cuál opción es la correcta?</span>
+          <select id="opCorrecta" aria-label="Opción correcta">
+            <option value="0" data-es="Opción 1" data-en="Option 1">Opción 1</option>
+            <option value="1" data-es="Opción 2" data-en="Option 2">Opción 2</option>
+            <option value="2" data-es="Opción 3" data-en="Option 3">Opción 3</option>
+            <option value="3" data-es="Opción 4" data-en="Option 4">Opción 4</option>
+          </select>
+        </div>
+
+        <div class="controls no-print" style="justify-content: flex-start">
+          <button onclick="crearPreguntaPlantilla()" data-es="Crear pregunta interactiva" data-en="Create interactive question">Crear pregunta interactiva</button>
+        </div>
+        <div id="pregunta-plantilla"></div>
+
+        <h3 data-es="Su conclusión" data-en="Your conclusion">Su conclusión</h3>
+        <div class="campo">
+          <span class="pista" data-es="¿Qué significa el resultado dentro de su situación real?" data-en="What does the result mean within your real-life situation?">¿Qué significa el resultado dentro de su situación real?</span>
+          <textarea aria-label="Conclusión" data-es-ph="Escriba aquí su interpretación final." data-en-ph="Write your final interpretation here." placeholder="Escriba aquí su interpretación final."></textarea>
+        </div>
+
+        <div class="caja-atencion no-print">
+          <span aria-hidden="true">📄 </span><span data-es="Cuando termine, presione «Guardar / Imprimir PDF» (arriba) y entregue el archivo." data-en="When you finish, press “Save / Print PDF” (above) and submit the file.">Cuando termine, presione «Guardar / Imprimir PDF» (arriba) y entregue el archivo.</span>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          © 2026 José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago.
+          <br />
+          <span data-es="Esta obra está bajo licencia" data-en="This work is licensed under">Esta obra está bajo licencia</span>
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license" target="_blank">Creative Commons CC BY-NC-SA 4.0</a>.
+        </p>
+      </footer>
     </div>
 
     <script>
       let language = 'es';
-      let teacherMode = false;
       let total = 0;
       let correct = 0;
 
-      function setLanguage(lang) {
-        language = lang;
+      /* ---------- Idioma ---------- */
+      function applyLanguage() {
+        document.documentElement.lang = language;
+        document.querySelectorAll('[data-es]').forEach((el) => {
+          el.textContent = language === 'es' ? el.getAttribute('data-es') : el.getAttribute('data-en');
+        });
+        document.querySelectorAll('[data-es-ph]').forEach((el) => {
+          el.setAttribute('placeholder', language === 'es' ? el.getAttribute('data-es-ph') : el.getAttribute('data-en-ph'));
+        });
+        actualizarCampos();
         loadScenario(1);
-      }
-
-      function toggleTeacher() {
-        teacherMode = !teacherMode;
-        alert(teacherMode ? 'Modo docente activado' : 'Modo docente desactivado');
-      }
-
-      function resetScore() {
-        total = 0;
-        correct = 0;
         updateScore();
       }
 
-      function updateScore() {
-        document.getElementById('score').innerHTML = (language === 'es' ? 'Puntaje: ' : 'Score: ') + correct + ' / ' + total;
+      function setLanguage(lang) {
+        language = lang;
+        applyLanguage();
       }
 
+      /* ---------- Puntaje del simulacro ---------- */
+      function resetScore() {
+        total = 0;
+        correct = 0;
+      }
+
+      function updateScore() {
+        document.getElementById('score').textContent = (language === 'es' ? 'Puntaje: ' : 'Score: ') + correct + ' / ' + total;
+      }
+
+      /* ---------- Parte 1: escenarios del ejemplo ---------- */
       function loadScenario(option) {
         resetScore();
-
-        let content = document.getElementById('content');
-        let questions = document.getElementById('questions');
-        questions.innerHTML = '';
+        const content = document.getElementById('content');
+        document.getElementById('questions').innerHTML = '';
 
         if (option === 1) {
-          content.innerHTML = language === 'es' ? '<h2>Trayectoria de una pelota</h2><p>h<sub>(t)</sub>=-5t²+20t</p>' : '<h2>Ball trajectory</h2><p>h<sub>(t)</sub>=-5t²+20t</p>';
-
-          graphQuadratic(-5, 20, 0, 0, 5, 'Tiempo', 'Altura');
-
-          addMCQ(language === 'es' ? '¿En qué segundo alcanza la altura máxima?' : 'At what time does the ball reach maximum height?', ['1', '2', '3', '4'], 1);
+          content.innerHTML =
+            language === 'es'
+              ? '<h3>Trayectoria de una pelota</h3><p>h<sub>(t)</sub> = -5t² + 20t</p>'
+              : '<h3>Ball trajectory</h3><p>h<sub>(t)</sub> = -5t² + 20t</p>';
+          graphQuadratic(-5, 20, 0, 0, 5, language === 'es' ? 'Tiempo' : 'Time', language === 'es' ? 'Altura' : 'Height');
+          addMCQ(
+            language === 'es' ? '¿En qué segundo alcanza la altura máxima?' : 'At what time does the ball reach maximum height?',
+            ['1', '2', '3', '4'],
+            1
+          );
         }
 
         if (option === 2) {
-          content.innerHTML = language === 'es' ? '<h2>Área máxima del jardín</h2><p>A<sub>(x)</sub>=x(20-x)</p>' : '<h2>Maximum garden area</h2><p>A<sub>(x)</sub=x(20-x)</p>';
-
+          content.innerHTML =
+            language === 'es'
+              ? '<h3>Área máxima del jardín</h3><p>A<sub>(x)</sub> = x(20 - x)</p>'
+              : '<h3>Maximum garden area</h3><p>A<sub>(x)</sub> = x(20 - x)</p>';
           graphGarden();
-
-          addMCQ(language === 'es' ? '¿Qué valor produce el área máxima?' : 'Which value produces maximum area?', ['5', '10', '15', '20'], 1);
+          addMCQ(
+            language === 'es' ? '¿Qué valor produce el área máxima?' : 'Which value produces the maximum area?',
+            ['5', '10', '15', '20'],
+            1
+          );
         }
 
         if (option === 3) {
-          content.innerHTML = language === 'es' ? '<h2>Distancia con aceleración</h3><p>d<sub>(t)</sub>=2t²+5t</p>' : '<h2>Distance with acceleration</h3><p>d<sub>(t)</sub>=2t²+5t</p>';
-
-          graphQuadratic(2, 5, 0, 0, 10, 'Tiempo', 'Distancia');
-
-          addMCQ(language === 'es' ? '¿Cuánta distancia recorre en 3 segundos?' : 'How far after 3 seconds?', ['21', '33', '39', '45'], 1);
+          content.innerHTML =
+            language === 'es'
+              ? '<h3>Distancia con aceleración</h3><p>d<sub>(t)</sub> = 2t² + 5t</p>'
+              : '<h3>Distance with acceleration</h3><p>d<sub>(t)</sub> = 2t² + 5t</p>';
+          graphQuadratic(2, 5, 0, 0, 10, language === 'es' ? 'Tiempo' : 'Time', language === 'es' ? 'Distancia' : 'Distance');
+          addMCQ(
+            language === 'es' ? '¿Cuánta distancia recorre en 3 segundos?' : 'How far does it travel after 3 seconds?',
+            ['21', '33', '39', '45'],
+            1
+          );
         }
 
         if (option === 4) {
-          content.innerHTML = language === 'es' ? '<h2>Interés compuesto</h2><p>A<sub>(t)</sub>=1000(1.05)<sup>t</sup></p>' : '<h2>Compound interest</h2><p>A<sub>(t)</sub>=1000(1.05)<sup>t</sup></p>';
-
+          content.innerHTML =
+            language === 'es'
+              ? '<h3>Interés compuesto</h3><p>A<sub>(t)</sub> = 1000(1.05)<sup>t</sup></p>'
+              : '<h3>Compound interest</h3><p>A<sub>(t)</sub> = 1000(1.05)<sup>t</sup></p>';
           graphExponential();
-
-          addMCQ(language === 'es' ? '¿Cuánto dinero habrá después de 2 años?' : 'How much after 2 years?', ['1050', '1102.5', '1200', '1500'], 1);
+          addMCQ(
+            language === 'es' ? '¿Cuánto dinero habrá después de 2 años?' : 'How much money after 2 years?',
+            ['1050', '1102.5', '1200', '1500'],
+            1
+          );
         }
       }
 
-      function addMCQ(question, options, correctIndex) {
-        total++;
-        let qDiv = document.createElement('div');
+      /* ---------- Constructor de preguntas (compartido) ---------- */
+      function construirMCQ(targetEl, question, options, correctIndex, contarPuntaje) {
+        const qDiv = document.createElement('div');
         qDiv.className = 'question';
-        qDiv.innerHTML = '<p>' + question + '</p>';
+        const p = document.createElement('p');
+        p.textContent = question;
+        qDiv.appendChild(p);
 
-        let container = document.createElement('div');
+        const container = document.createElement('div');
         container.className = 'option-container';
 
         options.forEach((opt, i) => {
-          let btn = document.createElement('button');
+          const btn = document.createElement('button');
           btn.className = 'option';
-          btn.innerHTML = opt;
-
+          btn.type = 'button';
+          btn.textContent = opt;
           btn.onclick = function () {
-            // Desactivar todos los botones después de elegir
-            Array.from(container.children).forEach(b => (b.disabled = true));
-
+            Array.from(container.children).forEach((b) => (b.disabled = true));
             if (i === correctIndex) {
-              correct++;
-              btn.style.background = 'green';
-              btn.style.color = 'white';
+              btn.classList.add('correct');
+              if (contarPuntaje) correct++;
             } else {
-              btn.style.background = 'red';
-              btn.style.color = 'white';
-              container.children[correctIndex].style.background = 'green';
-              container.children[correctIndex].style.color = 'white';
+              btn.classList.add('incorrect');
+              container.children[correctIndex].classList.add('correct');
             }
-
-            updateScore();
+            if (contarPuntaje) updateScore();
           };
-
           container.appendChild(btn);
         });
 
         qDiv.appendChild(container);
+        targetEl.appendChild(qDiv);
+      }
 
-        if (teacherMode) {
-          let answer = document.createElement('div');
-          answer.innerHTML = (language === 'es' ? 'Respuesta correcta: ' : 'Correct answer: ') + options[correctIndex];
-          answer.style.marginTop = '5px';
-          answer.style.color = 'blue';
-          qDiv.appendChild(answer);
-        }
-
-        document.getElementById('questions').appendChild(qDiv);
+      function addMCQ(question, options, correctIndex) {
+        total++;
+        construirMCQ(document.getElementById('questions'), question, options, correctIndex, true);
         updateScore();
       }
 
+      /* ---------- Gráficas (canvas autónomo, sin librerías externas) ---------- */
+      const lastPlots = {};
+
+      function plot(divId, x, y, xLabel, yLabel) {
+        lastPlots[divId] = { x: x, y: y, xLabel: xLabel, yLabel: yLabel };
+        drawPlot(divId, x, y, xLabel, yLabel);
+      }
+
+      function niceTicks(min, max, count) {
+        const range = max - min;
+        if (range <= 0) return [min];
+        const rawStep = range / count;
+        const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+        const norm = rawStep / mag;
+        let step;
+        if (norm < 1.5) step = 1;
+        else if (norm < 3) step = 2;
+        else if (norm < 7) step = 5;
+        else step = 10;
+        step *= mag;
+        const start = Math.ceil(min / step) * step;
+        const ticks = [];
+        for (let v = start; v <= max + 1e-9; v += step) ticks.push(Math.abs(v) < 1e-9 ? 0 : v);
+        return ticks;
+      }
+
+      function fmt(n) {
+        if (Math.abs(n) >= 1000) return n.toLocaleString('en-US');
+        return (Math.round(n * 100) / 100).toString();
+      }
+
+      function drawPlot(divId, x, y, xLabel, yLabel) {
+        const host = document.getElementById(divId);
+        if (!host || !x.length) return;
+
+        let canvas = host.querySelector('canvas');
+        if (!canvas) {
+          canvas = document.createElement('canvas');
+          canvas.style.display = 'block';
+          canvas.style.width = '100%';
+          canvas.style.height = '100%';
+          host.innerHTML = '';
+          host.appendChild(canvas);
+        }
+
+        const dpr = window.devicePixelRatio || 1;
+        const cssW = host.clientWidth || 600;
+        const cssH = host.clientHeight || 360;
+        canvas.width = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
+
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, cssW, cssH);
+
+        const m = { left: 64, right: 22, top: 18, bottom: 50 };
+        const plotW = cssW - m.left - m.right;
+        const plotH = cssH - m.top - m.bottom;
+
+        let xMin = Math.min.apply(null, x), xMax = Math.max.apply(null, x);
+        let yMin = Math.min.apply(null, y), yMax = Math.max.apply(null, y);
+        if (xMin === xMax) xMax = xMin + 1;
+        if (yMin === yMax) yMax = yMin + 1;
+        const yPad = (yMax - yMin) * 0.08;
+        yMin -= yPad;
+        yMax += yPad;
+
+        const sx = (v) => m.left + ((v - xMin) / (xMax - xMin)) * plotW;
+        const sy = (v) => m.top + (1 - (v - yMin) / (yMax - yMin)) * plotH;
+
+        // Cuadrícula y rótulos
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#555';
+        ctx.lineWidth = 1;
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        niceTicks(xMin, xMax, 6).forEach((t) => {
+          const px = sx(t);
+          if (px < m.left - 0.5 || px > cssW - m.right + 0.5) return;
+          ctx.strokeStyle = '#e2e8f0';
+          ctx.beginPath();
+          ctx.moveTo(px, m.top);
+          ctx.lineTo(px, m.top + plotH);
+          ctx.stroke();
+          ctx.fillText(fmt(t), px, m.top + plotH + 7);
+        });
+
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        niceTicks(yMin, yMax, 6).forEach((t) => {
+          const py = sy(t);
+          if (py < m.top - 0.5 || py > m.top + plotH + 0.5) return;
+          ctx.strokeStyle = '#e2e8f0';
+          ctx.beginPath();
+          ctx.moveTo(m.left, py);
+          ctx.lineTo(m.left + plotW, py);
+          ctx.stroke();
+          ctx.fillText(fmt(t), m.left - 9, py);
+        });
+
+        // Marco
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(m.left, m.top, plotW, plotH);
+
+        // Ejes en cero (si el rango los cruza)
+        ctx.strokeStyle = '#64748b';
+        if (yMin < 0 && yMax > 0) {
+          const py = sy(0);
+          ctx.beginPath();
+          ctx.moveTo(m.left, py);
+          ctx.lineTo(m.left + plotW, py);
+          ctx.stroke();
+        }
+        if (xMin < 0 && xMax > 0) {
+          const px = sx(0);
+          ctx.beginPath();
+          ctx.moveTo(px, m.top);
+          ctx.lineTo(px, m.top + plotH);
+          ctx.stroke();
+        }
+
+        // Curva
+        ctx.strokeStyle = '#1e40af';
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        for (let i = 0; i < x.length; i++) {
+          const px = sx(x[i]), py = sy(y[i]);
+          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        // Títulos de los ejes
+        ctx.fillStyle = '#111827';
+        ctx.font = 'bold 13px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(xLabel, m.left + plotW / 2, cssH - 6);
+        ctx.save();
+        ctx.translate(14, m.top + plotH / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.textBaseline = 'top';
+        ctx.fillText(yLabel, 0, 0);
+        ctx.restore();
+      }
+
+      // Redibujar al cambiar el tamaño de la ventana (responsivo)
+      let _resizeTimer;
+      window.addEventListener('resize', function () {
+        clearTimeout(_resizeTimer);
+        _resizeTimer = setTimeout(function () {
+          Object.keys(lastPlots).forEach(function (id) {
+            const p = lastPlots[id];
+            drawPlot(id, p.x, p.y, p.xLabel, p.yLabel);
+          });
+        }, 150);
+      });
+
       function graphQuadratic(a, b, c, min, max, xLabel, yLabel) {
-        let x = [],
-          y = [];
-        for (let i = min; i <= max; i += 0.1) {
+        const x = [], y = [];
+        const paso = (max - min) / 100 || 0.1;
+        for (let i = min; i <= max + 1e-9; i += paso) {
           x.push(i);
           y.push(a * i * i + b * i + c);
         }
-        Plotly.newPlot('graph', [{x: x, y: y, mode: 'lines'}], {xaxis: {title: xLabel}, yaxis: {title: yLabel}});
+        plot('graph', x, y, xLabel, yLabel);
       }
 
       function graphGarden() {
-        let x = [],
-          y = [];
+        const x = [], y = [];
         for (let i = 0; i <= 20; i += 0.2) {
           x.push(i);
           y.push(i * (20 - i));
         }
-        Plotly.newPlot('graph', [{x: x, y: y, mode: 'lines'}], {xaxis: {title: 'Lado'}, yaxis: {title: 'Área'}});
+        plot('graph', x, y, language === 'es' ? 'Lado' : 'Side', language === 'es' ? 'Área' : 'Area');
       }
 
       function graphExponential() {
-        let x = [],
-          y = [];
+        const x = [], y = [];
         for (let i = 0; i <= 10; i += 0.2) {
           x.push(i);
           y.push(1000 * Math.pow(1.05, i));
         }
-        Plotly.newPlot('graph', [{x: x, y: y, mode: 'lines'}], {xaxis: {title: 'Tiempo'}, yaxis: {title: 'Dinero'}});
+        plot('graph', x, y, language === 'es' ? 'Tiempo' : 'Time', language === 'es' ? 'Dinero' : 'Money');
       }
 
-      loadScenario(1);
+      /* ---------- Parte 3: campos dinámicos según tipo ---------- */
+      function actualizarCampos() {
+        const tipo = document.getElementById('tipoFuncion').value;
+        const lblA = document.getElementById('lblA');
+        const lblB = document.getElementById('lblB');
+        const campoC = document.getElementById('campoC');
+        const es = language === 'es';
+
+        if (tipo === 'cuadratica') {
+          lblA.textContent = es ? 'a  (coeficiente de x²)' : 'a  (x² coefficient)';
+          lblB.textContent = es ? 'b  (coeficiente de x)' : 'b  (x coefficient)';
+          campoC.style.display = '';
+        } else if (tipo === 'lineal') {
+          lblA.textContent = es ? 'a  (pendiente)' : 'a  (slope)';
+          lblB.textContent = es ? 'b  (intersección)' : 'b  (intercept)';
+          campoC.style.display = 'none';
+        } else {
+          lblA.textContent = es ? 'a  (valor inicial)' : 'a  (starting value)';
+          lblB.textContent = es ? 'b  (factor de crecimiento)' : 'b  (growth factor)';
+          campoC.style.display = 'none';
+        }
+      }
+
+      function generarGraficaPlantilla() {
+        const tipo = document.getElementById('tipoFuncion').value;
+        const a = parseFloat(document.getElementById('coefA').value);
+        const b = parseFloat(document.getElementById('coefB').value);
+        const c = parseFloat(document.getElementById('coefC').value) || 0;
+        const xMin = parseFloat(document.getElementById('xMin').value);
+        const xMax = parseFloat(document.getElementById('xMax').value);
+        const ejeX = document.getElementById('ejeX').value || (language === 'es' ? 'x' : 'x');
+        const ejeY = document.getElementById('ejeY').value || (language === 'es' ? 'y' : 'y');
+
+        if ([a, b, xMin, xMax].some((v) => isNaN(v)) || xMax <= xMin) {
+          alert(language === 'es' ? 'Revise sus números: complete a, b, x mínimo y x máximo (con máximo mayor que mínimo).' : 'Check your numbers: fill in a, b, min x and max x (max greater than min).');
+          return;
+        }
+
+        const x = [], y = [];
+        const paso = (xMax - xMin) / 100;
+        for (let i = xMin; i <= xMax + 1e-9; i += paso) {
+          let val;
+          if (tipo === 'cuadratica') val = a * i * i + b * i + c;
+          else if (tipo === 'lineal') val = a * i + b;
+          else val = a * Math.pow(b, i);
+          x.push(i);
+          y.push(val);
+        }
+        plot('graph-plantilla', x, y, ejeX, ejeY);
+      }
+
+      function crearPreguntaPlantilla() {
+        const pregunta = document.getElementById('preguntaTexto').value.trim();
+        const opciones = ['op1', 'op2', 'op3', 'op4'].map((id) => document.getElementById(id).value.trim());
+        const correcta = parseInt(document.getElementById('opCorrecta').value, 10);
+
+        if (!pregunta || opciones.some((o) => o === '')) {
+          alert(language === 'es' ? 'Complete la pregunta y las cuatro opciones antes de crearla.' : 'Fill in the question and all four options before creating it.');
+          return;
+        }
+
+        const target = document.getElementById('pregunta-plantilla');
+        target.innerHTML = '';
+        construirMCQ(target, pregunta, opciones, correcta, false);
+      }
+
+      function imprimirProyecto() {
+        window.print();
+      }
+
+      /* ---------- Inicio ---------- */
+      applyLanguage();
     </script>
   </body>
 </html>
-

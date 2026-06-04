@@ -305,7 +305,7 @@
       <div class="controls no-print">
         <button onclick="setLanguage('es')" aria-label="Cambiar a español">Español</button>
         <button onclick="setLanguage('en')" aria-label="Switch to English">English</button>
-        <button onclick="imprimirProyecto()" data-es="Guardar / Imprimir PDF" data-en="Save / Print PDF">Guardar / Imprimir PDF</button>
+        <button onclick="imprimirProyecto()" data-es="Generar PDF del proyecto" data-en="Create project PDF">Generar PDF del proyecto</button>
       </div>
 
       <div class="caja-objetivos">
@@ -355,18 +355,18 @@
 
         <div class="campo">
           <span class="etiqueta" data-es="Nombre del estudiante" data-en="Student name">Nombre del estudiante</span>
-          <input type="text" aria-label="Nombre del estudiante" data-es-ph="Escriba su nombre completo" data-en-ph="Type your full name" placeholder="Escriba su nombre completo" />
+          <input type="text" id="nombreEst" aria-label="Nombre del estudiante" data-es-ph="Escriba su nombre completo" data-en-ph="Type your full name" placeholder="Escriba su nombre completo" />
         </div>
 
         <div class="campo">
           <span class="etiqueta" data-es="Título de su proyecto" data-en="Project title">Título de su proyecto</span>
-          <input type="text" aria-label="Título del proyecto" data-es-ph="Ejemplo: La caída de un objeto" data-en-ph="Example: The fall of an object" placeholder="Ejemplo: La caída de un objeto" />
+          <input type="text" id="tituloProy" aria-label="Título del proyecto" data-es-ph="Ejemplo: La caída de un objeto" data-en-ph="Example: The fall of an object" placeholder="Ejemplo: La caída de un objeto" />
         </div>
 
         <div class="campo">
           <span class="etiqueta" data-es="Describa la situación real" data-en="Describe the real-life situation">Describa la situación real</span>
           <span class="pista" data-es="¿Qué sucede? ¿Qué cambia con el tiempo o con otra cantidad?" data-en="What happens? What changes over time or with another quantity?">¿Qué sucede? ¿Qué cambia con el tiempo o con otra cantidad?</span>
-          <textarea aria-label="Descripción de la situación" data-es-ph="Explique su situación en dos o tres oraciones." data-en-ph="Explain your situation in two or three sentences." placeholder="Explique su situación en dos o tres oraciones."></textarea>
+          <textarea id="situacion" aria-label="Descripción de la situación" data-es-ph="Explique su situación en dos o tres oraciones." data-en-ph="Explain your situation in two or three sentences." placeholder="Explique su situación en dos o tres oraciones."></textarea>
         </div>
 
         <h3 data-es="Su función y su gráfica" data-en="Your function and graph">Su función y su gráfica</h3>
@@ -469,11 +469,11 @@
         <h3 data-es="Su conclusión" data-en="Your conclusion">Su conclusión</h3>
         <div class="campo">
           <span class="pista" data-es="¿Qué significa el resultado dentro de su situación real?" data-en="What does the result mean within your real-life situation?">¿Qué significa el resultado dentro de su situación real?</span>
-          <textarea aria-label="Conclusión" data-es-ph="Escriba aquí su interpretación final." data-en-ph="Write your final interpretation here." placeholder="Escriba aquí su interpretación final."></textarea>
+          <textarea id="conclusion" aria-label="Conclusión" data-es-ph="Escriba aquí su interpretación final." data-en-ph="Write your final interpretation here." placeholder="Escriba aquí su interpretación final."></textarea>
         </div>
 
         <div class="caja-atencion no-print">
-          <span aria-hidden="true">📄 </span><span data-es="Cuando termine, presione «Guardar / Imprimir PDF» (arriba) y entregue el archivo." data-en="When you finish, press “Save / Print PDF” (above) and submit the file.">Cuando termine, presione «Guardar / Imprimir PDF» (arriba) y entregue el archivo.</span>
+          <span aria-hidden="true">📄 </span><span data-es="Cuando termine, presione «Generar PDF del proyecto» (arriba): se abrirá una vista limpia que puede guardar como PDF y entregar." data-en="When you finish, press “Create project PDF” (above): a clean view will open that you can save as PDF and submit.">Cuando termine, presione «Generar PDF del proyecto» (arriba): se abrirá una vista limpia que puede guardar como PDF y entregar.</span>
         </div>
       </section>
 
@@ -875,7 +875,97 @@
       }
 
       function imprimirProyecto() {
-        window.print();
+        const es = language === 'es';
+        const val = (id) => {
+          const el = document.getElementById(id);
+          return el ? el.value.trim() : '';
+        };
+        const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+        const nl = (s) => esc(s).replace(/\n/g, '<br>');
+
+        const nombre = val('nombreEst');
+        const titulo = val('tituloProy');
+        const situacion = val('situacion');
+        const conclusion = val('conclusion');
+
+        const tipo = document.getElementById('tipoFuncion').value;
+        const a = val('coefA'), b = val('coefB'), c = val('coefC');
+        let formula;
+        if (tipo === 'cuadratica') formula = 'f(x) = ' + a + '·x² + ' + b + '·x + ' + c;
+        else if (tipo === 'lineal') formula = 'f(x) = ' + a + '·x + ' + b;
+        else formula = 'f(x) = ' + a + '·(' + b + ')^x';
+
+        const cv = document.querySelector('#graph-plantilla canvas');
+        const imgData = cv ? cv.toDataURL('image/png') : '';
+
+        const pregunta = val('preguntaTexto');
+        const ops = ['op1', 'op2', 'op3', 'op4'].map(val);
+        const correcta = parseInt(document.getElementById('opCorrecta').value, 10);
+
+        let opsHtml = '';
+        if (pregunta && ops.every((o) => o !== '')) {
+          opsHtml =
+            '<ol type="A" class="ops">' +
+            ops
+              .map((o, i) =>
+                '<li' + (i === correcta ? ' class="ok"' : '') + '>' + esc(o) + (i === correcta ? (es ? ' — respuesta correcta' : ' — correct answer') : '') + '</li>'
+              )
+              .join('') +
+            '</ol>';
+        }
+
+        const L = es
+          ? { h: 'Proyecto final · Modelado con funciones', est: 'Estudiante', fecha: 'Fecha', tit: 'Título del proyecto', sit: 'Situación', fun: 'Función y gráfica', pre: 'Pregunta', con: 'Conclusión', sinG: '(No se generó la gráfica.)' }
+          : { h: 'Final project · Modeling with functions', est: 'Student', fecha: 'Date', tit: 'Project title', sit: 'Situation', fun: 'Function and graph', pre: 'Question', con: 'Conclusion', sinG: '(No graph was generated.)' };
+
+        const fecha = new Date().toLocaleDateString(es ? 'es-ES' : 'en-US');
+
+        const doc =
+          '<!doctype html><html lang="' + (es ? 'es' : 'en') + '"><head><meta charset="UTF-8"><title>' + L.h + '</title><style>' +
+          '@page{margin:18mm}' +
+          'body{font-family:Arial,Helvetica,sans-serif;color:#111827;line-height:1.5;max-width:760px;margin:0 auto;padding:10px}' +
+          'h1{color:#1e3a8a;font-size:20px;border-bottom:3px solid #cbd5e1;padding-bottom:6px}' +
+          'h2{color:#1e3a8a;font-size:15px;margin:22px 0 4px}' +
+          '.meta{color:#555;font-size:13px;margin-bottom:8px}' +
+          '.box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px}' +
+          '.formula{font-family:"Courier New",monospace;font-size:15px;background:#eff6ff;padding:8px 12px;border-radius:6px;display:inline-block}' +
+          'img{max-width:100%;border:1px solid #e2e8f0;border-radius:6px;margin-top:10px}' +
+          '.ops{margin:6px 0}.ops li{padding:3px 0}.ops .ok{font-weight:700;color:#1b5e20}' +
+          'footer{margin-top:26px;border-top:2px solid #cbd5e1;padding-top:8px;color:#555;font-size:11px}' +
+          '</style></head><body>' +
+          '<h1>' + L.h + '</h1>' +
+          '<p class="meta"><strong>' + L.est + ':</strong> ' + (esc(nombre) || '—') + ' &nbsp;·&nbsp; <strong>' + L.fecha + ':</strong> ' + fecha + '</p>' +
+          '<h2>' + L.tit + '</h2><div class="box">' + (nl(titulo) || '—') + '</div>' +
+          '<h2>' + L.sit + '</h2><div class="box">' + (nl(situacion) || '—') + '</div>' +
+          '<h2>' + L.fun + '</h2><p><span class="formula">' + esc(formula) + '</span></p>' +
+          (imgData ? '<img id="graf" src="' + imgData + '" alt="">' : '<p>' + L.sinG + '</p>') +
+          (pregunta ? '<h2>' + L.pre + '</h2><div class="box">' + nl(pregunta) + opsHtml + '</div>' : '') +
+          '<h2>' + L.con + '</h2><div class="box">' + (nl(conclusion) || '—') + '</div>' +
+          '<footer>© 2026 José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago · CC BY-NC-SA 4.0</footer>' +
+          '</body></html>';
+
+        const w = window.open('', '_blank');
+        if (!w) {
+          alert(es ? 'El navegador bloqueó la ventana emergente. Permita las ventanas emergentes para este sitio e intente de nuevo.' : 'Your browser blocked the pop-up window. Please allow pop-ups for this site and try again.');
+          return;
+        }
+        w.document.open();
+        w.document.write(doc);
+        w.document.close();
+
+        const lanzar = () => {
+          try {
+            w.focus();
+            w.print();
+          } catch (e) {}
+        };
+        const img = w.document.getElementById('graf');
+        if (img && !img.complete) {
+          img.onload = lanzar;
+          setTimeout(lanzar, 1200);
+        } else {
+          setTimeout(lanzar, 350);
+        }
       }
 
       /* ---------- Inicio ---------- */

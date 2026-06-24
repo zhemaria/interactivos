@@ -1,1 +1,801 @@
+<!DOCTYPE html>
+<!--
+  Gráficos circulares por pasos — Recurso educativo interactivo (Nivel 2)
+  Licencia: CC BY-NC-SA 4.0
+  Autor: José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construye un gráfico circular paso a paso</title>
+<meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago">
+<meta name="description" content="Recurso interactivo para calcular porcentajes, ángulos centrales y construir gráficos circulares (Nivel 2).">
+<meta name="license" content="CC BY-NC-SA 4.0">
+<link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+<style>
+  :root{
+    --fondo:#fbfaf6;
+    --tinta:#222831;
+    --tinta-suave:#555a63;
+    --linea:#e4e0d6;
+    --tarjeta:#ffffff;
+    --acento:#1f7a8c;
+    --acento-oscuro:#155c69;
+    --activo:#5c3900;        /* ámbar oscuro: 10.29:1 con blanco */
+    --activo-fondo:#fff3da;
+    --hecho:#1a7a4f;
+    --hecho-fondo:#e7f6ee;
+    --bloqueado:#9aa0a6;
+    --error:#b32134;
+    --sombra:0 4px 14px rgba(34,40,49,.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--fondo);
+    color:var(--tinta);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;
+  }
+  .envoltura{max-width:880px;margin:0 auto;padding:28px 20px 60px;}
+  header.cabecera{
+    text-align:center;
+    padding:22px 18px;
+    background:linear-gradient(135deg,#1f7a8c 0%,#2f9e7d 100%);
+    color:#fff;
+    border-radius:18px;
+    box-shadow:var(--sombra);
+  }
+  header.cabecera h1{
+    font-family:Georgia,"Times New Roman",serif;
+    margin:0 0 6px;
+    font-size:1.7rem;
+    letter-spacing:.2px;
+  }
+  header.cabecera p{margin:0;opacity:.95;font-size:1.02rem;}
 
+  .caja-objetivos{
+    background:var(--tarjeta);
+    border:1px solid var(--linea);
+    border-left:6px solid var(--acento);
+    border-radius:12px;
+    padding:16px 20px;
+    margin:22px 0;
+    box-shadow:var(--sombra);
+  }
+  .caja-objetivos h2{
+    font-family:Georgia,serif;
+    margin:0 0 8px;
+    font-size:1.15rem;
+    color:var(--acento-oscuro);
+  }
+  .caja-objetivos p{margin:0;color:var(--tinta-suave);}
+
+  /* ===== Acordeón de pasos ===== */
+  .paso{
+    background:var(--tarjeta);
+    border:1px solid var(--linea);
+    border-radius:14px;
+    margin:14px 0;
+    overflow:hidden;
+    box-shadow:var(--sombra);
+    transition:border-color .2s;
+  }
+  .paso.activo{border-color:var(--activo);}
+  .paso.hecho{border-color:var(--hecho);}
+  .paso.bloqueado{opacity:.62;}
+
+  .paso-cabeza{
+    display:flex;align-items:center;gap:14px;
+    width:100%;text-align:left;
+    padding:16px 18px;
+    background:none;border:none;cursor:pointer;
+    font:inherit;color:inherit;
+  }
+  .paso.bloqueado .paso-cabeza{cursor:not-allowed;}
+  .paso-cabeza:focus-visible{outline:3px solid var(--acento);outline-offset:-3px;}
+
+  .num{
+    flex:none;
+    width:42px;height:42px;border-radius:50%;
+    display:grid;place-items:center;
+    font-family:Georgia,serif;font-weight:bold;font-size:1.15rem;
+    background:#eef1f3;color:var(--tinta-suave);
+  }
+  .paso.activo .num{background:var(--activo-fondo);color:var(--activo);}
+  .paso.hecho .num{background:var(--hecho);color:#fff;}
+  .paso.bloqueado .num{background:#eef1f3;color:var(--bloqueado);}
+
+  .titulo-paso{flex:1;}
+  .titulo-paso b{display:block;font-size:1.08rem;font-family:Georgia,serif;}
+  .titulo-paso span{font-size:.92rem;color:var(--tinta-suave);}
+
+  .marca{flex:none;font-size:1.3rem;line-height:1;}
+  .flecha{flex:none;transition:transform .25s;color:var(--tinta-suave);}
+  .paso.abierto .flecha{transform:rotate(180deg);}
+
+  .paso-cuerpo{
+    display:none;
+    padding:4px 20px 22px;
+    border-top:1px solid var(--linea);
+  }
+  .paso.abierto .paso-cuerpo{display:block;}
+  .paso-cuerpo p.intro{color:var(--tinta-suave);margin:14px 0 16px;}
+
+  /* ===== Selección de tema ===== */
+  .temas{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+  .tema-btn{
+    border:2px solid var(--linea);background:#fff;border-radius:12px;
+    padding:16px 14px;cursor:pointer;text-align:center;
+    font:inherit;transition:transform .12s,border-color .15s,box-shadow .15s;
+  }
+  .tema-btn:hover{border-color:var(--acento);transform:translateY(-2px);box-shadow:var(--sombra);}
+  .tema-btn:focus-visible{outline:3px solid var(--acento);outline-offset:2px;}
+  .tema-btn.elegido{border-color:var(--acento);background:#eef7f9;}
+  .tema-btn .emoji{font-size:2rem;display:block;margin-bottom:6px;}
+  .tema-btn b{display:block;font-size:1rem;}
+  .tema-btn small{color:var(--tinta-suave);}
+
+  /* ===== Tabla ===== */
+  .tabla-envoltura{overflow-x:auto;margin:8px 0 18px;}
+  table.datos{border-collapse:collapse;width:100%;min-width:480px;}
+  table.datos caption{text-align:left;color:var(--tinta-suave);font-size:.9rem;padding-bottom:8px;}
+  table.datos th,table.datos td{border:1px solid var(--linea);padding:9px 10px;text-align:center;}
+  table.datos thead th{background:#f3f1ea;font-size:.92rem;color:var(--tinta);}
+  table.datos th[scope="row"]{text-align:left;background:#faf8f2;font-weight:600;}
+  table.datos .swatch{display:inline-block;width:13px;height:13px;border-radius:3px;margin-right:7px;vertical-align:middle;}
+  table.datos input{
+    width:78px;padding:7px 8px;border:1px solid #cfd3cf;border-radius:7px;
+    font:inherit;text-align:center;background:#fff;
+  }
+  table.datos input:focus{outline:2px solid var(--acento);outline-offset:1px;border-color:var(--acento);}
+  table.datos input:disabled{background:#f3f3f0;color:var(--tinta-suave);}
+  table.datos input.ok{border-color:var(--hecho);background:var(--hecho-fondo);}
+  table.datos input.mal{border-color:var(--error);background:#fdecee;}
+  .fila-total th,.fila-total td{background:#f0efe9;font-weight:bold;}
+  .col-oculta{display:none;}
+  .estado-celda{display:block;font-size:.8rem;height:14px;margin-top:2px;}
+  .estado-celda.ok{color:var(--hecho);}
+  .estado-celda.mal{color:var(--error);}
+
+  /* ===== Botones y avisos ===== */
+  .acciones{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:6px;}
+  button.btn{
+    font:inherit;font-weight:600;cursor:pointer;border:none;border-radius:9px;
+    padding:11px 20px;background:var(--acento);color:#fff;transition:background .15s;
+  }
+  button.btn:hover{background:var(--acento-oscuro);}
+  button.btn:focus-visible{outline:3px solid var(--activo);outline-offset:2px;}
+  button.btn.secundario{background:#fff;color:var(--acento);border:2px solid var(--acento);padding:9px 18px;}
+  button.btn.secundario:hover{background:#eef7f9;}
+  button.btn.fantasma{background:none;color:var(--tinta-suave);text-decoration:underline;padding:8px 4px;}
+
+  .aviso{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:.95rem;display:none;}
+  .aviso.ver{display:block;}
+  .aviso.exito{background:var(--hecho-fondo);color:#0f5a39;border:1px solid #bfe6d1;}
+  .aviso.fallo{background:#fdecee;color:#8c1827;border:1px solid #f3c2c9;}
+
+  .pista{
+    margin-top:12px;background:#fff8e8;border:1px solid #f0e0b8;
+    border-radius:10px;padding:12px 14px;font-size:.94rem;color:#5a4a1a;display:none;
+  }
+  .pista.ver{display:block;}
+  .pista b{color:var(--activo);}
+
+  /* ===== Gráfico ===== */
+  .grafico-zona{display:grid;grid-template-columns:1fr;gap:20px;align-items:start;}
+  @media(min-width:640px){.grafico-zona{grid-template-columns:1fr 260px;}}
+  #lienzo-svg{width:100%;height:auto;display:block;}
+  .leyenda{list-style:none;margin:0;padding:0;}
+  .leyenda li{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--linea);}
+  .leyenda .sw{width:16px;height:16px;border-radius:4px;flex:none;}
+  .leyenda .nm{flex:1;font-weight:600;}
+  .leyenda .vals{font-size:.85rem;color:var(--tinta-suave);text-align:right;}
+
+  /* ===== Conversión ===== */
+  .pregunta{background:#f7f9fa;border:1px solid var(--linea);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .pregunta p{margin:0 0 10px;}
+  .pregunta .resp{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  .pregunta input{width:120px;padding:8px 10px;border:1px solid #cfd3cf;border-radius:7px;font:inherit;}
+  .pregunta input:focus{outline:2px solid var(--acento);border-color:var(--acento);}
+  .pregunta .sol{font-size:.9rem;margin-top:8px;display:none;color:var(--tinta-suave);}
+  .pregunta .sol.ver{display:block;}
+  .ico{font-size:1.2rem;}
+
+  footer.pie{margin-top:34px;text-align:center;font-size:.82rem;color:var(--tinta-suave);line-height:1.6;}
+  footer.pie a{color:var(--acento-oscuro);}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="envoltura">
+
+  <header class="cabecera">
+    <h1>Construye un gráfico circular paso a paso</h1>
+    <p>De los datos al porcentaje, del porcentaje al ángulo, del ángulo al gráfico.</p>
+  </header>
+
+  <section class="caja-objetivos">
+    <h2>¿Qué vas a aprender?</h2>
+    <p>A calcular el porcentaje de cada categoría, a hallar su ángulo central con la regla
+       <strong>360° × porcentaje</strong>, a construir un gráfico circular a partir de esos datos
+       y a convertir entre porcentaje, ángulo y valor absoluto. Avanza un paso a la vez:
+       cada paso se abre cuando completas el anterior.</p>
+  </section>
+
+  <!-- PASO 1 -->
+  <div class="paso activo abierto" id="p1" data-step="1">
+    <button class="paso-cabeza" type="button">
+      <span class="num">1</span>
+      <span class="titulo-paso"><b>Elige un tema</b><span>Selecciona el conjunto de datos que vas a estudiar</span></span>
+      <span class="marca" aria-hidden="true"></span>
+      <span class="flecha" aria-hidden="true">▾</span>
+    </button>
+    <div class="paso-cuerpo">
+      <p class="intro">Cada tema reúne cuatro categorías. Elige uno para comenzar a trabajar con sus datos.</p>
+      <div class="temas" id="lista-temas"></div>
+    </div>
+  </div>
+
+  <!-- PASO 2 -->
+  <div class="paso bloqueado" id="p2" data-step="2">
+    <button class="paso-cabeza" type="button">
+      <span class="num">2</span>
+      <span class="titulo-paso"><b>Captura los datos</b><span>Escribe la cantidad de cada categoría</span></span>
+      <span class="marca" aria-hidden="true"></span>
+      <span class="flecha" aria-hidden="true">▾</span>
+    </button>
+    <div class="paso-cuerpo">
+      <p class="intro">Escribe cuántos hay en cada categoría (valores absolutos). El total se calcula solo.
+         Puedes usar los números de ejemplo o cambiarlos por los tuyos.</p>
+      <div class="hueco-tabla">
+      <div id="panel-tabla">
+      <div class="tabla-envoltura">
+        <table class="datos" id="tabla">
+          <caption>Datos del tema seleccionado.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Categoría</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col" class="col-pct col-oculta">Porcentaje (%)</th>
+              <th scope="col" class="col-ang col-oculta">Ángulo (°)</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-tabla"></tbody>
+          <tfoot>
+            <tr class="fila-total">
+              <th scope="row">Total</th>
+              <td id="total-cant">0</td>
+              <td class="col-pct col-oculta" id="total-pct">—</td>
+              <td class="col-ang col-oculta" id="total-ang">—</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      </div>
+      </div>
+      <div class="acciones">
+        <button class="btn" type="button" id="verif2">Confirmar datos</button>
+      </div>
+      <div class="aviso" id="aviso2"></div>
+    </div>
+  </div>
+
+  <!-- PASO 3 -->
+  <div class="paso bloqueado" id="p3" data-step="3">
+    <button class="paso-cabeza" type="button">
+      <span class="num">3</span>
+      <span class="titulo-paso"><b>Calcula el porcentaje</b><span>Qué parte del total representa cada categoría</span></span>
+      <span class="marca" aria-hidden="true"></span>
+      <span class="flecha" aria-hidden="true">▾</span>
+    </button>
+    <div class="paso-cuerpo">
+      <p class="intro">Completa la columna <strong>Porcentaje (%)</strong> de la tabla.
+         Usa la fórmula: <strong>(cantidad ÷ total) × 100</strong>. Puedes redondear a un decimal.</p>
+      <div class="hueco-tabla"></div>
+      <div class="acciones">
+        <button class="btn" type="button" id="verif3">Comprobar porcentajes</button>
+        <button class="btn fantasma" type="button" data-pista="pista3">Mostrar pista</button>
+      </div>
+      <div class="pista" id="pista3"></div>
+      <div class="aviso" id="aviso3"></div>
+    </div>
+  </div>
+
+  <!-- PASO 4 -->
+  <div class="paso bloqueado" id="p4" data-step="4">
+    <button class="paso-cabeza" type="button">
+      <span class="num">4</span>
+      <span class="titulo-paso"><b>Halla el ángulo del sector</b><span>Cuántos grados ocupa cada porción</span></span>
+      <span class="marca" aria-hidden="true"></span>
+      <span class="flecha" aria-hidden="true">▾</span>
+    </button>
+    <div class="paso-cuerpo">
+      <p class="intro">Completa la columna <strong>Ángulo (°)</strong>.
+         El círculo completo mide 360°, así que: <strong>ángulo = 360° × porcentaje</strong>,
+         que es lo mismo que <strong>porcentaje × 3.6</strong>. Redondea al grado más cercano.</p>
+      <div class="hueco-tabla"></div>
+      <div class="acciones">
+        <button class="btn" type="button" id="verif4">Comprobar ángulos</button>
+        <button class="btn fantasma" type="button" data-pista="pista4">Mostrar pista</button>
+      </div>
+      <div class="pista" id="pista4"></div>
+      <div class="aviso" id="aviso4"></div>
+    </div>
+  </div>
+
+  <!-- PASO 5 -->
+  <div class="paso bloqueado" id="p5" data-step="5">
+    <button class="paso-cabeza" type="button">
+      <span class="num">5</span>
+      <span class="titulo-paso"><b>Tu gráfico circular</b><span>Construido con los ángulos que calculaste</span></span>
+      <span class="marca" aria-hidden="true"></span>
+      <span class="flecha" aria-hidden="true">▾</span>
+    </button>
+    <div class="paso-cuerpo">
+      <p class="intro" id="texto-grafico">Este gráfico se dibuja con los ángulos de tu tabla. Cada porción muestra su categoría y su porcentaje.</p>
+      <div class="grafico-zona">
+        <div>
+          <svg id="lienzo-svg" viewBox="0 0 460 360" role="img" aria-labelledby="titulo-grafico desc-grafico"></svg>
+          <h3 id="titulo-grafico" class="col-oculta">Gráfico circular del tema seleccionado</h3>
+          <p id="desc-grafico" class="col-oculta"></p>
+        </div>
+        <div>
+          <ul class="leyenda" id="leyenda"></ul>
+        </div>
+      </div>
+      <div class="acciones" style="margin-top:18px;">
+        <button class="btn secundario" type="button" id="descargar">Descargar imagen (PNG)</button>
+        <button class="btn fantasma" type="button" id="reiniciar">Reiniciar todo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 6 -->
+  <div class="paso bloqueado" id="p6" data-step="6">
+    <button class="paso-cabeza" type="button">
+      <span class="num">6</span>
+      <span class="titulo-paso"><b>Practica las conversiones (opcional)</b><span>Entre porcentaje, ángulo y valor absoluto</span></span>
+      <span class="marca" aria-hidden="true"></span>
+      <span class="flecha" aria-hidden="true">▾</span>
+    </button>
+    <div class="paso-cuerpo">
+      <p class="intro">Tres preguntas rápidas creadas con tus propios datos. Convierte de una representación a otra.</p>
+      <div id="zona-conversion"></div>
+      <div class="acciones">
+        <button class="btn" type="button" id="verif6">Comprobar respuestas</button>
+        <button class="btn fantasma" type="button" id="otras6">Generar otras</button>
+      </div>
+      <div class="aviso" id="aviso6"></div>
+    </div>
+  </div>
+
+  <footer class="pie">
+    <p>
+      <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> ·
+      José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago
+    </p>
+  </footer>
+
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------- Datos ---------- */
+  var PALETA = ["#ef476f","#118ab2","#ffd166","#06d6a0","#9b5de5","#f3722c","#43aa8b","#577590"];
+
+  var TEMAS = [
+    { emoji:"🍎", titulo:"Frutas preferidas", unidad:"votos",
+      items:[["Manzana",8],["Plátano",5],["Naranja",4],["Fresa",3]] },
+    { emoji:"🚍", titulo:"Medio de transporte", unidad:"personas",
+      items:[["Automóvil",9],["Autobús",6],["Bicicleta",3],["A pie",2]] },
+    { emoji:"🎵", titulo:"Género musical", unidad:"votos",
+      items:[["Salsa",7],["Rock",5],["Pop",5],["Jazz",3]] },
+    { emoji:"🐾", titulo:"Mascotas del vecindario", unidad:"hogares",
+      items:[["Perro",10],["Gato",6],["Ave",2],["Pez",2]] }
+  ];
+
+  /* ---------- Estado ---------- */
+  var estado = { tema:null, filas:[], desbloqueado:1, hechos:{} };
+
+  /* ---------- Utilidades de pasos ---------- */
+  function pasoEl(n){ return document.getElementById("p"+n); }
+
+  var panelTabla = document.getElementById("panel-tabla");
+  function moverTablaA(n){
+    if(!estado.tema) return;
+    var hueco = pasoEl(n).querySelector(".hueco-tabla");
+    if(hueco && panelTabla.parentNode !== hueco) hueco.appendChild(panelTabla);
+  }
+
+  function abrir(n){
+    for(var i=1;i<=6;i++){ pasoEl(i).classList.remove("abierto"); }
+    pasoEl(n).classList.add("abierto");
+    if(n>=2 && n<=4) moverTablaA(n);
+  }
+
+  function clasePaso(n){
+    var el = pasoEl(n);
+    el.classList.remove("activo","hecho","bloqueado");
+    if(estado.hechos[n]){ el.classList.add("hecho"); el.querySelector(".marca").textContent="✓"; }
+    else if(n<=estado.desbloqueado){ el.classList.add("activo"); el.querySelector(".marca").textContent=""; }
+    else { el.classList.add("bloqueado"); el.querySelector(".marca").textContent="🔒"; }
+  }
+
+  function refrescarPasos(){ for(var i=1;i<=6;i++) clasePaso(i); }
+
+  function completar(n){
+    estado.hechos[n]=true;
+    if(n+1>estado.desbloqueado) estado.desbloqueado=n+1;
+    refrescarPasos();
+    if(n<6){ abrir(n+1); pasoEl(n+1).scrollIntoView({behavior:"smooth",block:"center"}); }
+  }
+
+  /* clic en cabeceras (acordeón con bloqueo) */
+  for(var i=1;i<=6;i++){
+    (function(n){
+      pasoEl(n).querySelector(".paso-cabeza").addEventListener("click",function(){
+        if(n>estado.desbloqueado) return;
+        var el=pasoEl(n);
+        if(el.classList.contains("abierto")) el.classList.remove("abierto");
+        else abrir(n);
+      });
+    })(i);
+  }
+
+  /* botones de pista */
+  var botonesPista=document.querySelectorAll("[data-pista]");
+  for(var b=0;b<botonesPista.length;b++){
+    botonesPista[b].addEventListener("click",function(){
+      var caja=document.getElementById(this.getAttribute("data-pista"));
+      caja.classList.toggle("ver");
+      this.textContent = caja.classList.contains("ver") ? "Ocultar pista" : "Mostrar pista";
+    });
+  }
+
+  /* ---------- PASO 1: temas ---------- */
+  var lista=document.getElementById("lista-temas");
+  TEMAS.forEach(function(t,idx){
+    var btn=document.createElement("button");
+    btn.type="button"; btn.className="tema-btn";
+    btn.innerHTML='<span class="emoji" aria-hidden="true">'+t.emoji+'</span><b>'+t.titulo+'</b><small>4 categorías</small>';
+    btn.addEventListener("click",function(){ elegirTema(idx,btn); });
+    lista.appendChild(btn);
+  });
+
+  function elegirTema(idx,btn){
+    estado.tema=TEMAS[idx];
+    estado.filas=estado.tema.items.map(function(it,k){
+      return {nombre:it[0], cant:it[1], pct:null, ang:null, color:PALETA[k%PALETA.length]};
+    });
+    var todos=lista.querySelectorAll(".tema-btn");
+    for(var k=0;k<todos.length;k++) todos[k].classList.remove("elegido");
+    btn.classList.add("elegido");
+
+    construirTabla();
+    estado.hechos={1:true};
+    estado.desbloqueado=2;
+    refrescarPasos();
+    abrir(2);
+  }
+
+  /* ---------- Tabla ---------- */
+  var cuerpo=document.getElementById("cuerpo-tabla");
+
+  function construirTabla(){
+    cuerpo.innerHTML="";
+    estado.filas.forEach(function(f,k){
+      var tr=document.createElement("tr");
+      tr.innerHTML =
+        '<th scope="row"><span class="swatch" style="background:'+f.color+'" aria-hidden="true"></span>'+f.nombre+'</th>'+
+        '<td><input type="number" min="0" step="1" value="'+f.cant+'" data-k="'+k+'" data-c="cant" aria-label="Cantidad de '+f.nombre+'"></td>'+
+        '<td class="col-pct col-oculta"><input type="number" min="0" step="0.1" data-k="'+k+'" data-c="pct" aria-label="Porcentaje de '+f.nombre+'" disabled><span class="estado-celda" data-est="pct-'+k+'"></span></td>'+
+        '<td class="col-ang col-oculta"><input type="number" min="0" step="1" data-k="'+k+'" data-c="ang" aria-label="Ángulo de '+f.nombre+'" disabled><span class="estado-celda" data-est="ang-'+k+'"></span></td>';
+      cuerpo.appendChild(tr);
+    });
+    cuerpo.querySelectorAll('input[data-c="cant"]').forEach(function(inp){
+      inp.addEventListener("input",function(){
+        estado.filas[+this.dataset.k].cant = parseFloat(this.value)||0;
+        actualizarTotal();
+      });
+    });
+    actualizarTotal();
+  }
+
+  function total(){ return estado.filas.reduce(function(s,f){return s+(f.cant||0);},0); }
+
+  function actualizarTotal(){
+    document.getElementById("total-cant").textContent = total();
+  }
+
+  function mostrarColumna(clase){
+    var celdas=document.querySelectorAll("."+clase);
+    for(var i=0;i<celdas.length;i++) celdas[i].classList.remove("col-oculta");
+  }
+
+  function activarInputs(c,activos){
+    var inp=cuerpo.querySelectorAll('input[data-c="'+c+'"]');
+    for(var i=0;i<inp.length;i++) inp[i].disabled = !activos;
+  }
+
+  function aviso(id,clase,texto){
+    var a=document.getElementById(id);
+    a.className="aviso ver "+clase; a.textContent=texto;
+  }
+  function limpiarAviso(id){ var a=document.getElementById(id); a.className="aviso"; }
+
+  /* ---------- PASO 2 ---------- */
+  document.getElementById("verif2").addEventListener("click",function(){
+    var ok=true;
+    estado.filas.forEach(function(f){ if(!(f.cant>0)) ok=false; });
+    if(!ok || total()<=0){
+      aviso("aviso2","fallo","Cada categoría debe tener una cantidad mayor que cero. Revisa la tabla.");
+      return;
+    }
+    activarInputs("cant",false);
+    mostrarColumna("col-pct");
+    activarInputs("pct",true);
+    document.getElementById("total-pct").textContent="—";
+    limpiarAviso("aviso2");
+    completar(2);
+    pintarPista3();
+  });
+
+  /* ---------- PASO 3 ---------- */
+  function pctEsperado(f){ return f.cant/total()*100; }
+
+  function pintarPista3(){
+    var f=estado.filas[0];
+    document.getElementById("pista3").innerHTML =
+      "<b>Porcentaje = (cantidad ÷ total) × 100.</b><br>Ejemplo con «"+f.nombre+"»: ("+
+      f.cant+" ÷ "+total()+") × 100 = <b>"+redondear(pctEsperado(f),1)+"%</b>.";
+  }
+
+  document.getElementById("verif3").addEventListener("click",function(){
+    var todoOk=true, sumaOk=true, suma=0;
+    estado.filas.forEach(function(f,k){
+      var inp=cuerpo.querySelector('input[data-c="pct"][data-k="'+k+'"]');
+      var val=parseFloat(inp.value);
+      var esp=pctEsperado(f);
+      var bien = !isNaN(val) && Math.abs(val-esp)<=0.3;
+      marcarCelda(inp,"pct-"+k,bien);
+      if(bien){ f.pct=val; suma+=val; } else { todoOk=false; }
+    });
+    if(!todoOk){
+      aviso("aviso3","fallo","Revisa las celdas marcadas en rojo. Recuerda: (cantidad ÷ total) × 100.");
+      return;
+    }
+    if(Math.abs(suma-100)>1.0) sumaOk=false;
+    document.getElementById("total-pct").textContent=redondear(suma,1)+"%";
+    activarInputs("pct",false);
+    mostrarColumna("col-ang");
+    activarInputs("ang",true);
+    document.getElementById("total-ang").textContent="—";
+    aviso("aviso3","exito","¡Muy bien! Los porcentajes suman aproximadamente 100%. Ahora calcula los ángulos.");
+    completar(3);
+    pintarPista4();
+  });
+
+  /* ---------- PASO 4 ---------- */
+  function angEsperado(f){ return f.cant/total()*360; }
+
+  function pintarPista4(){
+    var f=estado.filas[0];
+    document.getElementById("pista4").innerHTML =
+      "<b>Ángulo = porcentaje × 3.6</b> (porque 360° ÷ 100 = 3.6).<br>Ejemplo con «"+f.nombre+"»: "+
+      redondear(pctEsperado(f),1)+" × 3.6 = <b>"+Math.round(angEsperado(f))+"°</b>.";
+  }
+
+  document.getElementById("verif4").addEventListener("click",function(){
+    var todoOk=true, suma=0;
+    estado.filas.forEach(function(f,k){
+      var inp=cuerpo.querySelector('input[data-c="ang"][data-k="'+k+'"]');
+      var val=parseFloat(inp.value);
+      var esp=angEsperado(f);
+      var bien = !isNaN(val) && Math.abs(val-esp)<=1.5;
+      marcarCelda(inp,"ang-"+k,bien);
+      if(bien){ f.ang=esp; suma+=val; } else { todoOk=false; }
+    });
+    if(!todoOk){
+      aviso("aviso4","fallo","Revisa las celdas en rojo. Recuerda: ángulo = porcentaje × 3.6.");
+      return;
+    }
+    document.getElementById("total-ang").textContent=Math.round(suma)+"°";
+    activarInputs("ang",false);
+    aviso("aviso4","exito","¡Perfecto! Los ángulos suman aproximadamente 360°. Tu gráfico está listo.");
+    completar(4);
+    dibujarGrafico();
+    construirConversion();
+  });
+
+  function marcarCelda(inp,estId,bien){
+    inp.classList.remove("ok","mal");
+    inp.classList.add(bien?"ok":"mal");
+    var sp=document.querySelector('[data-est="'+estId+'"]');
+    if(sp){ sp.className="estado-celda "+(bien?"ok":"mal"); sp.textContent=bien?"✓":"Revisa"; }
+  }
+
+  function redondear(x,d){ var p=Math.pow(10,d); return Math.round(x*p)/p; }
+
+  /* ---------- PASO 5: gráfico SVG ---------- */
+  function polar(cx,cy,r,gr){ var a=(gr-90)*Math.PI/180; return {x:cx+r*Math.cos(a), y:cy+r*Math.sin(a)}; }
+
+  function dibujarGrafico(){
+    var svg=document.getElementById("lienzo-svg");
+    var cx=170, cy=180, r=120;
+    var t=total();
+    var acumulado=0;
+    var partes="";
+    var etiquetas="";
+    var desc=[];
+
+    estado.filas.forEach(function(f){
+      var frac=f.cant/t;
+      var ang=frac*360;
+      var ini=acumulado, fin=acumulado+ang;
+      acumulado=fin;
+      var pctTxt=redondear(frac*100,1);
+
+      if(frac>=0.999){
+        // un solo sector: círculo completo
+        partes+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+f.color+'" stroke="#fff" stroke-width="2"/>';
+      } else {
+        var p1=polar(cx,cy,r,ini), p2=polar(cx,cy,r,fin);
+        var grande = ang>180?1:0;
+        partes+='<path d="M '+cx+' '+cy+' L '+p1.x.toFixed(2)+' '+p1.y.toFixed(2)+
+                ' A '+r+' '+r+' 0 '+grande+' 1 '+p2.x.toFixed(2)+' '+p2.y.toFixed(2)+' Z" '+
+                'fill="'+f.color+'" stroke="#fff" stroke-width="2"/>';
+      }
+
+      // etiqueta externa con línea guía
+      var mid=ini+ang/2;
+      var pBorde=polar(cx,cy,r,mid);
+      var pFuera=polar(cx,cy,r+18,mid);
+      var derecha = Math.cos((mid-90)*Math.PI/180) >= 0;
+      var xTexto = derecha ? pFuera.x+6 : pFuera.x-6;
+      var anclaje = derecha ? "start":"end";
+      var xLinea = derecha ? pFuera.x+4 : pFuera.x-4;
+      etiquetas+='<polyline points="'+pBorde.x.toFixed(1)+','+pBorde.y.toFixed(1)+' '+
+                 pFuera.x.toFixed(1)+','+pFuera.y.toFixed(1)+' '+xLinea.toFixed(1)+','+pFuera.y.toFixed(1)+
+                 '" fill="none" stroke="#9aa0a6" stroke-width="1"/>';
+      etiquetas+='<text x="'+xTexto.toFixed(1)+'" y="'+(pFuera.y-1).toFixed(1)+'" text-anchor="'+anclaje+
+                 '" font-size="12" font-weight="600" fill="#222831">'+escapar(f.nombre)+'</text>';
+      etiquetas+='<text x="'+xTexto.toFixed(1)+'" y="'+(pFuera.y+13).toFixed(1)+'" text-anchor="'+anclaje+
+                 '" font-size="12" fill="#555a63">'+pctTxt+'%</text>';
+
+      desc.push(f.nombre+": "+pctTxt+" por ciento");
+    });
+
+    svg.innerHTML = partes + etiquetas;
+    document.getElementById("desc-grafico").textContent =
+      "Gráfico circular. " + desc.join("; ") + ".";
+
+    // leyenda
+    var ul=document.getElementById("leyenda");
+    ul.innerHTML="";
+    estado.filas.forEach(function(f){
+      var pct=redondear(f.cant/t*100,1);
+      var ang=Math.round(f.cant/t*360);
+      var li=document.createElement("li");
+      li.innerHTML='<span class="sw" style="background:'+f.color+'"></span>'+
+                   '<span class="nm">'+f.nombre+'</span>'+
+                   '<span class="vals">'+f.cant+' '+estado.tema.unidad+'<br>'+pct+'% · '+ang+'°</span>';
+      ul.appendChild(li);
+    });
+
+    document.getElementById("texto-grafico").textContent =
+      'Gráfico de "'+estado.tema.titulo+'". Cada porción muestra su categoría y su porcentaje. '+
+      'Total: '+t+' '+estado.tema.unidad+'.';
+  }
+
+  function escapar(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  /* ---------- Descargar PNG ---------- */
+  document.getElementById("descargar").addEventListener("click",function(){
+    try{
+      var svg=document.getElementById("lienzo-svg");
+      var clon=svg.cloneNode(true);
+      clon.setAttribute("xmlns","http://www.w3.org/2000/svg");
+      var fondo='<rect x="0" y="0" width="460" height="360" fill="#ffffff"/>';
+      clon.innerHTML = fondo + clon.innerHTML;
+      var xml=new XMLSerializer().serializeToString(clon);
+      var img=new Image();
+      var svg64="data:image/svg+xml;base64,"+btoa(unescape(encodeURIComponent(xml)));
+      img.onload=function(){
+        var c=document.createElement("canvas");
+        c.width=920; c.height=720;
+        var ctx=c.getContext("2d");
+        ctx.fillStyle="#fff"; ctx.fillRect(0,0,c.width,c.height);
+        ctx.drawImage(img,0,0,c.width,c.height);
+        var a=document.createElement("a");
+        a.download="grafico-circular.png";
+        a.href=c.toDataURL("image/png");
+        a.click();
+      };
+      img.src=svg64;
+    }catch(e){
+      alert("No fue posible generar la imagen en este navegador.");
+    }
+  });
+
+  /* ---------- Reiniciar ---------- */
+  document.getElementById("reiniciar").addEventListener("click",function(){ location.reload(); });
+
+  /* ---------- PASO 6: conversiones ---------- */
+  var preguntasActuales=[];
+
+  function elegirDistintos(n){
+    var idx=estado.filas.map(function(_,k){return k;});
+    for(var i=idx.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=idx[i]; idx[i]=idx[j]; idx[j]=tmp; }
+    return idx.slice(0,n);
+  }
+
+  function construirConversion(){
+    var t=total();
+    var sel=elegirDistintos(3);
+    var f0=estado.filas[sel[0]], f1=estado.filas[sel[1]], f2=estado.filas[sel[2]];
+
+    var ang0=Math.round(f0.cant/t*360);
+    var pct1=redondear(f1.cant/t*100,1);
+    var f2cant=f2.cant;
+
+    preguntasActuales=[
+      { texto:'El sector «'+f0.nombre+'» mide <b>'+ang0+'°</b>. ¿Qué <b>porcentaje</b> representa?',
+        unidad:"%", resp: redondear(ang0/3.6,1), tol:0.5,
+        sol:"Porcentaje = ángulo ÷ 3.6 = "+ang0+" ÷ 3.6 = "+redondear(ang0/3.6,1)+"%." },
+      { texto:'El sector «'+f1.nombre+'» representa el <b>'+pct1+'%</b> de un total de <b>'+t+' '+estado.tema.unidad+'</b>. ¿A cuántos '+estado.tema.unidad+' equivale?',
+        unidad:estado.tema.unidad, resp: redondear(pct1/100*t,0), tol:0.6,
+        sol:"Valor = (porcentaje ÷ 100) × total = ("+pct1+" ÷ 100) × "+t+" = "+redondear(pct1/100*t,0)+" "+estado.tema.unidad+"." },
+      { texto:'La categoría «'+f2.nombre+'» tiene <b>'+f2cant+'</b> de <b>'+t+'</b>. ¿Cuántos <b>grados</b> mide su sector?',
+        unidad:"°", resp: Math.round(f2cant/t*360), tol:1.5,
+        sol:"Ángulo = (cantidad ÷ total) × 360 = ("+f2cant+" ÷ "+t+") × 360 = "+Math.round(f2cant/t*360)+"°." }
+    ];
+
+    var zona=document.getElementById("zona-conversion");
+    zona.innerHTML="";
+    preguntasActuales.forEach(function(q,k){
+      var div=document.createElement("div");
+      div.className="pregunta";
+      div.innerHTML='<p>'+(k+1)+'. '+q.texto+'</p>'+
+        '<div class="resp"><input type="number" step="0.1" data-q="'+k+'" aria-label="Respuesta '+(k+1)+'">'+
+        '<span>'+q.unidad+'</span><span class="ico" data-ico="'+k+'" aria-hidden="true"></span></div>'+
+        '<div class="sol" data-sol="'+k+'">'+q.sol+'</div>';
+      zona.appendChild(div);
+    });
+    limpiarAviso("aviso6");
+    estado.hechos[5]=true;
+    if(estado.desbloqueado<6) estado.desbloqueado=6;
+    refrescarPasos();
+    abrir(5);
+  }
+
+  document.getElementById("verif6").addEventListener("click",function(){
+    var bien=0;
+    preguntasActuales.forEach(function(q,k){
+      var inp=document.querySelector('input[data-q="'+k+'"]');
+      var ico=document.querySelector('[data-ico="'+k+'"]');
+      var sol=document.querySelector('[data-sol="'+k+'"]');
+      var val=parseFloat(inp.value);
+      var ok=!isNaN(val) && Math.abs(val-q.resp)<=q.tol;
+      ico.textContent = ok?"✅":"❌";
+      if(ok){ bien++; } else { sol.classList.add("ver"); }
+    });
+    if(bien===preguntasActuales.length){
+      aviso("aviso6","exito","¡Excelente! Dominas la conversión entre porcentaje, ángulo y valor absoluto.");
+      if(!estado.hechos[6]) completar(6);
+    } else {
+      aviso("aviso6","fallo","Tienes "+bien+" de "+preguntasActuales.length+" correctas. Revisa las soluciones mostradas.");
+    }
+  });
+
+  document.getElementById("otras6").addEventListener("click",function(){ construirConversion(); abrir(6); });
+
+  /* ---------- Inicio ---------- */
+  refrescarPasos();
+})();
+</script>
+</body>
+</html>

@@ -1,1 +1,488 @@
+<!DOCTYPE html>
+<!--
+  Práctica: sumar y restar fracciones heterogéneas
+  © José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago
+  Licencia: CC BY-NC-SA 4.0 — https://creativecommons.org/licenses/by-nc-sa/4.0/
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago">
+  <meta name="license" content="CC BY-NC-SA 4.0">
+  <meta name="description" content="Ejercitador móvil para sumar y restar fracciones de distinto denominador con números pequeños.">
+  <link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>Práctica: sumar y restar fracciones</title>
+  <style>
+    :root {
+      --azul-profundo: #1e3a8a;
+      --azul: #1d4ed8;
+      --azul-claro: #dbe4fb;
+      --teal: #0f766e;
+      --tinta: #1f2937;
+      --apagado: #555555;
+      --exito: #166534;
+      --exito-fondo: #dcfce7;
+      --error: #b91c1c;
+      --error-fondo: #fee2e2;
+      --ambar: #5C3900;
+      --ambar-fondo: #fef3e2;
+      --papel: #ffffff;
+      --lienzo: #f4f6fb;
+      --borde: #cbd5e1;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--tinta);
+      background: var(--lienzo);
+      line-height: 1.55;
+      font-size: 17px;
+      padding-bottom: 28px;
+    }
+    .app { max-width: 480px; margin: 0 auto; padding: 0 16px; }
 
+    header {
+      background: var(--azul-profundo);
+      color: #fff;
+      text-align: center;
+      padding: 20px 16px 18px;
+    }
+    header h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.35rem;
+      margin: 0;
+      line-height: 1.25;
+    }
+    header p { margin: 4px 0 0; color: #e2e8f0; font-size: 0.92rem; }
+
+    /* Marcadores */
+    .stats {
+      display: flex;
+      gap: 10px;
+      margin: 16px 0 10px;
+    }
+    .stat {
+      flex: 1;
+      background: var(--papel);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      text-align: center;
+      padding: 10px 6px;
+    }
+    .stat .cifra { font-size: 1.5rem; font-weight: 800; color: var(--azul-profundo); line-height: 1; }
+    .stat .rotulo { font-size: 0.78rem; color: var(--apagado); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Selector de operación */
+    .segmentado {
+      display: flex;
+      background: var(--papel);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .seg-op {
+      flex: 1;
+      text-align: center;
+      padding: 12px 4px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      color: var(--tinta);
+      border-right: 1px solid var(--borde);
+    }
+    .seg-op:last-child { border-right: none; }
+    .seg-op[aria-checked="true"] { background: var(--azul); color: #fff; }
+
+    /* Tarjeta del problema */
+    .tarjeta {
+      background: var(--papel);
+      border: 1px solid var(--borde);
+      border-radius: 16px;
+      padding: 26px 18px;
+      text-align: center;
+    }
+    .problema {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 1.5rem;
+    }
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      font-weight: 800;
+      line-height: 1.05;
+    }
+    .frac .num { padding: 0 8px; }
+    .frac .den { padding: 3px 8px 0; border-top: 3px solid currentColor; }
+    .op-signo { font-size: 1.8rem; font-weight: 800; color: var(--azul-profundo); }
+    .igual { font-size: 1.8rem; font-weight: 800; }
+
+    /* Entrada de respuesta */
+    .respuesta {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .respuesta input {
+      font-family: inherit;
+      font-size: 1.6rem;
+      font-weight: 800;
+      width: 82px;
+      height: 60px;
+      text-align: center;
+      border: 3px solid var(--borde);
+      border-radius: 12px;
+      color: var(--tinta);
+      background: var(--lienzo);
+    }
+    .respuesta input:focus-visible {
+      outline: 3px solid var(--ambar);
+      outline-offset: 2px;
+      border-color: var(--azul);
+      background: #fff;
+    }
+    .respuesta .linea { width: 82px; height: 4px; background: var(--tinta); border-radius: 2px; }
+
+    /* Botones */
+    .acciones { margin-top: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .fila-2 { display: flex; gap: 12px; }
+    .fila-2 button { flex: 1; }
+    button {
+      font-family: inherit;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 14px;
+      background: var(--azul);
+      color: #fff;
+      min-height: 56px;
+      width: 100%;
+      transition: background 0.15s;
+    }
+    button:active { background: var(--azul-profundo); }
+    button.secundario { background: #e2e8f0; color: var(--tinta); }
+    button.secundario:active { background: #cbd5e1; }
+    button.exito { background: var(--exito); }
+    button:focus-visible { outline: 3px solid var(--ambar); outline-offset: 2px; }
+
+    /* Retroalimentación */
+    .retro {
+      margin-top: 16px;
+      padding: 16px 16px;
+      border-radius: 14px;
+      font-weight: 700;
+      text-align: left;
+      font-size: 1rem;
+    }
+    .retro[hidden] { display: none; }
+    .retro.ok { background: var(--exito-fondo); border-left: 6px solid var(--exito); color: var(--exito); }
+    .retro.mal { background: var(--error-fondo); border-left: 6px solid var(--error); color: var(--error); }
+    .retro.pista { background: var(--ambar-fondo); border-left: 6px solid var(--ambar); color: var(--ambar); }
+    .retro .frac { font-size: 1rem; }
+
+    .solucion {
+      margin-top: 12px;
+      background: var(--papel);
+      border: 1px dashed var(--borde);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: left;
+      color: var(--tinta);
+      font-weight: 400;
+    }
+    .solucion[hidden] { display: none; }
+    .solucion h2 { font-size: 1rem; color: var(--azul-profundo); margin: 0 0 8px; }
+    .solucion .paso { margin: 8px 0; }
+    .solucion .n {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--azul-profundo); color: #fff;
+      font-size: 0.8rem; font-weight: 700; margin-right: 8px;
+    }
+
+    .nota {
+      margin-top: 18px;
+      font-size: 0.85rem;
+      color: var(--apagado);
+      text-align: center;
+    }
+
+    footer {
+      margin-top: 24px;
+      background: var(--azul-profundo);
+      color: #e2e8f0;
+      text-align: center;
+      padding: 20px 16px;
+      font-size: 0.82rem;
+    }
+    footer a { color: #fff; }
+
+    .visualmente-oculto {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); border: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sumar y restar fracciones</h1>
+    <p>Distinto denominador · números pequeños</p>
+  </header>
+
+  <main class="app">
+
+    <div class="stats" aria-label="Marcadores">
+      <div class="stat">
+        <div class="cifra" id="st-correctas">0</div>
+        <div class="rotulo">Correctas</div>
+      </div>
+      <div class="stat">
+        <div class="cifra" id="st-racha">0</div>
+        <div class="rotulo">Racha</div>
+      </div>
+    </div>
+
+    <div class="segmentado" role="radiogroup" aria-label="Tipo de operación">
+      <div class="seg-op" role="radio" tabindex="0" data-op="suma" aria-checked="false">Sumar</div>
+      <div class="seg-op" role="radio" tabindex="0" data-op="resta" aria-checked="false">Restar</div>
+      <div class="seg-op" role="radio" tabindex="0" data-op="mixto" aria-checked="true">Mezcladas</div>
+    </div>
+
+    <section class="tarjeta" aria-labelledby="titulo-ej">
+      <h2 id="titulo-ej" class="visualmente-oculto">Ejercicio actual</h2>
+
+      <div class="problema">
+        <span class="frac" id="frac1" aria-hidden="true"></span>
+        <span class="op-signo" id="op-signo" aria-hidden="true">+</span>
+        <span class="frac" id="frac2" aria-hidden="true"></span>
+        <span class="igual" aria-hidden="true">=</span>
+        <span class="respuesta">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" id="in-num" aria-label="Numerador de la respuesta" autocomplete="off">
+          <span class="linea" aria-hidden="true"></span>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" id="in-den" aria-label="Denominador de la respuesta" autocomplete="off">
+        </span>
+      </div>
+      <p class="visualmente-oculto" id="enunciado-texto" aria-live="polite"></p>
+
+      <div class="acciones">
+        <button type="button" id="btn-principal">Comprobar</button>
+        <div class="fila-2">
+          <button type="button" class="secundario" id="btn-pista">Pista</button>
+          <button type="button" class="secundario" id="btn-saltar">Saltar</button>
+        </div>
+      </div>
+
+      <div class="retro" id="retro" hidden aria-live="polite"></div>
+      <div class="solucion" id="solucion" hidden></div>
+    </section>
+
+    <p class="nota">
+      Puede escribir la respuesta con el denominador común (por ejemplo, 5/6)
+      o ya simplificada. Ambas se aceptan como correctas.
+    </p>
+
+  </main>
+
+  <footer>
+    <p>Sumar y restar fracciones · práctica</p>
+    <p>© José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago.<br>
+    Bajo licencia <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a>.</p>
+  </footer>
+
+  <script>
+    "use strict";
+
+    function mcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a || 1; }
+    function mcm(a, b) { return a / mcd(a, b) * b; }
+    function id(x) { return document.getElementById(x); }
+    function aleatorio(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function fracHTML(n, d) { return '<span class="num">' + n + '</span><span class="den">' + d + '</span>'; }
+
+    var estado = { modo: "mixto", correctas: 0, racha: 0, ejercicio: null, resuelto: false };
+
+    /* -------- Generar ejercicio con números pequeños -------- */
+    function generar() {
+      var op;
+      if (estado.modo === "suma") op = "+";
+      else if (estado.modo === "resta") op = "−";
+      else op = Math.random() < 0.5 ? "+" : "−";
+
+      var d1 = aleatorio(2, 6), d2 = aleatorio(2, 6);
+      while (d2 === d1) d2 = aleatorio(2, 6);          // heterogéneas: distinto denominador
+      var n1 = aleatorio(1, d1 - 1), n2 = aleatorio(1, d2 - 1);  // fracciones propias
+
+      var comun = mcm(d1, d2);
+      var a = n1 * (comun / d1);   // numeradores con denominador común
+      var b = n2 * (comun / d2);
+
+      if (op === "−" && a < b) {   // que la resta no sea negativa
+        [n1, n2] = [n2, n1];
+        [d1, d2] = [d2, d1];
+        [a, b] = [b, a];
+      }
+
+      var resNum = (op === "+") ? (a + b) : (a - b);
+      var g = mcd(resNum, comun);
+      var simpNum = resNum === 0 ? 0 : resNum / g;
+      var simpDen = resNum === 0 ? 1 : comun / g;
+
+      estado.ejercicio = {
+        n1: n1, d1: d1, n2: n2, d2: d2, op: op,
+        comun: comun, a: a, b: b,
+        resNum: resNum, resDen: comun,
+        simpNum: simpNum, simpDen: simpDen,
+        f1: comun / d1, f2: comun / d2
+      };
+      estado.resuelto = false;
+      pintarEjercicio();
+    }
+
+    function pintarEjercicio() {
+      var e = estado.ejercicio;
+      id("frac1").innerHTML = fracHTML(e.n1, e.d1);
+      id("frac2").innerHTML = fracHTML(e.n2, e.d2);
+      id("op-signo").textContent = e.op;
+      id("enunciado-texto").textContent =
+        "Calcule " + e.n1 + " entre " + e.d1 + (e.op === "+" ? " más " : " menos ") +
+        e.n2 + " entre " + e.d2 + ". Escriba el numerador y el denominador de la respuesta.";
+      id("in-num").value = "";
+      id("in-den").value = "";
+      id("retro").hidden = true;
+      id("solucion").hidden = true;
+      id("btn-principal").textContent = "Comprobar";
+      id("btn-principal").classList.remove("exito");
+    }
+
+    /* -------- Retroalimentación -------- */
+    function retro(tipo, texto) {
+      var r = id("retro");
+      r.className = "retro " + tipo;
+      r.innerHTML = texto;
+      r.hidden = false;
+    }
+
+    function mostrarSolucion() {
+      var e = estado.ejercicio;
+      var extra = "";
+      if ((e.simpNum !== e.resNum || e.simpDen !== e.resDen)) {
+        extra = '<div class="paso"><span class="n">4</span>Simplifique dividiendo entre ' +
+          mcd(e.resNum, e.resDen) + ': <span class="frac">' + fracHTML(e.simpNum, e.simpDen) + '</span></div>';
+      }
+      var s = id("solucion");
+      s.innerHTML =
+        '<h2>Resolución</h2>' +
+        '<div class="paso"><span class="n">1</span>El mínimo común denominador de ' + e.d1 + ' y ' + e.d2 +
+          ' es <strong>' + e.comun + '</strong>.</div>' +
+        '<div class="paso"><span class="n">2</span>Convierta: <span class="frac">' + fracHTML(e.n1, e.d1) + '</span> = ' +
+          '<span class="frac">' + fracHTML(e.a, e.comun) + '</span> &nbsp;y&nbsp; ' +
+          '<span class="frac">' + fracHTML(e.n2, e.d2) + '</span> = <span class="frac">' + fracHTML(e.b, e.comun) + '</span></div>' +
+        '<div class="paso"><span class="n">3</span>' + (e.op === "+" ? "Sume" : "Reste") +
+          ' los numeradores: ' + e.a + ' ' + e.op + ' ' + e.b + ' = ' + e.resNum +
+          '. Resultado: <span class="frac">' + fracHTML(e.resNum, e.resDen) + '</span></div>' +
+        extra;
+      s.hidden = false;
+    }
+
+    /* -------- Botón principal: comprobar o siguiente -------- */
+    id("btn-principal").addEventListener("click", function () {
+      if (estado.resuelto) { generar(); id("in-num").focus(); return; }
+
+      var e = estado.ejercicio;
+      var num = id("in-num").value.trim();
+      var den = id("in-den").value.trim();
+      if (num === "" || den === "") { retro("pista", "Escriba el numerador y el denominador antes de comprobar."); return; }
+      var un = parseInt(num, 10), ud = parseInt(den, 10);
+      if (isNaN(un) || isNaN(ud) || ud === 0) { retro("pista", "El denominador no puede ser cero. Revise su respuesta."); return; }
+
+      // correcto si es equivalente al resultado (con denominador común o simplificado)
+      var equivalente = (un * e.resDen === e.resNum * ud);
+      if (equivalente) {
+        estado.correctas++;
+        estado.racha++;
+        id("st-correctas").textContent = estado.correctas;
+        id("st-racha").textContent = estado.racha;
+        estado.resuelto = true;
+        var msg = "¡Correcto! El resultado es <span class=\"frac\">" + fracHTML(e.resNum, e.resDen) + "</span>";
+        if (e.simpNum !== e.resNum || e.simpDen !== e.resDen) {
+          if (un === e.simpNum && ud === e.simpDen) {
+            msg += ", y lo dio ya simplificado. Excelente.";
+          } else {
+            msg += '. Su forma más simple es <span class="frac">' + fracHTML(e.simpNum, e.simpDen) + '</span>.';
+          }
+        } else {
+          msg += ", ya en su forma más simple.";
+        }
+        retro("ok", msg);
+        var bp = id("btn-principal");
+        bp.textContent = "Siguiente ejercicio";
+        bp.classList.add("exito");
+      } else {
+        estado.racha = 0;
+        id("st-racha").textContent = 0;
+        retro("mal", "Todavía no. Recuerde: primero un denominador común, luego " +
+          (e.op === "+" ? "sume" : "reste") + " los numeradores. Pulse «Ver resolución» si desea la guía.");
+        // añadir enlace a solución dentro de la retro
+        var r = id("retro");
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = "Ver resolución";
+        b.className = "secundario";
+        b.style.marginTop = "12px";
+        b.addEventListener("click", mostrarSolucion);
+        r.appendChild(b);
+      }
+    });
+
+    /* -------- Pista: solo el denominador común -------- */
+    id("btn-pista").addEventListener("click", function () {
+      var e = estado.ejercicio;
+      retro("pista", "Pista: el mínimo común denominador de " + e.d1 + " y " + e.d2 +
+        " es <strong>" + e.comun + "</strong>. Convierta las dos fracciones a ese denominador.");
+    });
+
+    /* -------- Saltar -------- */
+    id("btn-saltar").addEventListener("click", function () {
+      if (!estado.resuelto) { estado.racha = 0; id("st-racha").textContent = 0; }
+      generar();
+    });
+
+    /* -------- Selector de operación -------- */
+    document.querySelectorAll(".seg-op").forEach(function (op) {
+      function elegir() {
+        document.querySelectorAll(".seg-op").forEach(function (o) { o.setAttribute("aria-checked", "false"); });
+        op.setAttribute("aria-checked", "true");
+        estado.modo = op.getAttribute("data-op");
+        generar();
+      }
+      op.addEventListener("click", elegir);
+      op.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); elegir(); }
+      });
+    });
+
+    /* Enter en los campos comprueba */
+    ["in-num", "in-den"].forEach(function (x) {
+      id(x).addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter") { ev.preventDefault(); id("btn-principal").click(); }
+      });
+    });
+
+    /* Inicio */
+    generar();
+  </script>
+</body>
+</html>

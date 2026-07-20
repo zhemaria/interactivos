@@ -1,1 +1,602 @@
+<!doctype html>
+<!--
+  Del árbol a la tabla: probabilidad en dos extracciones
+  Recurso educativo interactivo — ABE/ASE Math
+  © José M. Fernández — Licencia CC BY-NC-SA 4.0
+  https://creativecommons.org/licenses/by-nc-sa/4.0/
+-->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Del árbol a la tabla: probabilidad en dos extracciones</title>
 
+    <meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+    <meta name="license" content="CC BY-NC-SA 4.0" />
+    <link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" />
+    <meta name="description" content="Herramienta interactiva para construir, paso a paso, el diagrama de árbol y la tabla de doble entrada de un experimento de dos extracciones, con y sin reemplazo." />
+
+    <style>
+      :root {
+        --bg: #eef1f5;
+        --surface: #ffffff;
+        --ink: #1f2933;
+        --muted: #4b5563;        /* cumple AA sobre blanco */
+        --accent: #1e3a8a;       /* índigo estructural */
+        --accent-soft: #e5eaf5;
+        --red: #b91c1c;          /* bola roja: blanco encima es legible */
+        --blue: #1d4ed8;         /* bola azul */
+        --green: #15803d;        /* comprobación */
+        --line: #cbd3dd;
+        --serif: Georgia, "Times New Roman", serif;
+        --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        font-family: var(--sans);
+        color: var(--ink);
+        margin: 0;
+        padding: 24px 16px 40px;
+        background: var(--bg);
+        line-height: 1.5;
+      }
+
+      .container { max-width: 1000px; margin: auto; }
+
+      header.intro { text-align: center; margin-bottom: 20px; }
+
+      h1 {
+        font-family: var(--serif);
+        font-size: clamp(1.5rem, 4vw, 2.1rem);
+        color: var(--accent);
+        margin: 0 0 6px;
+        line-height: 1.2;
+      }
+      .lede { color: var(--muted); max-width: 60ch; margin: 0 auto; }
+
+      .card {
+        background: var(--surface);
+        padding: 18px 20px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 6px 18px rgba(15, 23, 42, 0.05);
+        margin-bottom: 20px;
+      }
+
+      h2 {
+        font-family: var(--serif);
+        font-size: 1.2rem;
+        color: var(--accent);
+        margin: 0 0 12px;
+      }
+
+      /* ---------- Controles ---------- */
+      .controls { display: flex; flex-wrap: wrap; gap: 18px 26px; align-items: flex-end; }
+      .field { display: flex; flex-direction: column; gap: 4px; }
+      .field label { font-weight: 600; font-size: 0.9rem; }
+      .field input[type="number"] {
+        width: 92px; padding: 8px 10px; font-size: 1rem;
+        border: 1px solid var(--line); border-radius: 8px;
+      }
+      .switch { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+      .switch input { width: 20px; height: 20px; accent-color: var(--accent); }
+
+      button {
+        font: inherit; font-weight: 600; cursor: pointer;
+        border: 1px solid transparent; border-radius: 8px;
+        padding: 9px 16px; background: var(--accent); color: #fff;
+      }
+      button.ghost { background: #fff; color: var(--accent); border-color: var(--accent); }
+      button:disabled { opacity: 0.4; cursor: not-allowed; }
+      button:focus-visible, input:focus-visible, td:focus-visible {
+        outline: 3px solid #f59e0b; outline-offset: 2px;
+      }
+
+      .mode-badge {
+        display: inline-block; font-size: 0.85rem; font-weight: 700;
+        padding: 3px 10px; border-radius: 999px; margin-left: 4px;
+      }
+      .mode-con { background: #dcfce7; color: #14532d; }
+      .mode-sin { background: #fef3c7; color: #713f12; }
+
+      /* ---------- Paso a paso ---------- */
+      .stepper { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
+      .step-info {
+        flex: 1 1 260px; min-width: 220px;
+        background: var(--accent-soft); border-radius: 8px; padding: 10px 14px;
+      }
+      .step-count { font-weight: 700; color: var(--accent); font-size: 0.85rem; letter-spacing: 0.02em; }
+      .step-text { color: var(--ink); margin-top: 2px; }
+      progress { width: 100%; height: 8px; margin-top: 8px; accent-color: var(--accent); }
+
+      /* ---------- Diagrama SVG ---------- */
+      .diagram-wrap { overflow-x: auto; }
+      svg { width: 100%; height: auto; max-width: 100%; display: block; }
+
+      /* urna */
+      #g-urn .urn-body { fill: #f8fafc; stroke: var(--accent); stroke-width: 2; }
+      #g-urn .urn-lip  { fill: none; stroke: var(--accent); stroke-width: 2; }
+      #g-urn .ball-r { fill: var(--red); }
+      #g-urn .ball-a { fill: var(--blue); }
+      .urn-label { font-family: var(--sans); font-size: 12px; fill: var(--muted); font-weight: 600; }
+
+      /* ramas */
+      .edge { stroke-width: 2.5; fill: none; transition: stroke-width 0.15s ease; }
+      .edge-R { stroke: var(--red); }
+      .edge-A { stroke: var(--blue); }
+
+      .node { stroke: #fff; stroke-width: 2; }
+      .node-R { fill: var(--red); }
+      .node-A { fill: var(--blue); }
+      .node-t { font-family: var(--sans); font-size: 16px; font-weight: 700; fill: #fff; }
+
+      .prob text { font-family: var(--sans); font-size: 13px; fill: var(--ink); font-weight: 600; }
+      .prob line { stroke: var(--ink); stroke-width: 1.2; }
+
+      .jtag { font-family: var(--sans); font-size: 11px; font-weight: 700; fill: var(--muted); letter-spacing: 0.04em; }
+      .jdec { font-family: var(--sans); font-size: 11px; fill: var(--muted); }
+
+      .hit { fill: transparent; cursor: pointer; }
+
+      /* estados de revelado */
+      .reveal { opacity: 0; transform: translateX(-10px); transition: opacity 0.45s ease, transform 0.45s ease; }
+      .reveal.show { opacity: 1; transform: none; }
+
+      /* resaltado de camino */
+      .on.edge { stroke-width: 6; }
+      .on .node { stroke: #111827; stroke-width: 3; }
+      .on.prob text { fill: var(--accent); }
+      .on .jtag, .on .jdec { fill: var(--accent); }
+      .on .frac-emph { }
+
+      /* ---------- Panel de fórmula ---------- */
+      #formula { min-height: 96px; }
+      .formula-default { color: var(--muted); }
+      .deriv-title { font-weight: 700; margin-bottom: 8px; }
+      .deriv-line { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; font-size: 1.05rem; margin: 4px 0; }
+      .deriv-line .lead { color: var(--muted); min-width: 26px; }
+      .op { color: var(--muted); font-weight: 700; }
+      .note { color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
+
+      /* fracción apilada (HTML) */
+      .fr { display: inline-flex; flex-direction: column; text-align: center; vertical-align: middle; line-height: 1.05; }
+      .fr .n { padding: 0 4px; }
+      .fr .d { padding: 1px 4px 0; border-top: 1.6px solid currentColor; }
+      .fr.int { display: inline; }
+      .paren { font-size: 1.3em; color: var(--muted); }
+
+      /* ---------- Tabla ---------- */
+      .table-wrap { overflow-x: auto; }
+      table { width: 100%; border-collapse: collapse; text-align: center; min-width: 460px; }
+      caption { text-align: left; color: var(--muted); font-size: 0.9rem; margin-bottom: 8px; }
+      th, td { border: 1px solid var(--line); padding: 10px 8px; }
+      thead th, th[scope="row"] { background: var(--accent-soft); color: var(--ink); }
+      td[data-oc] { cursor: pointer; }
+      td.on, td[data-oc].on { background: #dbe3f6; outline: 2px solid var(--accent); }
+      .cell-frac { font-weight: 700; }
+      .cell-dec { display: block; color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+      .tot { background: #f3f4f6; color: var(--muted); font-weight: 600; }
+      .grand { background: #dcfce7; color: #14532d; font-weight: 700; }
+
+      .locked { color: var(--muted); font-style: italic; padding: 8px 0; }
+      .scroll-hint { display: none; color: var(--muted); font-size: 0.85rem; margin: 0 0 10px; }
+
+      /* ---------- Derivados y comprobación ---------- */
+      .derived-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+      .derived-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+      .derived-item .lbl { font-weight: 600; display: block; margin-bottom: 6px; }
+      .derived-item .val { font-size: 1.1rem; }
+      .check { font-size: 1.05rem; }
+      .check .ok { color: var(--green); font-weight: 700; }
+
+      /* leyenda */
+      .legend { display: flex; flex-wrap: wrap; gap: 16px; color: var(--muted); font-size: 0.9rem; margin-top: 12px; }
+      .legend span { display: inline-flex; align-items: center; gap: 6px; }
+      .dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+      .dot-r { background: var(--red); } .dot-a { background: var(--blue); }
+
+      footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 8px; }
+      footer a { color: var(--accent); }
+
+      @media (max-width: 600px) {
+        .controls { gap: 14px 18px; }
+        .field input[type="number"] { width: 100%; }
+        .diagram-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        #arbol svg { min-width: 680px; }
+        .scroll-hint { display: block; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .reveal { transition: none; transform: none; }
+        .edge { transition: none; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <header class="intro">
+        <h1>Del árbol a la tabla: probabilidad en dos extracciones</h1>
+        <p class="lede">
+          Extraemos dos bolas de una urna, una tras otra. Construye el diagrama paso a paso,
+          pasa el cursor por cada camino para ver su cálculo y descubre cómo se traslada a la tabla de doble entrada.
+        </p>
+      </header>
+
+      <!-- CONTROLES -->
+      <section class="card" aria-labelledby="h-controles">
+        <h2 id="h-controles">Datos del experimento</h2>
+        <div class="controls">
+          <div class="field">
+            <label for="rojas">Bolas rojas</label>
+            <input type="number" id="rojas" value="3" min="1" max="10" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label for="azules">Bolas azules</label>
+            <input type="number" id="azules" value="2" min="1" max="10" inputmode="numeric" />
+          </div>
+          <label class="switch" for="reemplazo">
+            <input type="checkbox" id="reemplazo" checked />
+            <span>Con reemplazo</span>
+          </label>
+          <span id="modeBadge" class="mode-badge mode-con">Modo: con reemplazo</span>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--line);margin:18px 0" />
+
+        <div class="stepper">
+          <button id="btnPrev" class="ghost" type="button">◀ Anterior</button>
+          <button id="btnNext" type="button">Siguiente paso ▶</button>
+          <button id="btnAll" class="ghost" type="button">Ver todo</button>
+          <button id="btnRestart" class="ghost" type="button">↺ Empezar de nuevo</button>
+          <div class="step-info" role="status" aria-live="polite">
+            <div class="step-count" id="stepCount">Paso 1 de 5</div>
+            <div class="step-text" id="stepText"></div>
+            <progress id="stepBar" max="5" value="1"></progress>
+          </div>
+        </div>
+      </section>
+
+      <!-- DIAGRAMA -->
+      <section class="card" aria-labelledby="h-arbol">
+        <h2 id="h-arbol">Diagrama de árbol</h2>
+        <div class="diagram-wrap">
+          <p class="scroll-hint">Desliza el diagrama en horizontal para verlo completo. En el teléfono, toca una celda de la tabla para resaltar su camino.</p>
+          <div id="arbol" role="img" aria-label="Diagrama de árbol de dos extracciones sucesivas."></div>
+        </div>
+        <div class="legend" aria-hidden="false">
+          <span><span class="dot dot-r"></span> R = bola roja</span>
+          <span><span class="dot dot-a"></span> A = bola azul</span>
+          <span>El color de cada rama indica la bola extraída en ese paso.</span>
+        </div>
+      </section>
+
+      <!-- FÓRMULA DINÁMICA -->
+      <section class="card" aria-labelledby="h-formula">
+        <h2 id="h-formula">Cálculo del camino</h2>
+        <div id="formula" aria-live="polite"></div>
+      </section>
+
+      <!-- TABLA -->
+      <section class="card" aria-labelledby="h-tabla">
+        <h2 id="h-tabla">Tabla de doble entrada</h2>
+        <div id="tablaZona">
+          <p class="locked" id="tablaLock">La tabla se completa en el paso 5. Avanza los pasos o pulsa «Ver todo».</p>
+          <div class="table-wrap" id="tablaWrap" hidden></div>
+        </div>
+      </section>
+
+      <!-- DERIVADOS + COMPROBACIÓN -->
+      <section class="card" id="cardDerivados" aria-labelledby="h-deriv" hidden>
+        <h2 id="h-deriv">Resultados derivados y comprobación</h2>
+        <div class="derived-grid" id="derivados"></div>
+        <p class="check" id="comprobacion" style="margin-top:16px"></p>
+      </section>
+
+      <footer>
+        Recurso educativo abierto bajo licencia
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>.
+        © José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago.
+      </footer>
+    </div>
+
+    <script>
+      // ---------- utilidades de fracciones (exactas, con enteros) ----------
+      function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a || 1; }
+      function simplify(n, d) { const g = gcd(n, d); return { n: n / g, d: d / g }; }
+      function fracHTML(n, d, emph) {
+        const cls = emph ? ' frac-emph' : '';
+        if (d === 1 || n === 0) return `<span class="fr int${cls}">${n}</span>`;
+        return `<span class="fr${cls}"><span class="n">${n}</span><span class="d">${d}</span></span>`;
+      }
+      function dec3(n, d) { return (n / d).toFixed(3); }
+
+      // ---------- estado ----------
+      const OC = {
+        RR: { f: 'R', s: 'R' }, RA: { f: 'R', s: 'A' },
+        AR: { f: 'A', s: 'R' }, AA: { f: 'A', s: 'A' }
+      };
+      const palabra = { R: 'roja', A: 'azul' };
+      let M = {};        // modelo calculado
+      let step = 4;      // 0..4  (Paso 1..5 para humanos)
+      const MAXSTEP = 4;
+
+      const NARRACION = [
+        'La urna contiene las bolas indicadas. Vamos a extraer dos, una tras otra, y anotar los colores.',
+        'Primera extracción. Cada rama muestra su probabilidad: el número de bolas de ese color entre el total.',
+        '',  // se completa según reemplazo
+        'Regla del producto. La probabilidad de cada camino se obtiene multiplicando las probabilidades de sus dos ramas.',
+        'Tabla de doble entrada. Organizamos los cuatro resultados; la suma de todos debe dar 1.'
+      ];
+
+      // ---------- cálculo del modelo ----------
+      function calcular() {
+        let r = parseInt(document.getElementById('rojas').value, 10);
+        let a = parseInt(document.getElementById('azules').value, 10);
+        if (isNaN(r) || r < 1) r = 1; if (r > 10) r = 10;
+        if (isNaN(a) || a < 1) a = 1; if (a > 10) a = 10;
+        const con = document.getElementById('reemplazo').checked;
+        const total = r + a;
+
+        // marginales (1ª extracción)
+        const marg = { R: { n: r, d: total }, A: { n: a, d: total } };
+
+        // condicionales (2ª extracción)
+        const t2 = con ? total : total - 1;
+        const cond = {
+          R: { R: { n: con ? r : r - 1, d: t2 }, A: { n: a, d: t2 } },
+          A: { R: { n: r, d: t2 }, A: { n: con ? a : a - 1, d: t2 } }
+        };
+
+        // conjuntas con denominador común D
+        const D = con ? total * total : total * (total - 1);
+        const num = {
+          RR: r * (con ? r : r - 1), RA: r * a,
+          AR: a * r, AA: a * (con ? a : a - 1)
+        };
+
+        M = { r, a, total, con, marg, cond, D, num };
+
+        // badge de modo
+        const badge = document.getElementById('modeBadge');
+        badge.textContent = con ? 'Modo: con reemplazo' : 'Modo: sin reemplazo';
+        badge.className = 'mode-badge ' + (con ? 'mode-con' : 'mode-sin');
+
+        NARRACION[2] = con
+          ? 'Segunda extracción, con reemplazo: la bola se devuelve, el total no cambia y las dos extracciones son independientes, P(2ª | 1ª) = P(2ª).'
+          : 'Segunda extracción, sin reemplazo: la bola no se devuelve; el total baja en 1 y la probabilidad depende de la primera extracción (eventos dependientes).';
+
+        dibujarArbol();
+        construirTabla();
+        construirDerivados();
+        render();
+        formulaDefault();
+      }
+
+      // ---------- SVG: helpers ----------
+      function svgFrac(x, y, n, d) {
+        const digits = Math.max(String(n).length, String(d).length);
+        const hw = 6 + digits * 4;
+        return `<g class="prob"><text x="${x}" y="${y - 3}" text-anchor="middle">${n}</text>`
+          + `<line x1="${x - hw}" y1="${y}" x2="${x + hw}" y2="${y}"/>`
+          + `<text x="${x}" y="${y + 14}" text-anchor="middle">${d}</text></g>`;
+      }
+      // coloca la fracción centrada en el punto medio de la rama, desplazada
+      // perpendicularmente hacia su lado exterior ('up' = arriba, 'down' = abajo)
+      function branchFrac(x1, y1, x2, y2, n, d, dir, gap) {
+        gap = gap || 30;
+        const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+        const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy) || 1;
+        let nx = -dy / L, ny = dx / L;                 // normal a la rama
+        if ((dir === 'up' && ny > 0) || (dir === 'down' && ny < 0)) { nx = -nx; ny = -ny; }
+        return svgFrac(Math.round(mx + nx * gap), Math.round(my + ny * gap), n, d);
+      }
+      function edge(x1, y1, x2, y2, color, oc) {
+        return `<line class="edge edge-${color}" data-oc="${oc}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+      }
+      function node(x, y, letter, oc) {
+        return `<g class="node-g" data-oc="${oc}">`
+          + `<circle class="node node-${letter}" cx="${x}" cy="${y}" r="20"/>`
+          + `<text class="node-t" x="${x}" y="${y + 5}" text-anchor="middle">${letter}</text></g>`;
+      }
+
+      // ---------- SVG: construir árbol ----------
+      function dibujarArbol() {
+        const { r, a, total, marg, cond, num, D } = M;
+
+        // urna con bolas
+        let balls = '';
+        for (let i = 0; i < total; i++) {
+          const col = i % 4, row = Math.floor(i / 4);
+          const cx = 58 + col * 22, cy = 192 + row * 22;
+          const cls = i < r ? 'ball-r' : 'ball-a';
+          balls += `<circle class="${cls}" cx="${cx}" cy="${cy}" r="8" aria-hidden="true"/>`;
+        }
+        const urn = `<g id="g-urn" role="img" aria-label="Urna con ${r} rojas y ${a} azules.">`
+          + `<path class="urn-body" d="M42 175 L138 175 L130 300 Q90 315 50 300 Z"/>`
+          + `<path class="urn-lip" d="M38 175 Q90 165 142 175"/>`
+          + balls
+          + `<text class="urn-label" x="90" y="335" text-anchor="middle">Urna: ${total} bolas</text></g>`;
+
+        // Nivel 1
+        const n1 =
+          `<g id="g-n1" class="reveal">`
+          + edge(150, 235, 343, 120, 'R', 'RR RA')
+          + edge(150, 235, 343, 350, 'A', 'AR AA')
+          + `<g class="prob" data-oc="RR RA">${branchFrac(150, 235, 343, 120, marg.R.n, marg.R.d, 'up')}</g>`
+          + `<g class="prob" data-oc="AR AA">${branchFrac(150, 235, 343, 350, marg.A.n, marg.A.d, 'down')}</g>`
+          + node(365, 120, 'R', 'RR RA')
+          + node(365, 350, 'A', 'AR AA')
+          + `</g>`;
+
+        // Nivel 2
+        const n2 =
+          `<g id="g-n2" class="reveal">`
+          + edge(388, 120, 638, 60, 'R', 'RR')
+          + edge(388, 120, 638, 175, 'A', 'RA')
+          + edge(388, 350, 638, 300, 'R', 'AR')
+          + edge(388, 350, 638, 415, 'A', 'AA')
+          + `<g class="prob" data-oc="RR">${branchFrac(388, 120, 638, 60, cond.R.R.n, cond.R.R.d, 'up')}</g>`
+          + `<g class="prob" data-oc="RA">${branchFrac(388, 120, 638, 175, cond.R.A.n, cond.R.A.d, 'down')}</g>`
+          + `<g class="prob" data-oc="AR">${branchFrac(388, 350, 638, 300, cond.A.R.n, cond.A.R.d, 'up')}</g>`
+          + `<g class="prob" data-oc="AA">${branchFrac(388, 350, 638, 415, cond.A.A.n, cond.A.A.d, 'down')}</g>`
+          + node(660, 60, 'R', 'RR')
+          + node(660, 175, 'A', 'RA')
+          + node(660, 300, 'R', 'AR')
+          + node(660, 415, 'A', 'AA')
+          + `</g>`;
+
+        // conjuntas (nivel 3) + zonas de hover
+        const jointFor = (oc, y) => {
+          const s = simplify(num[oc], D);
+          return `<g class="joint" data-oc="${oc}">`
+            + `<text class="jtag" x="742" y="${y - 20}" text-anchor="middle">${oc}</text>`
+            + svgFrac(742, y, s.n, s.d)
+            + `<text class="jdec" x="742" y="${y + 30}" text-anchor="middle">≈ ${dec3(num[oc], D)}</text></g>`;
+        };
+        const hits = [['RR', 60], ['RA', 175], ['AR', 300], ['AA', 415]]
+          .map(([oc, y]) => `<rect class="hit" data-oc="${oc}" data-trigger="1" tabindex="0" role="button" aria-label="Camino ${oc}" x="615" y="${y - 34}" width="205" height="68"/>`)
+          .join('');
+        const joint =
+          `<g id="g-joint" class="reveal">`
+          + jointFor('RR', 60) + jointFor('RA', 175) + jointFor('AR', 300) + jointFor('AA', 415)
+          + `</g>` + hits;
+
+        document.getElementById('arbol').innerHTML =
+          `<svg viewBox="0 0 830 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de árbol de dos extracciones.">`
+          + urn + n1 + n2 + joint + `</svg>`;
+
+        bindHover();
+      }
+
+      // ---------- tabla ----------
+      function construirTabla() {
+        const { marg, num, D } = M;
+        const cell = (oc) => {
+          const s = simplify(num[oc], D);
+          return `<td data-oc="${oc}" data-trigger="1" tabindex="0" role="button" `
+            + `aria-label="${OC[oc].f === 'R' ? '1ª roja' : '1ª azul'} y ${OC[oc].s === 'R' ? '2ª roja' : '2ª azul'}: probabilidad ${dec3(num[oc], D)}">`
+            + `<span class="cell-frac">${fracHTML(s.n, s.d)}</span>`
+            + `<span class="cell-dec">≈ ${dec3(num[oc], D)}</span></td>`;
+        };
+        // totales de columna (2ª extracción)
+        const colR = simplify(num.RR + num.AR, D);
+        const colA = simplify(num.RA + num.AA, D);
+
+        const html =
+          `<table>`
+          + `<caption>Probabilidad conjunta de cada par de extracciones. Fila = 1ª bola; columna = 2ª bola. Los totales muestran las probabilidades marginales.</caption>`
+          + `<thead><tr><th scope="col"></th><th scope="col">2ª: Roja</th><th scope="col">2ª: Azul</th><th scope="col" class="tot">Total fila</th></tr></thead>`
+          + `<tbody>`
+          + `<tr><th scope="row">1ª: Roja</th>${cell('RR')}${cell('RA')}<td class="tot">${fracHTML(marg.R.n, marg.R.d)}</td></tr>`
+          + `<tr><th scope="row">1ª: Azul</th>${cell('AR')}${cell('AA')}<td class="tot">${fracHTML(marg.A.n, marg.A.d)}</td></tr>`
+          + `<tr><th scope="row" class="tot">Total columna</th><td class="tot">${fracHTML(colR.n, colR.d)}</td><td class="tot">${fracHTML(colA.n, colA.d)}</td><td class="grand">1</td></tr>`
+          + `</tbody></table>`;
+        document.getElementById('tablaWrap').innerHTML = html;
+        bindHover();
+      }
+
+      // ---------- derivados + comprobación ----------
+      function construirDerivados() {
+        const { num, D } = M;
+        const mismo = simplify(num.RR + num.AA, D);
+        const distinto = simplify(num.RA + num.AR, D);
+        const unaRoja = simplify(num.RR + num.RA + num.AR, D);
+
+        const item = (lbl, formula, s, n, d) =>
+          `<div class="derived-item"><span class="lbl">${lbl}</span>`
+          + `<div class="val">${formula} = ${fracHTML(s.n, s.d)} <span class="paren">≈</span> ${dec3(n, d)}</div></div>`;
+
+        document.getElementById('derivados').innerHTML =
+          item('Mismo color', 'P(RR) + P(AA)', mismo, num.RR + num.AA, D)
+          + item('Distinto color', 'P(RA) + P(AR)', distinto, num.RA + num.AR, D)
+          + item('Al menos una roja', '1 − P(AA)', unaRoja, num.RR + num.RA + num.AR, D);
+
+        const suma = (num.RR + num.RA + num.AR + num.AA) / D;
+        document.getElementById('comprobacion').innerHTML =
+          `<strong>Comprobación:</strong> ${dec3(num.RR, D)} + ${dec3(num.RA, D)} + ${dec3(num.AR, D)} + ${dec3(num.AA, D)} = `
+          + `<span class="ok">${suma.toFixed(3)} ✓</span> (la probabilidad total siempre es 1).`;
+      }
+
+      // ---------- panel de fórmula ----------
+      function formulaDefault() {
+        document.getElementById('formula').innerHTML =
+          `<p class="formula-default">Pasa el cursor (o el foco con el teclado) por una rama del árbol o por una celda de la tabla `
+          + `para ver, paso a paso, cómo se calcula la probabilidad de ese camino con la <strong>regla del producto</strong>.</p>`;
+      }
+      function derivHTML(oc) {
+        const { marg, cond, num, D, con } = M;
+        const f = OC[oc].f, s = OC[oc].s;
+        const m1 = marg[f], c2 = cond[f][s];
+        const prodN = num[oc], prodD = D;
+        const simp = simplify(prodN, prodD);
+        const simplificable = (simp.n !== prodN || simp.d !== prodD) && prodN !== 0;
+        const notaCond = con
+          ? 'Con reemplazo, la 2ª extracción no depende de la 1ª: P(2ª | 1ª) = P(2ª).'
+          : 'Sin reemplazo, la 2ª extracción depende de la 1ª: el total baja a ' + (M.total - 1) + '.';
+
+        return `<div class="deriv-title">Camino: 1ª ${palabra[f]} → 2ª ${palabra[s]} &nbsp;(${oc})</div>`
+          + `<div class="deriv-line"><span class="lead">=</span> P(${f}<sub>1</sub>) <span class="op">·</span> P(${s}<sub>2</sub> | ${f}<sub>1</sub>)</div>`
+          + `<div class="deriv-line"><span class="lead">=</span> ${fracHTML(m1.n, m1.d, true)} <span class="op">·</span> ${fracHTML(c2.n, c2.d, true)}</div>`
+          + `<div class="deriv-line"><span class="lead">=</span> ${fracHTML(prodN, prodD)}`
+          + (simplificable ? ` <span class="op">=</span> ${fracHTML(simp.n, simp.d)}` : ``)
+          + ` <span class="op">≈</span> ${dec3(prodN, prodD)}</div>`
+          + `<p class="note">${notaCond}</p>`;
+      }
+
+      // ---------- resaltado ----------
+      function clearHL() { document.querySelectorAll('.on').forEach(el => el.classList.remove('on')); }
+      function setHL(oc) {
+        clearHL();
+        document.querySelectorAll('[data-oc~="' + oc + '"]').forEach(el => el.classList.add('on'));
+        document.getElementById('formula').innerHTML = derivHTML(oc);
+      }
+      function bindHover() {
+        document.querySelectorAll('[data-trigger]').forEach(el => {
+          el.onmouseenter = () => { if (step >= MAXSTEP - 1) setHL(el.dataset.oc); };
+          el.onfocus = () => { if (step >= MAXSTEP - 1) setHL(el.dataset.oc); };
+          el.onmouseleave = () => { clearHL(); formulaDefault(); };
+          el.onblur = () => { clearHL(); formulaDefault(); };
+        });
+      }
+
+      // ---------- render por paso ----------
+      function render() {
+        const g1 = document.getElementById('g-n1');
+        const g2 = document.getElementById('g-n2');
+        const gj = document.getElementById('g-joint');
+        if (g1) g1.classList.toggle('show', step >= 1);
+        if (g2) g2.classList.toggle('show', step >= 2);
+        if (gj) gj.classList.toggle('show', step >= 3);
+
+        const showTabla = step >= 4;
+        document.getElementById('tablaWrap').hidden = !showTabla;
+        document.getElementById('tablaLock').hidden = showTabla;
+        document.getElementById('cardDerivados').hidden = !showTabla;
+
+        document.getElementById('stepCount').textContent = `Paso ${step + 1} de 5`;
+        document.getElementById('stepText').textContent = NARRACION[step];
+        document.getElementById('stepBar').value = step + 1;
+
+        document.getElementById('btnPrev').disabled = step <= 0;
+        document.getElementById('btnNext').disabled = step >= MAXSTEP;
+
+        if (step < MAXSTEP - 1) { clearHL(); }
+        formulaDefault();
+      }
+
+      // ---------- eventos ----------
+      document.getElementById('rojas').addEventListener('input', calcular);
+      document.getElementById('azules').addEventListener('input', calcular);
+      document.getElementById('reemplazo').addEventListener('change', calcular);
+      document.getElementById('btnNext').addEventListener('click', () => { if (step < MAXSTEP) { step++; render(); } });
+      document.getElementById('btnPrev').addEventListener('click', () => { if (step > 0) { step--; render(); } });
+      document.getElementById('btnAll').addEventListener('click', () => { step = MAXSTEP; render(); });
+      document.getElementById('btnRestart').addEventListener('click', () => { step = 0; render(); });
+
+      // ---------- inicio ----------
+      calcular();
+      step = MAXSTEP; render();   // arranca mostrando el ejemplo completo
+    </script>
+  </body>
+</html>

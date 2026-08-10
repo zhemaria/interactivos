@@ -1,1 +1,2427 @@
+<!DOCTYPE html>
+<!--
+  Sismógrafo · De la placa al pilar — Simulador didáctico de terremotos
+  © José M. Fernández, ABE/ASE Math Master Teacher,
+  Harry S. Truman College — City Colleges of Chicago.
+  Licencia Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional
+  (CC BY-NC-SA 4.0) — https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De la placa al pilar · Simulador didáctico de terremotos</title>
+<meta name="description" content="Simulador interactivo que muestra qué ocurre en la corteza terrestre durante un terremoto: acumulación de esfuerzo, ruptura de la falla, propagación de ondas, efecto de sitio, resonancia y licuefacción.">
+<meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago">
+<meta name="license" content="CC BY-NC-SA 4.0">
+<link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #12151a;
+    --panel: #191d24;
+    --panel-2: #1f242d;
+    --panel-3: #252b35;
+    --border: #2a303b;
+    --ink: #e8a94a;
+    --ink-dim: #c98f36;
+    --danger: #f07b70;
+    --warn: #e8b95a;
+    --safe: #6dbb96;
+    --wave-p: #8fb4d9;
+    --wave-s: #e8a94a;
+    --wave-l: #d97ba8;
+    --text: #ece9e2;
+    --text-dim: #a2abba;
+    --sky-top: #0d1016;
+    --sky-bot: #1c2431;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(circle at 50% -10%, #1c222c 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:24px 16px 48px;
+  }
+  .app{width:100%;max-width:1180px;margin:0 auto;}
 
+  :focus-visible{
+    outline:3px solid var(--ink);
+    outline-offset:2px;
+    border-radius:4px;
+  }
+
+  /* ---------- Encabezado ---------- */
+  header.top{margin-bottom:18px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--ink); margin:0 0 6px;
+  }
+  h1{
+    font-family:'Archivo',sans-serif; font-weight:900;
+    font-size:clamp(26px,5vw,38px); line-height:1.05;
+    margin:0 0 8px; letter-spacing:-0.01em;
+  }
+  header.top p.lead{color:var(--text-dim);font-size:14px;line-height:1.6;margin:0;max-width:78ch;}
+
+  /* ---------- Cabecera en dos columnas ---------- */
+  .header-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:20px;}
+  @media (min-width: 980px){
+    .header-grid{grid-template-columns:1fr 340px;gap:22px;align-items:stretch;}
+  }
+  header.top{margin-bottom:0;display:flex;flex-direction:column;justify-content:center;}
+  .preset-card{
+    background:var(--panel);border:1px solid var(--border);
+    border-radius:8px;padding:14px 16px;
+  }
+  .preset-card h2.ph{margin-bottom:10px;}
+  .preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .preset-grid button{min-width:0;}
+  .preset-note{font-size:11px;color:var(--text-dim);line-height:1.5;margin:9px 0 0;}
+
+  /* ---------- Barra de acción sobre el escenario ---------- */
+  .action-bar{
+    background:var(--panel);border:1px solid var(--border);border-radius:8px;
+    padding:11px 13px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+  }
+  .action-bar .btns{display:flex;gap:8px;flex:0 0 auto;}
+  .action-bar #triggerBtn{flex:0 0 auto;padding:12px 20px;font-size:14px;letter-spacing:.01em;}
+  .action-bar #resetBtn{padding:12px 14px;}
+  .action-bar .phase-strip{flex:1 1 300px;margin-top:0;}
+
+  /* ---------- Fila inferior: bitácora y resultados ---------- */
+  .bottom-grid{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media (min-width: 820px){ .bottom-grid{grid-template-columns:1fr 1fr;} }
+
+  /* ---------- Rejilla principal ---------- */
+  .layout-grid{display:grid;grid-template-columns:1fr;gap:20px;}
+  @media (min-width: 980px){
+    .layout-grid{grid-template-columns:340px 1fr;gap:22px;align-items:start;}
+  }
+  @media (max-width: 979px){
+    .layout-grid{display:flex;flex-direction:column;}
+    .panel-right{order:1;}
+    .panel-left{order:2;}
+  }
+  .panel-left{display:flex;flex-direction:column;gap:14px;}
+  .panel-right{display:flex;flex-direction:column;gap:14px;}
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px;
+  }
+  .panel h2.ph{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink); margin:0 0 12px; font-weight:600;
+  }
+
+  /* ---------- Controles ---------- */
+  .ctrl-row{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:4px; margin-top:14px;
+  }
+  .ctrl-row:first-of-type{margin-top:0;}
+  .ctrl-row label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--text-dim);
+  }
+  .readout{font-family:'Archivo',sans-serif;font-weight:800;font-size:20px;color:var(--ink);}
+  .readout .u{font-size:12px;color:var(--text-dim);font-weight:600;}
+
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:26px; background:transparent; margin:2px 0;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:6px;border-radius:3px;
+    background:linear-gradient(90deg,var(--safe),var(--warn) 45%,var(--danger) 85%);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:20px;height:20px;margin-top:-7px;border-radius:50%;
+    background:#fff;border:3px solid var(--panel);
+    box-shadow:0 0 0 1px var(--border),0 2px 6px rgba(0,0,0,.55);cursor:pointer;
+  }
+  input[type=range]::-moz-range-track{
+    height:6px;border-radius:3px;
+    background:linear-gradient(90deg,var(--safe),var(--warn) 45%,var(--danger) 85%);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:18px;height:18px;border-radius:50%;background:#fff;
+    border:3px solid var(--panel);box-shadow:0 0 0 1px var(--border);cursor:pointer;
+  }
+  #depthSlider::-webkit-slider-runnable-track,
+  #distSlider::-webkit-slider-runnable-track{background:linear-gradient(90deg,#5b7fa3,#8fb4d9);}
+  #depthSlider::-moz-range-track,
+  #distSlider::-moz-range-track{background:linear-gradient(90deg,#5b7fa3,#8fb4d9);}
+
+  .ticks{
+    display:flex;justify-content:space-between;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;
+    color:var(--text-dim);padding:0 1px;margin-bottom:6px;
+  }
+
+  fieldset{
+    border:1px solid var(--border); border-radius:6px;
+    padding:10px 12px 12px; margin:16px 0 0;
+  }
+  legend{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);
+    padding:0 6px;
+  }
+  .seg{display:flex;flex-wrap:wrap;gap:6px;}
+  .seg button{
+    flex:1 1 auto; min-width:88px;
+    background:var(--panel-2); color:var(--text);
+    border:1px solid var(--border); border-radius:5px;
+    padding:8px 6px; font-size:12px; font-weight:600; cursor:pointer;
+    font-family:'Inter',sans-serif; line-height:1.25;
+  }
+  .seg button .sub{display:block;font-size:10px;color:var(--text-dim);font-weight:400;margin-top:2px;}
+  .seg button[aria-pressed="true"]{
+    background:var(--ink); color:#1a1305; border-color:var(--ink);
+  }
+  .seg button[aria-pressed="true"] .sub{color:#4a3505;}
+  .seg button:hover{border-color:var(--ink-dim);}
+
+  .btn-row{display:flex;gap:10px;margin-top:16px;}
+  button{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13px;
+    border-radius:5px;border:1px solid transparent;padding:11px 14px;
+    cursor:pointer;transition:transform .08s ease, filter .15s ease;
+  }
+  button:active{transform:translateY(1px);}
+  #triggerBtn{flex:1;background:var(--ink);color:#1a1305;font-weight:700;}
+  #triggerBtn:hover{filter:brightness(1.08);}
+  #triggerBtn:disabled{background:var(--panel-2);color:var(--text-dim);cursor:not-allowed;border-color:var(--border);}
+  #resetBtn{background:transparent;color:var(--text-dim);border-color:var(--border);}
+  #resetBtn:hover{color:var(--text);border-color:var(--text-dim);}
+
+  .toggle-row{
+    display:flex;align-items:center;gap:8px;margin-top:12px;
+    font-size:12px;color:var(--text-dim);
+  }
+  .toggle-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--ink);cursor:pointer;}
+  .toggle-row label{cursor:pointer;}
+
+  /* ---------- Lecturas numéricas ---------- */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+  .info-box{
+    background:var(--panel-2);border:1px solid var(--border);
+    border-radius:5px;padding:8px 10px;
+  }
+  .info-box.wide{grid-column:1 / -1;}
+  .info-box .k{
+    font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--text-dim);margin-bottom:3px;
+  }
+  .info-box .v{font-size:14px;font-weight:600;line-height:1.3;}
+  .info-box .v small{font-size:11px;color:var(--text-dim);font-weight:400;}
+  .v-ink{color:var(--ink);}
+
+  /* ---------- Fase y bitácora ---------- */
+  .phase-strip{
+    display:flex;gap:4px;margin-top:14px;flex-wrap:wrap;
+  }
+  .phase-chip{
+    flex:1 1 auto;text-align:center;
+    font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;
+    text-transform:uppercase;padding:5px 4px;border-radius:4px;
+    background:var(--panel-2);color:var(--text-dim);border:1px solid var(--border);
+  }
+  .phase-chip.on{background:var(--ink);color:#1a1305;border-color:var(--ink);font-weight:600;}
+  .phase-chip.done{background:var(--panel-3);color:var(--safe);border-color:var(--border);}
+
+  .log{
+    margin-top:12px;background:#14171d;border:1px solid var(--border);
+    border-radius:5px;padding:10px;height:132px;overflow-y:auto;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.65;
+    color:var(--text-dim);
+  }
+  .log p{margin:0 0 4px;}
+  .log .t{color:var(--ink);}
+  .log .hl{color:var(--text);}
+  .log .bad{color:var(--danger);}
+  .log .ok{color:var(--safe);}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:14px;
+    padding-top:12px;border-top:1px dashed var(--border);
+    font-size:11px;color:var(--text-dim);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .swatch{width:11px;height:11px;border-radius:2px;display:inline-block;}
+  .swatch.dash{border-radius:0;height:0;border-top:2px dashed var(--wave-p);width:14px;}
+
+  /* ---------- Escenario ---------- */
+  .stage-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:8px;
+    overflow:hidden;box-shadow:0 20px 50px -25px rgba(0,0,0,.75);
+  }
+  .stage-frame{
+    position:relative;width:100%;aspect-ratio:16/11;
+    background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bot) 38%);
+  }
+  #stage{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  .mag-badge{
+    position:absolute;top:10px;left:10px;
+    font-family:'IBM Plex Mono',monospace;
+    background:rgba(10,12,16,.72);border:1px solid var(--border);
+    border-radius:4px;padding:5px 9px;pointer-events:none;
+  }
+  .mag-badge .n{font-family:'Archivo',sans-serif;font-weight:900;font-size:20px;color:var(--ink);line-height:1;}
+  .mag-badge .l{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);}
+  .phase-tag{
+    position:absolute;top:10px;right:10px;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;
+    color:var(--text);background:rgba(10,12,16,.72);border:1px solid var(--border);
+    padding:5px 9px;border-radius:4px;pointer-events:none;max-width:56%;text-align:right;
+  }
+  .seismo-wrap{
+    border-top:1px solid var(--border);
+    background:
+      repeating-linear-gradient(0deg, rgba(232,169,74,0.055) 0 1px, transparent 1px 20px),
+      repeating-linear-gradient(90deg, rgba(232,169,74,0.055) 0 1px, transparent 1px 20px),
+      #14171d;
+    position:relative;
+  }
+  #seismo{width:100%;height:104px;display:block;}
+  .seismo-label{
+    position:absolute;top:6px;left:10px;
+    font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--text-dim);pointer-events:none;
+  }
+
+  .mini-grid{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media (min-width:700px){.mini-grid{grid-template-columns:1fr 1fr;}}
+  .mini-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:8px;
+    padding:12px 12px 10px;
+  }
+  .mini-card h3{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink);margin:0 0 8px;font-weight:600;
+  }
+  .mini-card .cv{position:relative;width:100%;aspect-ratio:16/9;}
+  .mini-card canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  .mini-note{font-size:11px;color:var(--text-dim);line-height:1.5;margin:8px 0 0;}
+
+  /* ---------- Resultados ---------- */
+  .results{margin-top:0;}
+  .results ul{list-style:none;margin:0;padding:0;}
+  .results li{
+    display:flex;align-items:center;gap:8px;
+    padding:7px 8px;border-bottom:1px solid var(--border);font-size:12.5px;
+  }
+  .results li:last-child{border-bottom:none;}
+  .results .mark{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:11px;
+    width:22px;text-align:center;flex:0 0 auto;
+  }
+  .results .nm{flex:1 1 auto;}
+  .results .st{font-size:11px;font-weight:600;flex:0 0 auto;}
+  .st-ok{color:var(--safe);}
+  .st-dm{color:var(--warn);}
+  .st-cl{color:var(--danger);}
+  .results .per{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-dim);flex:0 0 auto;width:64px;text-align:right;}
+
+  /* ---------- Sección didáctica ---------- */
+  .didactic{margin-top:28px;}
+  .didactic p.sub{color:var(--text-dim);font-size:13px;margin:0 0 16px;line-height:1.6;}
+  .didactic > details.acc-mega{margin-bottom:12px;}
+
+  details.acc{
+    background:var(--panel);border:1px solid var(--border);
+    border-radius:8px;margin-bottom:10px;overflow:hidden;
+  }
+  details.acc > summary{
+    cursor:pointer;list-style:none;padding:14px 16px;
+    font-weight:600;font-size:15px;color:var(--text);
+    display:flex;align-items:center;gap:10px;
+  }
+  details.acc > summary::-webkit-details-marker{display:none;}
+  details.acc > summary::after{
+    content:"+";margin-left:auto;color:var(--ink);
+    font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;
+  }
+  details.acc[open] > summary::after{content:"–";}
+  details.acc > summary:hover{background:var(--panel-2);}
+  details.acc .num{
+    flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+    background:var(--panel-3);color:var(--ink);border:1px solid var(--border);
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
+  }
+  details.acc-mega{border-color:var(--ink-dim);background:var(--panel);}
+  details.acc-mega > summary{padding:16px 18px;align-items:baseline;flex-wrap:wrap;gap:4px 12px;}
+  details.acc-mega > summary h2{
+    font-family:'Archivo',sans-serif;font-weight:800;font-size:20px;
+    margin:0;letter-spacing:-0.01em;display:inline;
+  }
+  details.acc-mega > summary .mega-sub{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-dim);
+    letter-spacing:.04em;
+  }
+  details.acc-mega > summary::after{font-size:22px;align-self:center;}
+  .mega-body{padding:0 16px 16px;}
+  .mega-body > .sub{margin-top:0;}
+
+  .acc-body{padding:0 16px 16px;font-size:14px;line-height:1.72;color:#dcd9d2;}
+  .acc-body p{margin:0 0 12px;}
+  .acc-body ul,.acc-body ol{margin:0 0 12px;padding-left:22px;}
+  .acc-body li{margin-bottom:7px;}
+  .acc-body strong{color:var(--text);}
+  .acc-body h3{
+    font-size:13px;margin:18px 0 8px;color:var(--ink);
+    font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
+  }
+  .formula{
+    background:#14171d;border:1px solid var(--border);border-left:3px solid var(--ink);
+    border-radius:0 5px 5px 0;padding:10px 14px;margin:0 0 12px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text);
+    overflow-x:auto;line-height:1.8;
+  }
+  .nota{
+    background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--safe);
+    border-radius:0 5px 5px 0;padding:11px 14px;margin:0 0 12px;font-size:13px;line-height:1.65;
+  }
+  .nota .tag{
+    display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--safe);margin-bottom:4px;font-weight:600;
+  }
+
+  table{
+    width:100%;border-collapse:collapse;margin:0 0 14px;font-size:12.5px;
+  }
+  caption{
+    caption-side:top;text-align:left;font-size:12px;color:var(--text-dim);
+    padding:0 0 8px;line-height:1.5;
+  }
+  th,td{
+    border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top;
+  }
+  th{background:var(--panel-2);color:var(--ink);font-weight:600;font-size:11.5px;}
+  tbody tr:nth-child(even){background:rgba(255,255,255,0.022);}
+
+  /* ---------- Autoevaluación ---------- */
+  .quiz-item{
+    background:var(--panel-2);border:1px solid var(--border);
+    border-radius:6px;padding:14px;margin-bottom:12px;
+  }
+  .quiz-q{font-weight:600;font-size:14px;margin:0 0 10px;line-height:1.55;}
+  .quiz-opts{display:flex;flex-direction:column;gap:7px;}
+  .quiz-opts button{
+    text-align:left;background:var(--panel);border:1px solid var(--border);
+    color:var(--text);font-size:13px;font-weight:400;padding:9px 12px;line-height:1.5;
+  }
+  .quiz-opts button:hover{border-color:var(--ink-dim);}
+  .quiz-opts button.correct{border-color:var(--safe);background:rgba(109,187,150,0.14);}
+  .quiz-opts button.wrong{border-color:var(--danger);background:rgba(240,123,112,0.12);}
+  .quiz-fb{margin-top:10px;font-size:12.5px;line-height:1.6;color:var(--text-dim);min-height:0;}
+  .quiz-fb.show{margin-top:10px;}
+  .quiz-fb .ok{color:var(--safe);font-weight:600;}
+  .quiz-fb .no{color:var(--danger);font-weight:600;}
+
+  footer.doc{
+    margin-top:28px;padding-top:16px;border-top:1px solid var(--border);
+    font-size:11.5px;color:var(--text-dim);line-height:1.7;
+  }
+  footer.doc a{color:var(--ink);}
+  .visually-hidden{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header-grid">
+    <header class="top">
+      <p class="eyebrow">Geociencias · Sismología aplicada al aula</p>
+      <h1>De la placa al pilar</h1>
+      <p class="lead">Simulador didáctico que conecta dos escalas: lo que ocurre <strong>dentro de la corteza terrestre</strong> —acumulación de esfuerzo, ruptura de la falla y propagación de ondas— y lo que ocurre <strong>en la superficie</strong>, donde el tipo de suelo y el período de cada edificación deciden quién resiste y quién colapsa.</p>
+    </header>
+
+    <div class="preset-card">
+      <h2 class="ph">Escenarios históricos</h2>
+      <div class="seg preset-grid" id="presetSeg" role="group" aria-label="Escenarios históricos precargados">
+        <button type="button" data-preset="mexico" aria-pressed="false">México 1985<span class="sub">M 8,0 · cuenca</span></button>
+        <button type="button" data-preset="guanica" aria-pressed="false">Guánica 2020<span class="sub">M 6,4 · costa</span></button>
+        <button type="button" data-preset="sf" aria-pressed="false">San Francisco 1906<span class="sub">M 7,9 · desgarre</span></button>
+        <button type="button" data-preset="haiti" aria-pressed="false">Haití 2010<span class="sub">M 7,0 · superficial</span></button>
+        <button type="button" data-preset="profundo" aria-pressed="false">Foco profundo<span class="sub">M 6,5 · 90 km</span></button>
+        <button type="button" data-preset="somero" aria-pressed="false">Foco somero<span class="sub">M 6,5 · 5 km</span></button>
+      </div>
+      <p class="preset-note">Cada escenario carga magnitud, profundidad, distancia, tipo de falla y suelo. Los dos últimos forman una pareja de contraste: misma magnitud, distinta profundidad.</p>
+    </div>
+  </div>
+
+  <div class="layout-grid">
+
+    <!-- ============ PANEL IZQUIERDO: CONTROLES ============ -->
+    <div class="panel-left">
+
+      <div class="panel">
+        <h2 class="ph">Consola de parámetros</h2>
+
+        <div class="ctrl-row">
+          <label for="magSlider">Magnitud de momento</label>
+          <div class="readout"><span id="magVal">6.5</span> <span class="u">M<sub>w</sub></span></div>
+        </div>
+        <input type="range" id="magSlider" min="4" max="9" step="0.1" value="6.5"
+               aria-describedby="magHelp">
+        <div class="ticks"><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+        <p id="magHelp" class="visually-hidden">Escala logarítmica: cada unidad multiplica por 32 la energía liberada.</p>
+
+        <div class="ctrl-row">
+          <label for="depthSlider">Profundidad del foco</label>
+          <div class="readout"><span id="depthVal">12</span> <span class="u">km</span></div>
+        </div>
+        <input type="range" id="depthSlider" min="3" max="100" step="1" value="12"
+               aria-describedby="depthHelp">
+        <div class="ticks"><span>3</span><span>25</span><span>50</span><span>75</span><span>100 km</span></div>
+        <p id="depthHelp" class="visually-hidden">Por debajo de 70 kilómetros el sismo se considera de profundidad intermedia y ocurre dentro de la placa que se hunde.</p>
+
+        <div class="ctrl-row">
+          <label for="distSlider">Distancia de la ciudad</label>
+          <div class="readout"><span id="distVal">20</span> <span class="u">km</span></div>
+        </div>
+        <input type="range" id="distSlider" min="5" max="60" step="1" value="20">
+        <div class="ticks"><span>5</span><span>20</span><span>40</span><span>60 km</span></div>
+
+        <div class="ctrl-row">
+          <label for="durSlider">Duración de la sacudida</label>
+          <div class="readout"><span id="durVal">25</span> <span class="u">s</span></div>
+        </div>
+        <input type="range" id="durSlider" min="8" max="60" step="1" value="25">
+        <div class="ticks"><span>8</span><span>25</span><span>40</span><span>60 s</span></div>
+
+        <fieldset>
+          <legend>Tipo de falla</legend>
+          <div class="seg" id="faultSeg" role="group" aria-label="Tipo de falla geológica">
+            <button type="button" data-fault="normal" aria-pressed="false">Normal<span class="sub">Distensiva</span></button>
+            <button type="button" data-fault="inversa" aria-pressed="true">Inversa<span class="sub">Compresiva</span></button>
+            <button type="button" data-fault="desgarre" aria-pressed="false">Desgarre<span class="sub">Lateral</span></button>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Suelo bajo la ciudad</legend>
+          <div class="seg" id="soilSeg" role="group" aria-label="Tipo de suelo bajo la ciudad">
+            <button type="button" data-soil="roca" aria-pressed="true">Roca firme<span class="sub">T ≈ 0,25 s</span></button>
+            <button type="button" data-soil="cuenca" aria-pressed="false">Cuenca lacustre<span class="sub">T ≈ 2,0 s</span></button>
+            <button type="button" data-soil="arena" aria-pressed="false">Arena saturada<span class="sub">T ≈ 0,8 s</span></button>
+          </div>
+        </fieldset>
+
+        <div class="toggle-row">
+          <input type="checkbox" id="reduceMotion">
+          <label for="reduceMotion">Reducir movimiento (sacudida atenuada)</label>
+        </div>
+        <div class="toggle-row">
+          <input type="checkbox" id="fastMode">
+          <label for="fastMode">Velocidad ×3 (acortar la espera)</label>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <h2 class="ph">Lecturas del modelo</h2>
+        <div class="info-grid">
+          <div class="info-box">
+            <div class="k">Momento sísmico M₀</div>
+            <div class="v v-ink" id="m0Val">—</div>
+          </div>
+          <div class="info-box">
+            <div class="k">Energía liberada</div>
+            <div class="v" id="energyVal">—</div>
+          </div>
+          <div class="info-box">
+            <div class="k">Longitud de ruptura</div>
+            <div class="v" id="srlVal">—</div>
+          </div>
+          <div class="info-box">
+            <div class="k">Ancho de ruptura</div>
+            <div class="v" id="rwVal">—</div>
+          </div>
+          <div class="info-box">
+            <div class="k">Desplazamiento medio</div>
+            <div class="v" id="adVal">—</div>
+          </div>
+          <div class="info-box">
+            <div class="k">Desplazamiento máximo</div>
+            <div class="v" id="mdVal">—</div>
+          </div>
+          <div class="info-box">
+            <div class="k">Distancia hipocentral</div>
+            <div class="v" id="rhypoVal">—</div>
+          </div>
+          <div class="info-box">
+            <div class="k">Llegada P / S</div>
+            <div class="v" id="arrVal">—</div>
+          </div>
+          <div class="info-box">
+            <div class="k">PGA en la ciudad</div>
+            <div class="v v-ink" id="pgaVal">—</div>
+          </div>
+          <div class="info-box">
+            <div class="k">Intensidad Mercalli</div>
+            <div class="v v-ink" id="mmiVal">—</div>
+          </div>
+          <div class="info-box wide">
+            <div class="k">Efecto de sitio</div>
+            <div class="v" id="siteVal">—</div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- ============ PANEL DERECHO: ESCENARIO ============ -->
+    <div class="panel-right">
+
+      <div class="action-bar">
+        <div class="btns">
+          <button type="button" id="triggerBtn">▶ Iniciar ciclo sísmico</button>
+          <button type="button" id="resetBtn">Reiniciar</button>
+        </div>
+        <div class="phase-strip" id="phaseStrip" aria-hidden="true">
+          <span class="phase-chip" data-ph="stress">1 · Esfuerzo</span>
+          <span class="phase-chip" data-ph="rupture">2 · Ruptura</span>
+          <span class="phase-chip" data-ph="travel">3 · Ondas</span>
+          <span class="phase-chip" data-ph="shaking">4 · Sacudida</span>
+          <span class="phase-chip" data-ph="after">5 · Réplicas</span>
+        </div>
+      </div>
+
+      <div class="stage-card">
+        <div class="stage-frame" id="stageFrame">
+          <canvas id="stage" role="img" aria-label="Corte transversal de la corteza terrestre con una ciudad en la superficie. La descripción dinámica del evento aparece en la bitácora."></canvas>
+          <div class="mag-badge">
+            <div class="n" id="badgeVal">6.5</div>
+            <div class="l">Magnitud</div>
+          </div>
+          <div class="phase-tag" id="phaseTag">En reposo</div>
+        </div>
+        <div class="seismo-wrap">
+          <span class="seismo-label">Sismograma en la ciudad</span>
+          <canvas id="seismo" aria-hidden="true"></canvas>
+        </div>
+      </div>
+
+      <div class="mini-grid">
+        <div class="mini-card">
+          <h3>Vista en planta de la ruptura</h3>
+          <div class="cv"><canvas id="plan" aria-hidden="true"></canvas></div>
+          <p class="mini-note">La longitud de ruptura se mide <em>a lo largo</em> de la falla, es decir, perpendicular al corte transversal.</p>
+        </div>
+        <div class="mini-card">
+          <h3>Espectro de respuesta del sitio</h3>
+          <div class="cv"><canvas id="spec" aria-hidden="true"></canvas></div>
+          <p class="mini-note">Cada marca es una edificación. Donde la curva se levanta, el suelo y el edificio entran en resonancia.</p>
+        </div>
+      </div>
+
+      <div class="bottom-grid">
+        <div class="panel">
+          <h2 class="ph">Bitácora del evento</h2>
+          <div class="log" id="log" role="log" aria-live="polite" aria-atomic="false">
+            <p>Sistema en reposo. Ajuste los parámetros y pulse «Iniciar ciclo sísmico».</p>
+          </div>
+          <div class="legend">
+            <span><span class="swatch dash"></span>Onda P</span>
+            <span><span class="swatch" style="background:#e8a94a"></span>Onda S</span>
+            <span><span class="swatch" style="background:#d97ba8"></span>Onda superficial</span>
+            <span><span class="swatch" style="background:#6dbb96"></span>Intacto</span>
+            <span><span class="swatch" style="background:#e8b95a"></span>Dañado</span>
+            <span><span class="swatch" style="background:#f07b70"></span>Colapsado</span>
+          </div>
+        </div>
+
+        <div class="panel results">
+          <h2 class="ph">Estado de las edificaciones</h2>
+          <ul id="resultList">
+            <li><span class="mark" aria-hidden="true">●</span><span class="nm">Sin simulación ejecutada</span><span class="per"></span><span class="st"></span></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ SECCIÓN DIDÁCTICA ============ -->
+  <section class="didactic" aria-labelledby="didacticTitle">
+   <details class="acc acc-mega">
+    <summary><h2 id="didacticTitle">Guía didáctica: qué ocurre realmente bajo nuestros pies</h2><span class="mega-sub">8 apartados · fundamentos, escalas, resonancia, licuefacción y actividades</span></summary>
+    <div class="mega-body">
+    <p class="sub">Cada apartado explica un fragmento del proceso que el simulador representa. Puede abrirse en cualquier orden.</p>
+
+    <details class="acc">
+      <summary><span class="num" aria-hidden="true">1</span>El ciclo sísmico: la teoría del rebote elástico</summary>
+      <div class="acc-body">
+        <p>Un terremoto tectónico no es un accidente instantáneo: es el desenlace de un proceso lento que puede durar décadas, siglos o milenios. Henry Fielding Reid lo formuló tras estudiar el sismo de San Francisco de 1906 y sigue siendo el marco explicativo vigente.</p>
+        <ol>
+          <li><strong>Acumulación (fase intersísmica).</strong> Las corrientes convectivas del manto empujan las placas, pero la fricción estática mantiene <em>bloqueada</em> la falla. La roca no se rompe todavía: se deforma elásticamente, como una regla de plástico que se dobla. La energía se almacena en forma de deformación.</li>
+          <li><strong>Ruptura (fase cosísmica).</strong> Cuando el esfuerzo supera la resistencia al corte de la roca, la falla cede. La ruptura nace en un punto —el <strong>hipocentro</strong> o foco— y se propaga a lo largo del plano de falla a unos 2 a 3 km/s.</li>
+          <li><strong>Rebote.</strong> Los bloques se deslizan y «rebotan» hacia una posición sin deformar, pero desplazada. En el simulador se aprecia cómo las líneas de referencia, que estaban curvadas junto a la falla, se enderezan dejando un <strong>escalón permanente</strong>. Esa deformación permanente es la huella que el terremoto deja en la corteza.</li>
+          <li><strong>Relajación y réplicas.</strong> El campo de esfuerzos alrededor de la ruptura queda desequilibrado. Las <strong>réplicas</strong> lo reajustan siguiendo la ley de Omori: su frecuencia decae aproximadamente como 1/t.</li>
+        </ol>
+        <div class="nota">
+          <span class="tag">Idea clave para el aula</span>
+          Lo que se siente en la superficie dura segundos; lo que lo produjo tardó siglos en prepararse. El terremoto no «crea» energía: la libera.
+        </div>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary><span class="num" aria-hidden="true">2</span>Dónde ocurre: capas de la Tierra y fronteras de placas</summary>
+      <div class="acc-body">
+        <p>Los sismos que nos afectan nacen en la parte superior y frágil de la corteza. Por debajo de unos 15 a 20 kilómetros, la roca continental deja de romperse y empieza a fluir plásticamente: por eso el simulador marca la <strong>transición frágil-dúctil</strong> con una línea de referencia.</p>
+        <table>
+          <caption>Tabla 1. Capas del interior terrestre y su relación con la actividad sísmica.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Capa</th>
+              <th scope="col">Espesor aproximado</th>
+              <th scope="col">Relevancia sísmica</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Corteza oceánica</td><td>≈ 5 km</td><td>Delgada y densa; se subduce bajo las placas continentales.</td></tr>
+            <tr><td>Corteza continental</td><td>≈ 30 a 40 km</td><td>Aloja la zona sismogénica frágil (0 a 20 km).</td></tr>
+            <tr><td>Manto</td><td>≈ 2 900 km</td><td>Su convección mueve las placas; la astenosfera actúa como capa deformable sobre la que flotan.</td></tr>
+            <tr><td>Núcleo externo (líquido)</td><td>≈ 2 300 km</td><td>Bloquea las ondas S y refracta las P: origina la zona de sombra sísmica.</td></tr>
+            <tr><td>Núcleo interno (sólido)</td><td>≈ 1 200 km de diámetro</td><td>Refleja ondas profundas; se detectó gracias a la sismología.</td></tr>
+          </tbody>
+        </table>
+        <h3>La zona de sombra</h3>
+        <p>Entre los 104° y los 140° de distancia angular desde el epicentro no llegan ondas S y las P llegan muy debilitadas. Esa ausencia fue la prueba de que el núcleo externo es líquido: las ondas de corte no se propagan en fluidos. La sismología, literalmente, radiografió el planeta desde fuera.</p>
+        <h3>Superficiales, intermedios y profundos</h3>
+        <p>No todos los sismos nacen en la corteza. La profundidad del foco los clasifica en tres familias, y esa profundidad pesa tanto como la magnitud a la hora de causar daño.</p>
+        <table>
+          <caption>Tabla 2. Clasificación de los sismos según la profundidad del foco.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Familia</th>
+              <th scope="col">Profundidad</th>
+              <th scope="col">Dónde y por qué se producen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Superficiales</td><td>0 a 70 km</td><td>En la corteza frágil. Son la gran mayoría y, con diferencia, los más destructivos.</td></tr>
+            <tr><td>Intermedios</td><td>70 a 300 km</td><td>Dentro de la placa oceánica que se subduce. Esa placa entra fría en el manto y conserva su rigidez, de modo que aún puede fracturarse.</td></tr>
+            <tr><td>Profundos</td><td>300 a 700 km</td><td>En el extremo hundido de la placa. Se sienten en áreas enormes, pero rara vez causan destrucción.</td></tr>
+          </tbody>
+        </table>
+        <div class="nota">
+          <span class="tag">Dos sismos casi gemelos, dos desenlaces opuestos</span>
+          Compare en el simulador dos eventos de <strong>magnitud 6,5 a 10 km de distancia epicentral</strong>: uno con el foco a <strong>90 km</strong> y otro con el foco a <strong>5 km</strong>. La magnitud es la misma; la distancia hipocentral no. En el primer caso el foco está a más de 90 km del observador y la aceleración llega muy atenuada (intensidad Mercalli V, ventanas que traquetean). En el segundo, el foco está prácticamente debajo de los cimientos: la aceleración se multiplica por siete y la intensidad salta al grado VIII, con daño grave en estructuras deficientes. Esta es la razón de que sismos de magnitud similar produzcan, en unos países, un susto y, en otros, una catástrofe.
+        </div>
+        <p>Observe además que al llevar el foco por debajo de los 45 km el simulador deja de dibujar un escarpe en la superficie: una ruptura a esa profundidad no deforma el terreno de forma apreciable. Toda su huella es la sacudida.</p>
+
+        <h3>Las tres fronteras de placas</h3>
+        <ul>
+          <li><strong>Divergente:</strong> las placas se separan y se crea corteza nueva (dorsales oceánicas, Gran Valle del Rift). Predominan las fallas <em>normales</em>.</li>
+          <li><strong>Convergente:</strong> las placas chocan; la más densa se subduce y se destruye corteza. Predominan las fallas <em>inversas</em> y ocurren los sismos de mayor magnitud del planeta.</li>
+          <li><strong>Transformante:</strong> las placas se deslizan lateralmente (falla de San Andrés, fosa de Puerto Rico). Predominan las fallas de <em>desgarre</em>.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary><span class="num" aria-hidden="true">3</span>Del hipocentro a la superficie: las ondas sísmicas</summary>
+      <div class="acc-body">
+        <p>La energía liberada viaja como ondas elásticas. El simulador dibuja los tres frentes con velocidades distintas, y por eso el sismograma registra tres llegadas sucesivas.</p>
+        <table>
+          <caption>Tabla 3. Tipos de ondas sísmicas representadas en el simulador.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Onda</th>
+              <th scope="col">Velocidad típica</th>
+              <th scope="col">Movimiento de las partículas</th>
+              <th scope="col">Efecto en superficie</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>P (primaria, compresional)</td><td>≈ 6 km/s</td><td>Empuja y estira en la misma dirección de propagación.</td><td>Golpe seco vertical; rara vez destruye por sí sola.</td></tr>
+            <tr><td>S (secundaria, de corte)</td><td>≈ 3,5 km/s</td><td>Oscila perpendicular a la propagación; no viaja por fluidos.</td><td>Sacudida lateral que somete a corte los pilares.</td></tr>
+            <tr><td>Superficiales (Love y Rayleigh)</td><td>≈ 3 km/s</td><td>Love: horizontal perpendicular. Rayleigh: elíptico, como el oleaje.</td><td>Amplitud mayor y período largo: son las verdaderas demoledoras de ciudades.</td></tr>
+          </tbody>
+        </table>
+        <h3>Aplicación matemática: la regla de los ocho segundos</h3>
+        <p>Como las ondas P y S salen a la vez pero viajan a distinta velocidad, la diferencia entre sus tiempos de llegada mide la distancia al foco:</p>
+        <div class="formula">R ≈ (t<sub>S</sub> − t<sub>P</sub>) × 8   [R en km, tiempos en segundos]</div>
+        <p>Verifíquelo en el simulador: anote la llegada P y S que muestra el panel de lecturas, aplique la fórmula y compárela con la distancia hipocentral calculada. Es un excelente ejercicio de proporcionalidad y despeje de variables.</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary><span class="num" aria-hidden="true">4</span>Medir el sismo: Richter, magnitud de momento, Mercalli y PGA</summary>
+      <div class="acc-body">
+        <p>Conviene distinguir con claridad tres conceptos que el público suele confundir.</p>
+        <ul>
+          <li><strong>Magnitud:</strong> un número <em>único</em> por sismo. Describe el tamaño físico de la ruptura en el foco.</li>
+          <li><strong>Intensidad:</strong> <em>varía</em> de un lugar a otro. Describe lo que se siente y lo que se rompe en cada punto.</li>
+          <li><strong>Aceleración máxima del suelo (PGA):</strong> la medida instrumental del sacudimiento en un punto; se expresa en gales (cm/s²) o como fracción de la gravedad <em>g</em>.</li>
+        </ul>
+        <h3>De Richter a la magnitud de momento</h3>
+        <p>La escala de Richter fue diseñada en 1935 para sismos locales de California a partir de la amplitud registrada por un sismógrafo concreto. Es logarítmica: <strong>cada unidad multiplica por 10 la amplitud y por ≈ 32 la energía</strong>. Su limitación es que se <em>satura</em>: por encima de 7,0 deja de distinguir bien los eventos.</p>
+        <p>La sismología actual usa la <strong>magnitud de momento (M<sub>w</sub>)</strong>, que se calcula a partir de una magnitud física real, el momento sísmico:</p>
+        <div class="formula">M₀ = μ · A · D<br>M<sub>w</sub> = (2/3) · log₁₀(M₀) − 6,07</div>
+        <p>donde μ es la rigidez de la roca (≈ 3 × 10¹⁰ Pa), A el área de ruptura y D el desplazamiento medio. El simulador calcula M₀ a partir de la magnitud elegida y lo muestra en el panel de lecturas.</p>
+        <h3>Intensidad de Mercalli modificada</h3>
+        <table>
+          <caption>Tabla 4. Escala de intensidad de Mercalli modificada y su correspondencia aproximada con la aceleración máxima del suelo.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Grado</th>
+              <th scope="col">Qué se observa</th>
+              <th scope="col">PGA aproximada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>I a III</td><td>Perceptible por pocas personas; los objetos colgantes oscilan levemente.</td><td>Menos de 0,02 g</td></tr>
+            <tr><td>IV a V</td><td>Se siente ampliamente; las ventanas traquetean y los líquidos se derraman.</td><td>0,02 a 0,08 g</td></tr>
+            <tr><td>VI a VII</td><td>Dificultad para mantenerse en pie; daño leve en mampostería ordinaria.</td><td>0,08 a 0,25 g</td></tr>
+            <tr><td>VIII a IX</td><td>Daño grave en estructuras deficientes; fallan muros de carga; el suelo se agrieta.</td><td>0,25 a 0,60 g</td></tr>
+            <tr><td>X a XII</td><td>Destrucción casi total; caen puentes; fallas del terreno generalizadas.</td><td>Más de 0,60 g</td></tr>
+          </tbody>
+        </table>
+        <p>Por encima del grado IX la destrucción deja de depender solo de la aceleración: los suelos blandos no son capaces de transmitir aceleraciones mucho mayores sin fallar antes por licuefacción o deslizamiento.</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary><span class="num" aria-hidden="true">5</span>El suelo manda: efecto de sitio y resonancia</summary>
+      <div class="acc-body">
+        <p>Este es el apartado más contraintuitivo y el más valioso para el aula. <strong>La magnitud no basta para predecir el daño.</strong> Dos edificios idénticos, a la misma distancia del epicentro, pueden correr suertes opuestas si se asientan sobre suelos distintos.</p>
+        <h3>Período natural de una estructura</h3>
+        <p>Toda edificación oscila con un período propio, el tiempo que tarda en completar un vaivén. Una regla práctica de ingeniería es:</p>
+        <div class="formula">T ≈ 0,1 × N   [N = número de pisos]</div>
+        <p>Una casa de un piso vibra rápido (T ≈ 0,1 s); un edificio de 20 pisos oscila lento (T ≈ 2 s); un rascacielos de 30 pisos, más lento aún (T ≈ 3 s).</p>
+        <h3>Período del terreno</h3>
+        <p>El terreno también tiene su período. La roca firme vibra rápido y con amplitud pequeña. En cambio, cuando las ondas entran en una cuenca de sedimentos blandos su velocidad se desploma y, por conservación de energía, <strong>la amplitud se dispara</strong>: el suelo se mueve despacio pero muchísimo más.</p>
+        <div class="nota">
+          <span class="tag">Caso paradigmático: Ciudad de México, 1985</span>
+          El sismo (M 8,0) se originó en la costa, a más de 350 km. Las arcillas del antiguo lago dieron al terreno un período de oscilación de unos 2 segundos. Los edificios de 10 a 20 pisos —cuyo período natural era también de 2 segundos— entraron en resonancia y colapsaron por miles. Paradójicamente, las casas bajas coloniales y la Torre Latinoamericana, de 44 pisos, quedaron prácticamente ilesas: no estaban en fase con el suelo.
+        </div>
+        <p>Reproduzca el experimento: seleccione <strong>M 8,0</strong>, distancia <strong>60 km</strong> y suelo <strong>cuenca lacustre</strong>; después repita con <strong>roca firme</strong>. Observe en el espectro de respuesta cómo se desplaza el pico y cómo cambian por completo los edificios que sobreviven.</p>
+        <div class="formula">Demanda sobre el edificio = PGA<sub>sitio</sub> × S(T<sub>edificio</sub>)</div>
+        <p>La función S(T) es el <em>espectro de respuesta</em>: mide cuántas veces amplifica el conjunto suelo-estructura la aceleración del terreno para cada período. Su pico coincide con el período del sitio.</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary><span class="num" aria-hidden="true">6</span>Cuando el suelo se vuelve líquido: la licuefacción</summary>
+      <div class="acc-body">
+        <p>En arenas finas o limos saturados de agua subterránea, la sacudida colapsa la estructura granular del suelo. La presión del agua entre los poros se dispara y supera las tensiones de contacto entre los granos. Durante unos segundos, el terreno <strong>pierde por completo su capacidad de carga</strong> y se comporta como un líquido denso.</p>
+        <p>Las consecuencias son inconfundibles:</p>
+        <ul>
+          <li>Los edificios se hunden, se inclinan o se vuelcan aunque su estructura esté intacta: el problema no está en el edificio, sino bajo él.</li>
+          <li>Aparecen <strong>volcanes de arena</strong>: agua y arena expulsadas a la superficie por las grietas.</li>
+          <li>Los objetos enterrados y menos densos —tanques, tuberías, alcantarillas— <em>flotan</em> y emergen.</li>
+        </ul>
+        <p>En el simulador, seleccione el suelo <strong>arena saturada</strong> y una magnitud alta a corta distancia. Cuando la aceleración supera aproximadamente 0,15 g, verá el estrato licuarse y las edificaciones inclinarse y hundirse.</p>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary><span class="num" aria-hidden="true">7</span>Las matemáticas del simulador: modelo y supuestos</summary>
+      <div class="acc-body">
+        <p>Este interactivo no reproduce cifras al azar: aplica relaciones empíricas publicadas. Se documentan aquí para que puedan verificarse, discutirse y utilizarse como ejercicios de logaritmos y funciones.</p>
+        <h3>Dimensiones de la ruptura (Wells y Coppersmith, 1994)</h3>
+        <p>Estas regresiones se obtuvieron a partir de cientos de terremotos históricos y relacionan la magnitud con el tamaño físico de la ruptura.</p>
+        <div class="formula">
+          log₁₀(SRL) = −3,22 + 0,69 · M<sub>w</sub>   longitud de ruptura superficial (km)<br>
+          log₁₀(RW)&nbsp; = −1,01 + 0,32 · M<sub>w</sub>   ancho de ruptura en profundidad (km)<br>
+          log₁₀(AD)&nbsp; = −4,80 + 0,69 · M<sub>w</sub>   desplazamiento medio (m)<br>
+          log₁₀(MD)&nbsp; = −5,46 + 0,82 · M<sub>w</sub>   desplazamiento máximo (m)
+        </div>
+        <h3>Momento sísmico y energía</h3>
+        <div class="formula">
+          M₀ = 10<sup>(1,5 · M<sub>w</sub> + 9,1)</sup>  N·m<br>
+          E<sub>s</sub> ≈ 10<sup>(1,5 · M<sub>w</sub> + 4,8)</sup>  julios
+        </div>
+        <h3>Atenuación de la aceleración (Fukushima y Tanaka, 1990)</h3>
+        <div class="formula">
+          log₁₀(PGA) = 0,41·M − log₁₀(R + 0,032·10<sup>0,41M</sup>) − 0,0034·R + 1,30
+        </div>
+        <p>con la PGA en cm/s² y R la distancia hipocentral en kilómetros, calculada como R = √(d² + h²), donde d es la distancia epicentral y h la profundidad del foco. Por eso, en el simulador, <strong>un sismo somero sacude mucho más que uno profundo de igual magnitud</strong>.</p>
+        <h3>Conversión a intensidad (Wald y colaboradores, 1999)</h3>
+        <div class="formula">
+          MMI = 3,66 · log₁₀(PGA) − 1,66   para intensidades altas<br>
+          MMI = 2,20 · log₁₀(PGA) + 1,00   para intensidades bajas
+        </div>
+        <div class="nota">
+          <span class="tag">Limitaciones que conviene explicitar al alumnado</span>
+          El corte transversal exagera la escala vertical en los primeros kilómetros para que los estratos superficiales sean visibles; los desplazamientos de los bloques se amplifican para poder apreciarse; la ciudad se dibuja fuera de escala; y el modelo de daño es una simplificación pedagógica, no un cálculo estructural. Un edificio real se evalúa con análisis dinámico completo, no con un solo número.
+        </div>
+      </div>
+    </details>
+
+    <details class="acc">
+      <summary><span class="num" aria-hidden="true">8</span>Propuestas de trabajo para el aula</summary>
+      <div class="acc-body">
+        <h3>Investigación guiada (indagación)</h3>
+        <ol>
+          <li><strong>El experimento de México 1985.</strong> Fije M 8,0 y distancia 60 km. Ejecute la simulación sobre roca y sobre cuenca lacustre. Registre en una tabla el estado de cada edificación. ¿Qué edificio cambia más de suerte? ¿Por qué?</li>
+          <li><strong>Profundidad contra magnitud.</strong> Compare M 6,5 con el foco a 5 km y M 6,5 con el foco a 90 km, ambos a 10 km de distancia epicentral y sobre el mismo suelo. Anote la PGA y la intensidad Mercalli de cada caso. ¿Cuántas veces mayor es la aceleración del sismo somero? Después repita subiendo la magnitud del profundo hasta igualar la intensidad del somero: ¿cuánta magnitud extra hace falta para compensar la profundidad?</li>
+          <li><strong>La regla de los ocho segundos.</strong> Para tres distancias distintas, anote t<sub>P</sub> y t<sub>S</sub>, calcule R = 8·(t<sub>S</sub> − t<sub>P</sub>) y compare con la distancia hipocentral del panel. Calcule el error relativo porcentual.</li>
+          <li><strong>Crecimiento logarítmico.</strong> Registre la energía liberada para M 5, M 6, M 7 y M 8. ¿Por cuánto se multiplica al subir una unidad? Represente los datos en papel semilogarítmico.</li>
+          <li><strong>Diseño con criterio.</strong> Se le encarga ubicar un hospital de 12 plantas. Justifique con datos del simulador qué combinación de suelo y altura escogería y cuál evitaría.</li>
+        </ol>
+        <h3>Preguntas de discusión</h3>
+        <ul>
+          <li>¿Por qué se dice que «los terremotos no matan; los edificios mal construidos sí»?</li>
+          <li>Si la magnitud es única, ¿por qué dos ciudades reportan intensidades Mercalli distintas para el mismo sismo?</li>
+          <li>¿Qué información necesitaría un municipio para decidir dónde permitir edificios altos?</li>
+          <li>¿Puede predecirse un terremoto? ¿Qué diferencia hay entre predecir y estimar la peligrosidad?</li>
+        </ul>
+        <h3>Conexión con el currículo</h3>
+        <p>Logaritmos y notación científica; funciones exponenciales; proporcionalidad y despeje; lectura de gráficas y espectros; período y frecuencia; conservación de la energía; análisis de datos en tablas; argumentación con evidencia científica.</p>
+      </div>
+    </details>
+
+    </div>
+   </details>
+
+   <details class="acc acc-mega">
+    <summary><h2>Compruebe lo aprendido</h2><span class="mega-sub">6 preguntas con retroalimentación inmediata</span></summary>
+    <div class="mega-body">
+      <p class="sub">Puede responderse tras explorar el simulador.</p>
+      <div id="quiz"></div>
+    </div>
+   </details>
+  </section>
+
+  <footer class="doc">
+    <p><strong>De la placa al pilar · Simulador didáctico de terremotos.</strong> Recurso educativo abierto elaborado por José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago.</p>
+    <p>Modelo pedagógico simplificado con fines exclusivamente didácticos. Basado en relaciones empíricas de Wells y Coppersmith (1994), Fukushima y Tanaka (1990) y Wald <em>et al.</em> (1999). No debe utilizarse para evaluación de riesgo sísmico ni para diseño estructural.</p>
+    <p>Esta obra está licenciada bajo <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" rel="license">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.</p>
+  </footer>
+
+</div>
+<script>
+(function(){
+'use strict';
+
+/* =======================================================================
+   DE LA PLACA AL PILAR — motor de simulación
+   Modelo pedagógico simplificado. Ver apartado 7 de la guía didáctica.
+   ======================================================================= */
+
+var $ = function(id){ return document.getElementById(id); };
+
+/* ---------- Constantes físicas ---------- */
+var VP = 6.0;        // km/s onda P
+var VS = 3.5;        // km/s onda S
+var VL = 3.0;        // km/s ondas superficiales
+var V_RUP = 2.6;     // km/s velocidad de propagación de la ruptura
+var DEPTH_VIEW = 105; // km representados en el corte
+var G_GAL = 981;     // 1 g en cm/s^2
+
+var T_STRESS = 6.0;  // s de la fase de acumulación (representa siglos)
+var T_RUP    = 2.0;  // s de la fase de ruptura
+
+/* ---------- Suelos ---------- */
+var SOILS = {
+  roca:   { nombre:'Roca firme',        tsite:0.25, smax:2.5, sigma:0.60, amp:1.00, sedKm:0.35, liq:false, color:'#3d4654', desc:'Vibra rápido y con amplitud pequeña. Castiga a las construcciones bajas y rígidas.' },
+  cuenca: { nombre:'Cuenca lacustre',   tsite:2.00, smax:4.5, sigma:0.45, amp:1.60, sedKm:1.30, liq:false, color:'#5c4b3c', desc:'Arcillas blandas: amplifican los períodos largos. Peligro máximo para edificios de 10 a 20 pisos.' },
+  arena:  { nombre:'Arena saturada',    tsite:0.80, smax:3.2, sigma:0.55, amp:1.90, sedKm:0.95, liq:true,  color:'#6d6350', desc:'Arenas finas con nivel freático alto: amplifican y pueden licuarse por encima de 0,15 g.' }
+};
+
+var FAULTS = {
+  normal:   { nombre:'Normal (distensiva)',  dip:60, dir:+1, desc:'El bloque colgante desciende. Típica de fronteras divergentes.' },
+  inversa:  { nombre:'Inversa (compresiva)', dip:45, dir:-1, desc:'El bloque colgante cabalga hacia arriba. Típica de zonas de subducción.' },
+  desgarre: { nombre:'De desgarre (lateral)',dip:88, dir:0,  desc:'Los bloques se deslizan horizontalmente, uno respecto del otro.' }
+};
+
+/* ---------- Edificaciones ---------- */
+var BUILDING_DEFS = [
+  { nombre:'Casa de adobe',          pisos:1,  T:0.15, cap:0.25, off:-0.140, w:0.026, tipo:'adobe',  color:'#c99a6b' },
+  { nombre:'Escuela de mampostería', pisos:3,  T:0.30, cap:0.35, off:-0.088, w:0.030, tipo:'brick',  color:'#b5654f' },
+  { nombre:'Bodega industrial',      pisos:1,  T:0.20, cap:0.45, off:-0.028, w:0.046, tipo:'nave',   color:'#7a8290' },
+  { nombre:'Edificio de 12 pisos',   pisos:12, T:1.20, cap:0.85, off: 0.030, w:0.030, tipo:'conc',   color:'#5b7fa3' },
+  { nombre:'Torre de 20 pisos',      pisos:20, T:2.00, cap:0.80, off: 0.082, w:0.028, tipo:'conc',   color:'#4c8f7a' },
+  { nombre:'Torre sismorresistente', pisos:30, T:3.20, cap:2.40, off: 0.132, w:0.026, tipo:'iso',    color:'#e8a94a' }
+];
+
+/* =======================================================================
+   1. MODELO NUMÉRICO
+   ======================================================================= */
+
+/* Wells y Coppersmith (1994), regresiones para todos los tipos de falla */
+function wellsCoppersmith(mw){
+  return {
+    srl: Math.pow(10, -3.22 + 0.69*mw),   // km, longitud de ruptura superficial
+    rw:  Math.pow(10, -1.01 + 0.32*mw),   // km, ancho de ruptura en profundidad
+    ad:  Math.pow(10, -4.80 + 0.69*mw),   // m, desplazamiento medio
+    md:  Math.pow(10, -5.46 + 0.82*mw),   // m, desplazamiento máximo
+    ra:  Math.pow(10, -3.49 + 0.91*mw)    // km2, área de ruptura
+  };
+}
+function momento(mw){ return Math.pow(10, 1.5*mw + 9.1); }        // N·m
+function energia(mw){ return Math.pow(10, 1.5*mw + 4.8); }        // J
+
+/* Fukushima y Tanaka (1990): PGA en cm/s2, R hipocentral en km */
+function pgaRoca(mw, R){
+  var a = 0.41*mw;
+  var log = a - Math.log(R + 0.032*Math.pow(10,a))/Math.LN10 - 0.0034*R + 1.30;
+  return Math.pow(10, log);
+}
+/* Wald et al. (1999): de PGA (gal) a intensidad Mercalli modificada */
+function mmiDesdePGA(gal){
+  if(gal <= 0.1) return 1;
+  var l = Math.log(gal)/Math.LN10;
+  var alta = 3.66*l - 1.66;
+  var baja = 2.20*l + 1.00;
+  var v = alta >= 5 ? alta : baja;
+  return Math.max(1, Math.min(12, v));
+}
+var ROMANOS = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+function romano(m){ return ROMANOS[Math.max(1,Math.min(12, Math.round(m)))]; }
+
+/* Espectro de respuesta normalizado: Sa/PGA en función del período */
+function espectro(T, soil){
+  var s = SOILS[soil];
+  var z = Math.log(T/s.tsite)/s.sigma;
+  return 1 + (s.smax - 1) * Math.exp(-0.5*z*z);
+}
+
+/* =======================================================================
+   2. ESTADO
+   ======================================================================= */
+var st = {
+  mw:6.5, depth:12, dist:20, dur:25,
+  fault:'inversa', soil:'roca',
+  reduce:false, fast:false,
+  phase:'idle',        // idle | stress | rupture | travel | shaking | after | done
+  t:0, last:0, running:false,
+  stress:0, rupProg:0, slipped:false,
+  buildings:[], aftershocks:[], liqParticles:[], liqLevel:0,
+  seis:[], tP:0, tS:0, tL:0, marks:[],
+  derived:null, logged:{}
+};
+
+var stageFrame=$('stageFrame'), stage=$('stage'), ctx=stage.getContext('2d');
+var seismo=$('seismo'), sctx=seismo.getContext('2d');
+var planC=$('plan'), pctx=planC.getContext('2d');
+var specC=$('spec'), xctx=specC.getContext('2d');
+
+var W=0,H=0,SW=0,SH=0,PW=0,PH=0,XW=0,XH=0,dpr=1;
+var GY=0, X0=0, PXKM=0, UG=0;
+
+function resize(){
+  dpr = Math.max(1, window.devicePixelRatio||1);
+  function fit(cv, c){
+    var r = cv.getBoundingClientRect();
+    cv.width = Math.max(1, Math.round(r.width*dpr));
+    cv.height= Math.max(1, Math.round(r.height*dpr));
+    c.setTransform(dpr,0,0,dpr,0,0);
+    return [r.width, r.height];
+  }
+  var a = fit(stage, ctx);  W=a[0]; H=a[1];
+  var b = fit(seismo, sctx); SW=b[0]; SH=b[1];
+  var c = fit(planC, pctx); PW=c[0]; PH=c[1];
+  var d = fit(specC, xctx); XW=d[0]; XH=d[1];
+  GY = H*0.40; UG = H-GY; X0 = W*0.26; PXKM = W*0.0082;
+  buildLiqParticles();
+  drawSpectrum(); drawPlan();
+}
+window.addEventListener('resize', resize);
+if('ResizeObserver' in window){ new ResizeObserver(resize).observe(stageFrame); }
+
+/* ---------- Conversiones geométricas ---------- */
+function kmToX(k){ return X0 + k*PXKM; }
+function xToKm(x){ return (x-X0)/PXKM; }
+function depthToY(d){
+  if(d<=5)  return GY + (d/5)*0.20*UG;
+  if(d<=35) return GY + (0.20 + (d-5)/30*0.42)*UG;
+  return GY + (0.62 + (d-35)/70*0.38)*UG;
+}
+
+/* ---------- Geometría de la falla ---------- */
+function faultGeom(){
+  var f = FAULTS[st.fault];
+  var dipRad = f.dip*Math.PI/180;
+  var tanD = Math.tan(dipRad);
+  return {
+    dip:f.dip, dipRad:dipRad, dir:f.dir,
+    kmAt: function(d){ return (d - st.depth)/tanD; },   // km horizontal a la profundidad d
+    xAt:  function(d){ return kmToX((d - st.depth)/tanD); },
+    yAt:  function(d){ return depthToY(d); }
+  };
+}
+
+/* =======================================================================
+   3. CÁLCULO DERIVADO
+   ======================================================================= */
+function computeDerived(){
+  var wc = wellsCoppersmith(st.mw);
+  var s = SOILS[st.soil];
+  var R = Math.sqrt(st.dist*st.dist + st.depth*st.depth);
+  var pgaR = pgaRoca(st.mw, R);              // gal en roca
+  var pgaSitio = pgaR * s.amp;               // gal en el sitio
+  var mmi = mmiDesdePGA(pgaSitio);
+  var dTop = Math.max(0.1, st.depth - wc.rw/2);
+  var dBot = Math.min(DEPTH_VIEW-1, st.depth + wc.rw/2);
+  var res = {
+    wc:wc, R:R,
+    pgaRocaG: pgaR/G_GAL,
+    pgaG: pgaSitio/G_GAL,
+    pgaGal: pgaSitio,
+    mmi:mmi,
+    m0:momento(st.mw), es:energia(st.mw),
+    tP:R/VP, tS:R/VS, tL:st.depth/VS + st.dist/VL,
+    dTop:dTop, dBot:dBot,
+    superficial: dTop <= 1.2,
+    profundo: st.depth > 70,
+    intermedio: st.depth > 45 && st.depth <= 70,
+    claseProf: st.depth<=70 ? 'superficial' : 'intermedio',
+    rupDur: Math.max(0.5, wc.srl/(2*V_RUP)),
+    licua: s.liq && (pgaSitio/G_GAL) > 0.15
+  };
+  res.demanda = BUILDING_DEFS.map(function(b){
+    var sa = res.pgaG * espectro(b.T, st.soil);
+    return { sa:sa, ratio: sa/b.cap };
+  });
+  st.derived = res;
+  return res;
+}
+
+/* =======================================================================
+   4. INTERFAZ: LECTURAS
+   ======================================================================= */
+function fmt(n, d){ return n.toFixed(d===undefined?1:d).replace('.', ','); }
+function sci(x){
+  var e = Math.floor(Math.log(x)/Math.LN10);
+  var m = x/Math.pow(10,e);
+  return fmt(m,1)+' × 10^'+e;
+}
+function supSci(x){
+  var e = Math.floor(Math.log(x)/Math.LN10);
+  var m = x/Math.pow(10,e);
+  return fmt(m,1)+' × 10<sup>'+e+'</sup>';
+}
+
+function updateReadouts(){
+  var d = computeDerived();
+  $('magVal').textContent = fmt(st.mw,1);
+  $('badgeVal').textContent = fmt(st.mw,1);
+  $('depthVal').textContent = st.depth;
+  $('distVal').textContent = st.dist;
+  $('durVal').textContent = st.dur;
+
+  $('m0Val').innerHTML = supSci(d.m0)+' <small>N·m</small>';
+  var hiro = d.es/6.3e13;
+  $('energyVal').innerHTML = supSci(d.es)+' <small>J<br>≈ '+(hiro<1?fmt(hiro,2):fmt(hiro,0))+' bombas de Hiroshima</small>';
+  $('srlVal').innerHTML = fmt(d.wc.srl,1)+' <small>km</small>';
+  $('rwVal').innerHTML  = fmt(d.wc.rw,1)+' <small>km</small>';
+  $('adVal').innerHTML  = fmt(d.wc.ad,2)+' <small>m</small>';
+  $('mdVal').innerHTML  = fmt(d.wc.md,2)+' <small>m</small>';
+  $('rhypoVal').innerHTML = fmt(d.R,1)+' <small>km</small>';
+  $('arrVal').innerHTML = fmt(d.tP,1)+' s / '+fmt(d.tS,1)+' s';
+  $('pgaVal').innerHTML = fmt(d.pgaG,3)+' <small>g&nbsp;·&nbsp;'+fmt(d.pgaGal,0)+' gal</small>';
+  $('mmiVal').innerHTML = romano(d.mmi)+' <small>('+fmt(d.mmi,1)+')</small>';
+
+  var s = SOILS[st.soil];
+  var txt = s.nombre+' · período del sitio T = '+fmt(s.tsite,2)+' s · amplificación de PGA ×'+fmt(s.amp,2);
+  if(d.licua) txt += ' · RIESGO DE LICUEFACCIÓN';
+  $('siteVal').textContent = txt;
+
+  drawSpectrum(); drawPlan();
+}
+
+/* =======================================================================
+   5. BITÁCORA
+   ======================================================================= */
+function log(html, cls){
+  var box = $('log');
+  var p = document.createElement('p');
+  p.innerHTML = '<span class="t">['+fmt(st.t,1)+' s]</span> <span class="'+(cls||'')+'">'+html+'</span>';
+  box.appendChild(p);
+  box.scrollTop = box.scrollHeight;
+}
+function clearLog(msg){
+  $('log').innerHTML = '<p>'+msg+'</p>';
+}
+function once(key, fn){
+  if(!st.logged[key]){ st.logged[key]=true; fn(); }
+}
+
+function setPhase(p, tag){
+  st.phase = p;
+  $('phaseTag').textContent = tag;
+  var order = ['stress','rupture','travel','shaking','after'];
+  var idx = order.indexOf(p);
+  var chips = $('phaseStrip').querySelectorAll('.phase-chip');
+  for(var i=0;i<chips.length;i++){
+    var ci = order.indexOf(chips[i].getAttribute('data-ph'));
+    chips[i].className = 'phase-chip' + (ci===idx?' on':(idx>ci && idx>=0?' done':''));
+  }
+  stage.setAttribute('aria-label','Corte de la corteza terrestre. Fase actual: '+tag+'.');
+}
+
+/* =======================================================================
+   6. DIBUJO DEL CORTE
+   ======================================================================= */
+
+/* Movimiento del suelo en un punto a distancia epicentral dkm (km) */
+function groundMotion(dkm, tw){
+  var d = st.derived;
+  if(!d || tw<=0) return {v:0, hz:0};
+  var ad = Math.abs(dkm);
+  var R = Math.sqrt(ad*ad + st.depth*st.depth);
+  var tp = R/VP, ts = R/VS, tl = st.depth/VS + ad/VL;
+  var s = SOILS[st.soil];
+  var pgaLocal = pgaRoca(st.mw, R)*s.amp/G_GAL;
+  var A = Math.min(30, pgaLocal*70) * (st.reduce?0.35:1);
+  var tauS = Math.max(1.2, st.dur*0.28), tauL = Math.max(2, st.dur*0.5);
+  var v=0, hz=0, u, e;
+  if(tw>tp){ u=tw-tp; e=Math.exp(-u/0.8); v += A*0.40*e*Math.sin(u*2*Math.PI*5.0); hz += A*0.14*e*Math.sin(u*2*Math.PI*5.0); }
+  if(tw>ts){ u=tw-ts; e=Math.exp(-u/tauS); hz += A*0.95*e*Math.sin(u*2*Math.PI*2.2); v += A*0.28*e*Math.sin(u*2*Math.PI*2.2+1.1); }
+  if(tw>tl){
+    u=tw-tl; e=Math.exp(-u/tauL);
+    var f = 1/Math.max(0.4, s.tsite);
+    var aL = A*(s.tsite>1?1.5:0.8);
+    hz += aL*e*Math.sin(u*2*Math.PI*f);
+    v  += aL*0.55*e*Math.cos(u*2*Math.PI*f);
+  }
+  return {v:v, hz:hz};
+}
+
+/* Desplazamiento permanente de los bloques, en píxeles */
+function slipPx(){
+  if(!st.derived) return 0;
+  var m = st.derived.wc.ad;
+  return Math.min(30, 3 + m*5) * st.rupProg;   // exageración didáctica
+}
+
+function surfaceY(x, tw){
+  var dkm = xToKm(x);
+  var g = groundMotion(dkm, tw);
+  var y = GY + g.v*0.5;
+  /* asiento por licuefacción */
+  if(st.liqLevel>0){
+    var cxk = st.dist;
+    var zz = (dkm-cxk)/9;
+    y += st.liqLevel*7*Math.exp(-zz*zz);
+  }
+  return y;
+}
+
+var STRATA = [
+  { to:15, color:'#2b3240', label:'Corteza superior · frágil (zona sismogénica)' },
+  { to:35, color:'#232a36', label:'Corteza inferior · dúctil' },
+  { to:70, color:'#1d232e', label:'Manto litosférico' },
+  { to:DEPTH_VIEW, color:'#2a2230', label:'Astenosfera · manto dúctil' }
+];
+
+function pathSurface(tw){
+  ctx.beginPath();
+  ctx.moveTo(-40, surfaceY(-40, tw));
+  for(var x=-40; x<=W+40; x+=6) ctx.lineTo(x, surfaceY(x, tw));
+  ctx.lineTo(W+40, surfaceY(W+40, tw));
+}
+
+function drawStrata(tw){
+  var s = SOILS[st.soil];
+  var ySed = depthToY(s.sedKm);
+  /* estratos profundos */
+  for(var i=0;i<STRATA.length;i++){
+    var top = i===0 ? s.sedKm : STRATA[i-1].to;
+    ctx.fillStyle = STRATA[i].color;
+    ctx.fillRect(-40, depthToY(top), W+80, depthToY(STRATA[i].to)-depthToY(top)+2);
+  }
+  /* capa de sedimentos con techo ondulado */
+  ctx.fillStyle = s.color;
+  pathSurface(tw);
+  ctx.lineTo(W+40, ySed); ctx.lineTo(-40, ySed); ctx.closePath(); ctx.fill();
+
+  /* textura de la capa de sedimentos */
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,0.20)'; ctx.lineWidth = 1;
+  for(var k=1;k<4;k++){
+    var yy = GY + (ySed-GY)*k/4;
+    ctx.beginPath(); ctx.moveTo(-40,yy); ctx.lineTo(W+40,yy); ctx.stroke();
+  }
+  ctx.restore();
+
+  /* separadores de estratos */
+  ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 1;
+  for(var j=0;j<STRATA.length;j++){
+    var yb = depthToY(STRATA[j].to);
+    ctx.beginPath(); ctx.moveTo(-40,yb); ctx.lineTo(W+40,yb); ctx.stroke();
+  }
+  /* transición frágil-dúctil */
+  ctx.save();
+  ctx.setLineDash([5,5]); ctx.strokeStyle='rgba(232,169,74,0.35)'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(0, depthToY(15)); ctx.lineTo(W, depthToY(15)); ctx.stroke();
+  ctx.restore();
+}
+
+/* Rejilla de referencia que muestra la deformación elástica */
+function drawStrainGrid(tw){
+  var f = faultGeom();
+  var d = st.derived;
+  if(!d) return;
+  var Lkm = 16;                                  // longitud de decaimiento
+  var maxPx = Math.min(26, 3 + d.wc.ad*5);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(143,180,217,0.30)';
+  ctx.lineWidth = 1;
+  for(var km=-60; km<=70; km+=10){
+    ctx.beginPath();
+    var first = true;
+    for(var dp=0.5; dp<=DEPTH_VIEW; dp+=1.5){
+      var fk = f.kmAt(dp);
+      var dx = km - fk;
+      var side = dx>=0 ? 1 : -1;
+      var far = 1 - Math.exp(-Math.abs(dx)/Lkm);
+      var u;
+      if(st.fault==='desgarre'){
+        u = 0;      // el desplazamiento es perpendicular al corte: se ve en la vista en planta
+      } else {
+        /* solo la flexión elástica: el escalón permanente lo aporta el propio bloque */
+        var deepFac = Math.max(0.10, 1 - Math.max(0, st.depth-20)/85);
+        var full = maxPx*0.6*side*FAULTS[st.fault].dir*deepFac;
+        u = full * st.stress * (1-st.rupProg) * far;
+      }
+      var x = kmToX(km) + u;
+      var y = depthToY(dp);
+      if(first){ ctx.moveTo(x,y); first=false; } else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawStressField(){
+  if(st.stress<=0.02) return;
+  var f = faultGeom();
+  var d = st.derived;
+  var cx = f.xAt(st.depth), cy = depthToY(st.depth);
+  var rr = Math.max(40, (d.wc.rw*0.6)*PXKM);
+  var g = ctx.createRadialGradient(cx,cy,2,cx,cy,rr*1.6);
+  var a = st.stress*(1-st.rupProg);
+  g.addColorStop(0,'rgba(240,90,70,'+(0.55*a)+')');
+  g.addColorStop(0.45,'rgba(232,169,74,'+(0.30*a)+')');
+  g.addColorStop(1,'rgba(232,169,74,0)');
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0,GY,W,H-GY); ctx.clip();
+  ctx.fillStyle=g; ctx.fillRect(0,GY,W,H-GY);
+  ctx.restore();
+}
+
+function drawFault(){
+  var f = faultGeom();
+  var d = st.derived;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(-40,GY-2,W+80,H-GY+4); ctx.clip();
+
+  /* traza de la falla: completa si es cortical, acotada si el foco es profundo */
+  var deep = st.depth > 45;
+  var dA = deep ? Math.max(0, d.dTop - d.wc.rw*0.8) : 0;
+  var dB = deep ? Math.min(DEPTH_VIEW, d.dBot + d.wc.rw*0.8) : DEPTH_VIEW;
+  ctx.strokeStyle='rgba(255,255,255,0.42)'; ctx.lineWidth=1.6;
+  ctx.setLineDash([6,4]);
+  ctx.beginPath();
+  ctx.moveTo(f.xAt(dA), depthToY(dA));
+  ctx.lineTo(f.xAt(dB), depthToY(dB));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* parche que rompe */
+  if(st.rupProg>0){
+    var dTop=d.dTop, dBot=d.dBot;
+    var p = st.rupProg;
+    var tA = st.depth + (dTop-st.depth)*p;
+    var tB = st.depth + (dBot-st.depth)*p;
+    var grd = ctx.createLinearGradient(f.xAt(tA),depthToY(tA),f.xAt(tB),depthToY(tB));
+    grd.addColorStop(0,'#ffd08a'); grd.addColorStop(0.5,'#f07b70'); grd.addColorStop(1,'#ffd08a');
+    ctx.strokeStyle=grd; ctx.lineWidth=5; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(f.xAt(tA),depthToY(tA)); ctx.lineTo(f.xAt(tB),depthToY(tB)); ctx.stroke();
+    ctx.strokeStyle='rgba(255,200,140,0.35)'; ctx.lineWidth=12;
+    ctx.beginPath(); ctx.moveTo(f.xAt(tA),depthToY(tA)); ctx.lineTo(f.xAt(tB),depthToY(tB)); ctx.stroke();
+  }
+
+  /* símbolos de movimiento */
+  var msD = deep ? st.depth : st.depth*0.55;
+  var mx = f.xAt(msD), my = depthToY(msD);
+  ctx.lineWidth=2; ctx.strokeStyle='rgba(255,255,255,0.75)'; ctx.fillStyle='rgba(255,255,255,0.75)';
+  if(st.fault==='desgarre'){
+    ctx.beginPath(); ctx.arc(mx+13,my,7,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(mx+13,my,2.4,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(mx-13,my,7,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(mx-18,my-5); ctx.lineTo(mx-8,my+5);
+    ctx.moveTo(mx-18,my+5); ctx.lineTo(mx-8,my-5); ctx.stroke();
+  } else {
+    var up = FAULTS[st.fault].dir===-1;
+    arrow(mx+16, my, up?-1:1);
+    arrow(mx-16, my, up?1:-1);
+  }
+  ctx.restore();
+
+  /* etiqueta si la traza queda fuera del corte */
+  ctx.save();
+  ctx.font='10px "IBM Plex Mono", monospace'; ctx.textAlign='left';
+  if(deep){
+    ctx.fillStyle='#c98f36';
+    ctx.fillText('foco profundo: la ruptura no alcanza la superficie', 12, GY+18);
+  } else if(f.xAt(0) < 4){
+    ctx.fillStyle='#a2abba';
+    ctx.fillText('◀ traza de la falla fuera del corte', 12, GY+18);
+  }
+  ctx.restore();
+}
+function arrow(x,y,dir){
+  ctx.beginPath();
+  ctx.moveTo(x, y-11*dir); ctx.lineTo(x, y+11*dir);
+  ctx.lineTo(x-4, y+5*dir); ctx.moveTo(x, y+11*dir); ctx.lineTo(x+4, y+5*dir);
+  ctx.stroke();
+}
+
+/* Frentes de onda: se trazan punto a punto para respetar la escala vertical */
+function drawWaveFronts(tw){
+  if(tw<=0) return;
+  var f = faultGeom();
+  var hk = f.kmAt(st.depth), hd = st.depth;
+  var fronts = [
+    { r:VP*tw, color:'rgba(143,180,217,0.85)', w:1.4, dash:[4,5] },
+    { r:VS*tw, color:'rgba(232,169,74,0.90)',  w:2.4, dash:null }
+  ];
+  ctx.save();
+  ctx.beginPath(); ctx.rect(-40,GY,W+80,H-GY); ctx.clip();
+  for(var i=0;i<fronts.length;i++){
+    var fr = fronts[i];
+    if(fr.r<=0) continue;
+    ctx.strokeStyle=fr.color; ctx.lineWidth=fr.w;
+    if(fr.dash) ctx.setLineDash(fr.dash); else ctx.setLineDash([]);
+    ctx.beginPath();
+    var started=false;
+    for(var a=-Math.PI; a<=Math.PI+0.01; a+=Math.PI/48){
+      var kk = hk + fr.r*Math.cos(a);
+      var dd = hd + fr.r*Math.sin(a);
+      if(dd<0 || dd>DEPTH_VIEW+3){ started=false; continue; }
+      var px = kmToX(kk), py = depthToY(dd);
+      if(!started){ ctx.moveTo(px,py); started=true; } else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  /* onda superficial: se genera al llegar la S a la superficie */
+  var t0 = st.depth/VS;
+  if(tw>t0){
+    var rL = VL*(tw-t0);
+    ctx.save();
+    ctx.strokeStyle='rgba(217,123,168,0.85)'; ctx.lineWidth=3;
+    var xs=[kmToX(-rL), kmToX(rL)];
+    for(var j=0;j<2;j++){
+      var xx=xs[j];
+      if(xx<-20||xx>W+20) continue;
+      ctx.beginPath();
+      ctx.moveTo(xx, surfaceY(xx,tw)-9);
+      ctx.lineTo(xx, surfaceY(xx,tw)+9);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+function drawHypoEpi(){
+  var f = faultGeom();
+  var hx = f.xAt(st.depth), hy = depthToY(st.depth);
+  var ex = kmToX(0), ey = surfaceY(ex, currentTw());
+  ctx.save();
+  ctx.setLineDash([3,4]); ctx.strokeStyle='rgba(240,123,112,0.55)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(hx,hy); ctx.lineTo(ex,ey); ctx.stroke();
+  ctx.setLineDash([]);
+  /* epicentro */
+  ctx.fillStyle='#f07b70';
+  ctx.beginPath();
+  for(var i=0;i<5;i++){
+    var a1=-Math.PI/2+i*(Math.PI*2/5), a2=a1+Math.PI/5;
+    ctx.lineTo(ex+Math.cos(a1)*8, ey+Math.sin(a1)*8);
+    ctx.lineTo(ex+Math.cos(a2)*3.4, ey+Math.sin(a2)*3.4);
+  }
+  ctx.closePath(); ctx.fill();
+  /* hipocentro */
+  var pulse = st.phase==='rupture' ? 1+0.5*Math.sin(st.t*22) : 1;
+  ctx.fillStyle='#ffd08a';
+  ctx.beginPath(); ctx.arc(hx,hy,5*pulse,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.arc(hx,hy,8*pulse,0,Math.PI*2); ctx.stroke();
+
+  ctx.font='10px "IBM Plex Mono", monospace';
+  ctx.fillStyle='#ece9e2'; ctx.textAlign='left';
+  ctx.fillText('epicentro', ex+11, ey-8);
+  ctx.fillStyle='#ffd08a';
+  ctx.fillText('hipocentro · '+st.depth+' km', hx+12, hy+4);
+  ctx.restore();
+}
+
+function drawScales(){
+  ctx.save();
+  ctx.font='9px "IBM Plex Mono", monospace';
+  ctx.fillStyle='#9aa4b3'; ctx.textAlign='left';
+  var marks=[0,5,15,35,70,105];
+  for(var i=0;i<marks.length;i++){
+    var y=depthToY(marks[i]);
+    ctx.fillStyle='rgba(255,255,255,0.20)';
+    ctx.fillRect(0,y,7,1);
+    ctx.fillStyle='#9aa4b3';
+    ctx.fillText(marks[i]+(i===marks.length-1?' km':''), 10, i===marks.length-1 ? y-4 : y+3);
+  }
+  /* etiquetas de estratos */
+  ctx.textAlign='right';
+  ctx.fillStyle='#9aa4b3';
+  ctx.fillText('corteza superior · frágil', W-8, depthToY(9));
+  ctx.fillText('corteza inferior · dúctil', W-8, depthToY(26));
+  ctx.fillText('manto litosférico', W-8, depthToY(52));
+  ctx.fillText('astenosfera · manto dúctil', W-8, depthToY(90));
+  ctx.fillStyle='#c98f36';
+  ctx.fillText('transición frágil–dúctil ≈ 15 km', W-8, depthToY(15)-5);
+
+  /* escala horizontal */
+  var x1=14, x2=14+10*PXKM;
+  var yb=GY-30;
+  ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(x1,yb-4); ctx.lineTo(x1,yb); ctx.lineTo(x2,yb); ctx.lineTo(x2,yb-4);
+  ctx.stroke();
+  ctx.fillStyle='#9aa4b3'; ctx.textAlign='center';
+  ctx.fillText('10 km', (x1+x2)/2, yb-6);
+  ctx.restore();
+}
+
+/* ---------- Licuefacción ---------- */
+function buildLiqParticles(){
+  st.liqParticles=[];
+  for(var i=0;i<90;i++){
+    st.liqParticles.push({
+      kx:(Math.random()*40-14),
+      dy:Math.random(),
+      ph:Math.random()*Math.PI*2,
+      r:1.2+Math.random()*2.2
+    });
+  }
+}
+function drawLiquefaction(tw){
+  if(st.liqLevel<=0.01) return;
+  var s=SOILS[st.soil];
+  var ySed=depthToY(s.sedKm);
+  ctx.save();
+  ctx.beginPath(); ctx.rect(-40,GY-14,W+80,ySed-GY+16); ctx.clip();
+  for(var i=0;i<st.liqParticles.length;i++){
+    var p=st.liqParticles[i];
+    var kx = st.dist + p.kx;
+    var x = kmToX(kx) + Math.sin(tw*2.5+p.ph)*7*st.liqLevel;
+    var y = GY + (ySed-GY)*p.dy + Math.cos(tw*2.1+p.ph)*5*st.liqLevel;
+    ctx.fillStyle='rgba(150,180,205,'+(0.20+0.45*st.liqLevel)+')';
+    ctx.beginPath(); ctx.arc(x,y,p.r,0,Math.PI*2); ctx.fill();
+  }
+  /* volcanes de arena */
+  ctx.fillStyle='rgba(170,195,215,'+(0.5*st.liqLevel)+')';
+  for(var k=0;k<4;k++){
+    var kx2 = st.dist - 12 + k*8;
+    var x2 = kmToX(kx2), y2 = surfaceY(x2,tw);
+    var rr = 5*st.liqLevel;
+    ctx.beginPath(); ctx.ellipse(x2,y2-1, rr*2.2, rr*0.8, 0,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ---------- Réplicas ---------- */
+function genAftershocks(){
+  st.aftershocks=[];
+  var d=st.derived;
+  var n = Math.round(8 + (st.mw-4)*11);
+  for(var i=0;i<n;i++){
+    var u=Math.random();
+    var tt = 1.2*(Math.pow(1-u, -1/0.9) - 1);       // decaimiento tipo Omori
+    if(tt>26) continue;
+    var f=faultGeom();
+    var dp = d.dTop + Math.random()*(d.dBot-d.dTop);
+    var jitter = (Math.random()-0.5)*d.wc.rw*0.8;
+    st.aftershocks.push({ t:tt, km:f.kmAt(dp)+jitter, d:dp+(Math.random()-0.5)*4, m:0.4+Math.random()*1.6 });
+  }
+}
+function drawAftershocks(tAfter){
+  ctx.save();
+  ctx.beginPath(); ctx.rect(-40,GY,W+80,H-GY); ctx.clip();
+  for(var i=0;i<st.aftershocks.length;i++){
+    var a=st.aftershocks[i];
+    if(tAfter<a.t) continue;
+    var age=tAfter-a.t;
+    var flash=Math.max(0, 1-age/0.7);
+    var x=kmToX(a.km), y=depthToY(Math.max(0.4,a.d));
+    ctx.fillStyle='rgba(240,123,112,'+(0.35+0.55*flash)+')';
+    ctx.beginPath(); ctx.arc(x,y, a.m*(1+flash*1.6),0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ---------- Edificaciones ---------- */
+function resetBuildings(){
+  st.buildings = BUILDING_DEFS.map(function(b){
+    return {
+      def:b, damage:0, outcome:'intact', willCollapse:false,
+      collapseAt:1e9, collapseProgress:0, tilt:0, sink:0, ratio:0, sa:0
+    };
+  });
+}
+function rollOutcomes(){
+  var d=st.derived;
+  st.buildings.forEach(function(b,i){
+    var dm = d.demanda[i];
+    b.sa = dm.sa; b.ratio = dm.ratio;
+    if(dm.ratio>1.25){ b.outcome='collapsed'; b.willCollapse=true; b.damage=1; }
+    else if(dm.ratio>0.72){ b.outcome='damaged'; b.damage=Math.min(0.95,(dm.ratio-0.6)/0.8); }
+    else { b.outcome='intact'; b.damage=Math.max(0,(dm.ratio-0.3)*0.4); }
+    b.collapseAt = d.tS + 1.5 + Math.random()*Math.max(2, st.dur*0.45);
+  });
+  /* licuefacción: vuelca a los edificios de cimentación superficial */
+  if(d.licua){
+    st.buildings.forEach(function(b,i){
+      if(b.def.T<1.4 && b.outcome!=='collapsed'){
+        b.outcome = b.def.tipo==='iso' ? b.outcome : 'damaged';
+        b.damage = Math.max(b.damage, 0.6);
+      }
+    });
+  }
+}
+
+function drawBuilding(b, idx, tw){
+  var def=b.def;
+  var cityX = kmToX(st.dist);
+  var bx = cityX + def.off*W;
+  var g = groundMotion(st.dist, tw);
+  var baseY = surfaceY(bx, tw);
+  var hPx = (0.05 + def.pisos*0.0093)*H;
+  var wPx = def.w*W;
+
+  /* oscilación propia: amplitud proporcional a la demanda espectral */
+  var top=0;
+  if(tw>st.derived.tS && st.phase!=='idle'){
+    var u = tw - st.derived.tS;
+    var env = Math.exp(-u/Math.max(1.5, st.dur*0.42));
+    var amp = Math.min(hPx*0.30, b.sa*46) * env * (st.reduce?0.35:1);
+    top = amp*Math.sin(u*2*Math.PI/def.T);
+  }
+  var tilt=0, sink=0;
+  if(st.liqLevel>0 && def.T<1.4){
+    tilt = st.liqLevel*0.10*(idx%2?1:-1)*(def.tipo==='iso'?0.2:1);
+    sink = st.liqLevel*hPx*0.10*(def.tipo==='iso'?0.3:1);
+  }
+
+  /* colapso consumado */
+  if(b.outcome==='collapsed' && b.collapseProgress>=1){
+    ctx.save(); ctx.translate(bx, baseY);
+    ctx.fillStyle='#4a4a4a';
+    ctx.beginPath(); ctx.moveTo(-wPx*0.75,0);
+    for(var i=0;i<=8;i++){
+      var fx=-wPx*0.75+(i/8)*wPx*1.5;
+      var fy=-Math.abs(Math.sin(i*1.7))*hPx*0.13-2;
+      ctx.lineTo(fx,fy);
+    }
+    ctx.lineTo(wPx*0.75,0); ctx.closePath(); ctx.fill();
+    ctx.restore();
+    labelBuilding(def, bx, baseY, b, idx);
+    return;
+  }
+
+  var collapseRot=0, collapseSink=0, dust=0;
+  if(b.outcome==='collapsed' && b.collapseProgress>0){
+    var p=b.collapseProgress;
+    collapseRot = p*(Math.PI/2.15)*(idx%2?1:-1);
+    collapseSink = p*hPx*0.32; dust=p;
+  }
+
+  ctx.save();
+  ctx.translate(bx + g.hz*0.5, baseY - collapseSink + sink);
+  ctx.rotate(collapseRot + tilt);
+
+  /* sombra */
+  ctx.fillStyle='rgba(0,0,0,0.28)';
+  ctx.beginPath(); ctx.ellipse(0,3,wPx*0.62,3.4,0,0,Math.PI*2); ctx.fill();
+
+  /* cuerpo flexionado */
+  var N=12;
+  ctx.beginPath();
+  var i2;
+  for(i2=0;i2<=N;i2++){
+    var f2=i2/N, ox=top*Math.pow(f2,1.7);
+    var yy=-hPx*f2;
+    if(i2===0) ctx.moveTo(-wPx/2+ox, yy); else ctx.lineTo(-wPx/2+ox, yy);
+  }
+  for(i2=N;i2>=0;i2--){
+    var f3=i2/N, ox3=top*Math.pow(f3,1.7);
+    ctx.lineTo(wPx/2+ox3, -hPx*f3);
+  }
+  ctx.closePath();
+  ctx.fillStyle=def.color; ctx.fill();
+
+  /* techos y ventanas */
+  if(def.tipo==='adobe'){
+    ctx.fillStyle='#8a4f3a';
+    ctx.beginPath();
+    ctx.moveTo(-wPx/2-4+top*0.85,-hPx); ctx.lineTo(top,-hPx-wPx*0.42); ctx.lineTo(wPx/2+4+top*0.85,-hPx);
+    ctx.closePath(); ctx.fill();
+  }
+  var rows = def.tipo==='nave'?1:Math.max(1, Math.min(14, def.pisos));
+  var cols = def.tipo==='nave'?4:2;
+  ctx.fillStyle = def.tipo==='iso' ? 'rgba(60,40,10,0.45)' : 'rgba(255,255,255,0.16)';
+  for(var r=0;r<rows;r++){
+    var fr=(r+0.5)/rows, oxr=top*Math.pow(fr,1.7);
+    for(var c=0;c<cols;c++){
+      var wq=wPx/(cols+1)*0.52;
+      var xq=-wPx/2+ (c+1)*(wPx/(cols+1)) - wq/2 + oxr;
+      var hq=Math.min(6, hPx/rows*0.45);
+      ctx.fillRect(xq, -hPx*fr - hq/2, wq, hq);
+    }
+  }
+  /* aislamiento de base */
+  if(def.tipo==='iso'){
+    ctx.fillStyle='#2c313a';
+    ctx.fillRect(-wPx*0.6,-5, wPx*1.2, 5);
+    ctx.fillStyle='#e8a94a';
+    for(var q=0;q<3;q++) ctx.fillRect(-wPx*0.45+q*wPx*0.45, -4, 4, 3);
+  }
+  /* grietas */
+  if(b.damage>0.08 && b.outcome!=='collapsed'){
+    ctx.strokeStyle='rgba(15,8,4,'+Math.min(0.9,0.35+b.damage*0.55)+')';
+    ctx.lineWidth=1.3;
+    ctx.beginPath();
+    ctx.moveTo(-wPx*0.2,-hPx*0.9);
+    ctx.lineTo(-wPx*0.36,-hPx*0.55);
+    ctx.lineTo(-wPx*0.1,-hPx*0.2);
+    ctx.stroke();
+    if(b.damage>0.5){
+      ctx.beginPath();
+      ctx.moveTo(wPx*0.25,-hPx*0.75); ctx.lineTo(wPx*0.42,-hPx*0.3);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  if(dust>0 && dust<1){
+    ctx.save(); ctx.globalAlpha=0.32*(1-Math.abs(dust-0.5)*1.2);
+    ctx.fillStyle='#9a9a9a';
+    for(var z=0;z<7;z++){
+      var ang=z*1.1+dust*3, rr=dust*wPx*1.1;
+      ctx.beginPath();
+      ctx.arc(bx+Math.cos(ang)*rr, baseY-collapseSink*0.3+Math.sin(ang)*rr*0.4, 4+dust*6,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  labelBuilding(def, bx, baseY, b, idx);
+}
+
+function labelBuilding(def, bx, baseY, b, idx){
+  ctx.save();
+  ctx.font='8.5px "IBM Plex Mono", monospace';
+  ctx.textAlign='center';
+  ctx.fillStyle = b.outcome==='collapsed' ? '#f07b70' : (b.outcome==='damaged' ? '#e8b95a' : 'rgba(255,255,255,0.42)');
+  ctx.fillText(def.pisos+'p · T='+fmt(def.T,2)+' s', bx, baseY+13+(idx%2)*11);
+  ctx.restore();
+}
+
+/* ---------- Cielo y ciudad ---------- */
+function drawSky(tw){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.35)';
+  for(var i=0;i<24;i++){
+    var sx=(i*53.7)%100/100*W, sy=(i*91.3)%60/100*H*0.30;
+    ctx.globalAlpha=0.14+0.22*(0.5+0.5*Math.sin(st.t*2+i));
+    ctx.fillRect(sx,sy,1.5,1.5);
+  }
+  ctx.restore();
+}
+function drawCityLabel(tw){
+  var cityXr=kmToX(st.dist);
+  var y=surfaceY(cityXr,tw)+42;
+  var cityX=Math.max(W*0.20, Math.min(W*0.80, cityXr));
+  ctx.save();
+  ctx.font='10px "IBM Plex Mono", monospace'; ctx.textAlign='center';
+  ctx.fillStyle='#a2abba';
+  ctx.fillText('ciudad a '+st.dist+' km del epicentro · suelo: '+SOILS[st.soil].nombre, cityX, y);
+  ctx.fillStyle='#8d97a6'; ctx.font='9px "IBM Plex Mono", monospace';
+  ctx.fillText('(edificaciones fuera de escala)', cityX, y+12);
+  ctx.restore();
+}
+
+function currentTw(){
+  if(st.phase==='idle' || st.phase==='stress' || st.phase==='rupture') return 0;
+  return st.t - (T_STRESS + T_RUP);
+}
+
+/* ---------- Escena completa ---------- */
+function drawScene(){
+  var tw = currentTw();
+  var f = faultGeom();
+  drawSky(tw);
+
+  var offPx = 0, offX=0, offY=0;
+  if(st.fault!=='desgarre'){
+    var sp = slipPx();
+    var vis;
+    if(st.derived && st.derived.superficial) vis = 1;
+    else vis = Math.max(0, 0.45*(1 - (st.derived? st.derived.dTop:0)/30));
+    offPx = sp*vis;
+    offX = Math.cos(f.dipRad)*offPx*FAULTS[st.fault].dir;
+    offY = Math.sin(f.dipRad)*offPx*FAULTS[st.fault].dir;
+  }
+
+  /* polilínea del plano de falla, extrapolada fuera del lienzo */
+  var plane=[];
+  for(var dp=0; dp<=DEPTH_VIEW+8; dp+=1){ plane.push([f.xAt(dp), depthToY(Math.min(DEPTH_VIEW+3,dp)) + (dp>DEPTH_VIEW?40:0)]); }
+
+  /* --- bloque de muro (izquierda / debajo del plano): fijo --- */
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(plane[0][0], GY-60);
+  for(var i=0;i<plane.length;i++) ctx.lineTo(plane[i][0], plane[i][1]);
+  ctx.lineTo(-200, H+80); ctx.lineTo(-200, GY-60); ctx.closePath();
+  ctx.clip();
+  drawStrata(tw);
+  drawStrainGrid(tw);
+  ctx.restore();
+
+  /* --- bloque colgante (derecha / encima del plano): desplazado --- */
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(plane[0][0], GY-60);
+  for(var j=0;j<plane.length;j++) ctx.lineTo(plane[j][0], plane[j][1]);
+  ctx.lineTo(W+200, H+80); ctx.lineTo(W+200, GY-60); ctx.closePath();
+  ctx.clip();
+  ctx.translate(offX, offY);
+  drawStrata(tw);
+  drawStrainGrid(tw);
+  ctx.restore();
+
+  drawStressField();
+  drawWaveFronts(tw);
+  drawFault();
+  if(st.phase==='after' || st.phase==='done'){ drawAftershocks(st.t - (T_STRESS+T_RUP+1)); }
+  drawLiquefaction(tw);
+  drawHypoEpi();
+
+  /* línea de superficie */
+  ctx.save();
+  ctx.strokeStyle='#5a6472'; ctx.lineWidth=1.6;
+  ctx.beginPath();
+  var started=false;
+  for(var x=-10;x<=W+10;x+=5){
+    var yy=surfaceY(x,tw);
+    var side = xToKm(x) > f.kmAt(0) ? 1 : 0;
+    var ry = yy + (st.fault!=='desgarre' && side ? offY : 0);
+    if(!started){ ctx.moveTo(x,ry); started=true; } else ctx.lineTo(x,ry);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  st.buildings.forEach(function(b,i){ drawBuilding(b,i,tw); });
+  drawCityLabel(tw);
+  drawScales();
+}
+
+/* =======================================================================
+   7. SISMOGRAMA
+   ======================================================================= */
+var MAXS=340;
+function pushSeismo(tw, dt){
+  if(!st.running) return;
+  var d=st.derived;
+  /* el intervalo de muestreo se ajusta para que quepa el evento completo */
+  var total = d ? (T_STRESS + T_RUP + d.tL + st.dur + 12) : 60;
+  var sdt = Math.max(0.03, total/MAXS);
+  st.seisAcc = (st.seisAcc||0) + dt;
+  if(st.seisAcc < sdt) return;
+  st.seisAcc = 0;
+
+  var v=0;
+  if(tw>0){
+    var g=groundMotion(st.dist, tw);
+    v = g.hz/22 + (Math.random()-0.5)*0.02;
+  } else {
+    v = (Math.random()-0.5)*0.012;
+  }
+  st.seis.push(v);
+  if(st.seis.length>MAXS){
+    st.seis.shift();
+    if(st.mP!=null) st.mP--;
+    if(st.mS!=null) st.mS--;
+    if(st.mL!=null) st.mL--;
+  }
+  if(d && tw>0){
+    if(st.mP==null && tw>=d.tP) st.mP=st.seis.length-1;
+    if(st.mS==null && tw>=d.tS) st.mS=st.seis.length-1;
+    if(st.mL==null && tw>=d.tL) st.mL=st.seis.length-1;
+  }
+}
+function drawSeismo(){
+  sctx.clearRect(0,0,SW,SH);
+  var mid=SH/2, step=SW/(MAXS-1);
+  sctx.strokeStyle='rgba(255,255,255,0.10)'; sctx.lineWidth=1;
+  sctx.beginPath(); sctx.moveTo(0,mid); sctx.lineTo(SW,mid); sctx.stroke();
+
+  var marks=[['P',st.mP,'#8fb4d9'],['S',st.mS,'#e8a94a'],['L',st.mL,'#d97ba8']];
+  for(var m=0;m<marks.length;m++){
+    var idx=marks[m][1];
+    if(idx==null || idx<0) continue;
+    var xx=idx*step;
+    if(xx<0||xx>SW) continue;
+    sctx.strokeStyle=marks[m][2]; sctx.lineWidth=1; sctx.setLineDash([2,3]);
+    sctx.beginPath(); sctx.moveTo(xx,4); sctx.lineTo(xx,SH-4); sctx.stroke();
+    sctx.setLineDash([]);
+    sctx.fillStyle=marks[m][2]; sctx.font='10px "IBM Plex Mono", monospace';
+    sctx.fillText(marks[m][0], xx+3, 14);
+  }
+  sctx.strokeStyle='#e8a94a'; sctx.lineWidth=1.5;
+  sctx.beginPath();
+  for(var i=0;i<st.seis.length;i++){
+    var x=i*step, y=mid - Math.max(-1.6,Math.min(1.6,st.seis[i]))*(SH*0.42);
+    if(i===0) sctx.moveTo(x,y); else sctx.lineTo(x,y);
+  }
+  sctx.stroke();
+}
+
+/* =======================================================================
+   8. VISTA EN PLANTA
+   ======================================================================= */
+function drawPlan(){
+  if(!st.derived) computeDerived();
+  var d=st.derived;
+  pctx.clearRect(0,0,PW,PH);
+  var midY=PH*0.58;
+  var srl=d.wc.srl;
+  var half=Math.max(srl*0.62, st.dist*1.25, 6);
+  var scale=(PW*0.44)/half;            // px por km
+  var cx=PW/2;
+
+  /* fondo */
+  pctx.fillStyle='#14171d'; pctx.fillRect(0,0,PW,PH);
+
+  /* traza de la falla */
+  pctx.strokeStyle='rgba(255,255,255,0.35)'; pctx.lineWidth=1.4; pctx.setLineDash([6,4]);
+  pctx.beginPath(); pctx.moveTo(6,midY); pctx.lineTo(PW-6,midY); pctx.stroke();
+  pctx.setLineDash([]);
+
+  /* segmento roto */
+  var prog=st.rupProg;
+  if(prog>0){
+    var hl=Math.min(PW/2-6, srl/2*scale*prog);
+    var grd=pctx.createLinearGradient(cx-hl,0,cx+hl,0);
+    grd.addColorStop(0,'#ffd08a'); grd.addColorStop(0.5,'#f07b70'); grd.addColorStop(1,'#ffd08a');
+    pctx.strokeStyle=grd; pctx.lineWidth=5; pctx.lineCap='round';
+    pctx.beginPath(); pctx.moveTo(cx-hl,midY); pctx.lineTo(cx+hl,midY); pctx.stroke();
+  }
+
+  /* carretera de referencia: se curva al acumular esfuerzo y se corta al romper */
+  if(st.fault==='desgarre'){
+    var rx=cx - Math.min(PW*0.30, Math.max(34, srl*0.20*scale));
+    var offs=Math.min(15, 4+d.wc.ad*3);
+    var elast=st.stress*(1-prog), perm=prog;
+    var Ld=PH*0.30;
+    pctx.strokeStyle='#8b97a7'; pctx.lineWidth=2.2;
+    /* tramo superior (bloque que avanza hacia la izquierda) */
+    pctx.beginPath();
+    for(var yy=6; yy<=midY; yy+=3){
+      var f1=1-Math.exp(-(midY-yy)/Ld);      // 0 junto a la falla, 1 lejos
+      var ux=-offs*(elast*f1 + perm);
+      if(yy===6) pctx.moveTo(rx+ux,yy); else pctx.lineTo(rx+ux,yy);
+    }
+    pctx.stroke();
+    /* tramo inferior (bloque que avanza hacia la derecha) */
+    pctx.beginPath();
+    for(var yb=midY; yb<=PH-14; yb+=3){
+      var f2=1-Math.exp(-(yb-midY)/Ld);
+      var ux2=offs*(elast*f2 + perm);
+      if(yb===midY) pctx.moveTo(rx+ux2,yb); else pctx.lineTo(rx+ux2,yb);
+    }
+    pctx.stroke();
+    pctx.fillStyle='#8d97a6'; pctx.font='9px "IBM Plex Mono", monospace'; pctx.textAlign='left';
+    pctx.fillText('carretera', rx+6, PH-18);
+    if(prog>0.6){
+      pctx.fillStyle='#e8a94a';
+      pctx.fillText('desplazada '+fmt(d.wc.ad,2)+' m', cx-PW*0.20, midY-9);
+    }
+  } else {
+    /* flechas de convergencia (inversa) o de extensión (normal) */
+    var conv = FAULTS[st.fault].dir===-1;
+    pctx.strokeStyle='rgba(255,255,255,0.55)'; pctx.lineWidth=1.6;
+    for(var k=-1;k<=1;k+=2){
+      var ax=cx+k*PW*0.16;
+      var yTail = midY + k*0 + (k<0?-30:30);
+      var yHead = midY + (k<0?-10:10);
+      var y1 = conv ? yTail : yHead, y2 = conv ? yHead : yTail;
+      pctx.beginPath(); pctx.moveTo(ax,y1); pctx.lineTo(ax,y2); pctx.stroke();
+      var s2 = y2>y1 ? 1 : -1;
+      pctx.beginPath();
+      pctx.moveTo(ax-4, y2-5*s2); pctx.lineTo(ax, y2); pctx.lineTo(ax+4, y2-5*s2);
+      pctx.stroke();
+    }
+    pctx.fillStyle='#8d97a6'; pctx.font='9px "IBM Plex Mono", monospace'; pctx.textAlign='left';
+    pctx.fillText(conv?'compresión':'extensión', 8, PH-10);
+  }
+
+  /* epicentro y ciudad */
+  pctx.fillStyle='#f07b70';
+  pctx.beginPath(); pctx.arc(cx,midY,4,0,Math.PI*2); pctx.fill();
+  var cyy=midY - st.dist*scale;
+  cyy=Math.max(12, cyy);
+  pctx.fillStyle='#6dbb96';
+  pctx.fillRect(cx-9, cyy-5, 18, 8);
+  pctx.strokeStyle='rgba(109,187,150,0.5)'; pctx.setLineDash([2,3]); pctx.lineWidth=1;
+  pctx.beginPath(); pctx.moveTo(cx,midY); pctx.lineTo(cx,cyy); pctx.stroke();
+  pctx.setLineDash([]);
+
+  /* réplicas en planta */
+  if(st.phase==='after'||st.phase==='done'){
+    var tA=st.t-(T_STRESS+T_RUP+1);
+    pctx.fillStyle='rgba(240,123,112,0.55)';
+    for(var i=0;i<st.aftershocks.length;i++){
+      var a=st.aftershocks[i];
+      if(tA<a.t) continue;
+      var ax2=cx+(a.km*2.4)*scale*0.25 + (Math.sin(i*7.3)*srl*0.35*scale);
+      var ay2=midY+Math.cos(i*3.1)*10;
+      if(ax2<4||ax2>PW-4) continue;
+      pctx.beginPath(); pctx.arc(ax2,ay2,a.m*1.2,0,Math.PI*2); pctx.fill();
+    }
+  }
+
+  /* textos */
+  pctx.fillStyle='#a2abba'; pctx.font='9.5px "IBM Plex Mono", monospace'; pctx.textAlign='left';
+  pctx.fillText('SRL = '+fmt(d.wc.srl,1)+' km', 8, 14);
+  pctx.textAlign='center';
+  pctx.fillText('traza de la falla', PW/2, midY+16);
+  pctx.fillStyle='#6dbb96';
+  pctx.fillText('ciudad', cx, cyy-9);
+
+  /* barra de escala */
+  var barKm = half>60?50:(half>25?20:5);
+  var bw=barKm*scale;
+  pctx.strokeStyle='rgba(255,255,255,0.4)'; pctx.lineWidth=1;
+  pctx.beginPath();
+  pctx.moveTo(PW-10-bw, PH-10); pctx.lineTo(PW-10, PH-10);
+  pctx.moveTo(PW-10-bw, PH-14); pctx.lineTo(PW-10-bw, PH-6);
+  pctx.moveTo(PW-10, PH-14); pctx.lineTo(PW-10, PH-6);
+  pctx.stroke();
+  pctx.fillStyle='#a2abba'; pctx.textAlign='right';
+  pctx.fillText(barKm+' km', PW-10, PH-16);
+}
+
+/* =======================================================================
+   9. ESPECTRO DE RESPUESTA
+   ======================================================================= */
+function drawSpectrum(){
+  if(!st.derived) computeDerived();
+  var d=st.derived;
+  xctx.clearRect(0,0,XW,XH);
+  xctx.fillStyle='#14171d'; xctx.fillRect(0,0,XW,XH);
+  var L=34, Rr=8, Tp=10, B=24;
+  var pw=XW-L-Rr, ph=XH-Tp-B;
+  var t0=0.05, t1=5;
+  function tx(T){ return L + (Math.log(T/t0)/Math.log(t1/t0))*pw; }
+  var maxSa=0;
+  var soils=['roca', st.soil];
+  for(var s0=0;s0<soils.length;s0++){
+    for(var T=t0;T<=t1;T*=1.12){
+      var v=d.pgaRocaG*SOILS[soils[s0]].amp*espectro(T,soils[s0]);
+      if(v>maxSa) maxSa=v;
+    }
+  }
+  st.buildings.forEach(function(b){ if(b.def.cap<2 && b.def.cap>maxSa) maxSa=b.def.cap; });
+  maxSa=Math.max(0.08, maxSa*1.12);
+  function ty(v){ return Tp + ph - Math.min(1,v/maxSa)*ph; }
+
+  /* ejes */
+  xctx.strokeStyle='rgba(255,255,255,0.16)'; xctx.lineWidth=1;
+  xctx.beginPath(); xctx.moveTo(L,Tp); xctx.lineTo(L,Tp+ph); xctx.lineTo(L+pw,Tp+ph); xctx.stroke();
+  xctx.fillStyle='#9aa4b3'; xctx.font='9px "IBM Plex Mono", monospace'; xctx.textAlign='center';
+  var tks=[0.1,0.5,1,2,5];
+  for(var i=0;i<tks.length;i++){
+    var x=tx(tks[i]);
+    xctx.strokeStyle='rgba(255,255,255,0.08)';
+    xctx.beginPath(); xctx.moveTo(x,Tp); xctx.lineTo(x,Tp+ph); xctx.stroke();
+    xctx.fillText(String(tks[i]).replace('.',','), x, XH-12);
+  }
+  xctx.fillText('período T (s)', L+pw/2, XH-2);
+  xctx.save(); xctx.translate(9, Tp+ph/2); xctx.rotate(-Math.PI/2);
+  xctx.fillText('aceleración Sa (g)', 0,0); xctx.restore();
+  xctx.textAlign='right';
+  xctx.fillText(fmt(maxSa,2), L-3, Tp+8);
+
+  /* curva de referencia en roca */
+  function curve(soil, color, dash, wid){
+    xctx.strokeStyle=color; xctx.lineWidth=wid;
+    if(dash) xctx.setLineDash(dash); else xctx.setLineDash([]);
+    xctx.beginPath();
+    var first=true;
+    for(var T=t0;T<=t1;T*=1.04){
+      var v=d.pgaRocaG*SOILS[soil].amp*espectro(T,soil);
+      var X=tx(T), Y=ty(v);
+      if(first){ xctx.moveTo(X,Y); first=false; } else xctx.lineTo(X,Y);
+    }
+    xctx.stroke(); xctx.setLineDash([]);
+  }
+  if(st.soil!=='roca') curve('roca','rgba(143,180,217,0.55)',[4,4],1.3);
+  curve(st.soil,'#e8a94a',null,2.2);
+
+  /* edificaciones: demanda contra capacidad */
+  st.buildings.forEach(function(b){
+    var T=b.def.T;
+    var sa=d.pgaRocaG*SOILS[st.soil].amp*espectro(T,st.soil);
+    var X=tx(T);
+    var yD=ty(sa), yC=ty(b.def.cap);
+    var over = sa>b.def.cap;
+    xctx.strokeStyle= over? '#f07b70':'rgba(109,187,150,0.85)';
+    xctx.lineWidth=1.4;
+    xctx.beginPath(); xctx.moveTo(X,yD); xctx.lineTo(X,yC); xctx.stroke();
+    /* capacidad: marca hueca */
+    xctx.strokeStyle='#a2abba'; xctx.lineWidth=1.4;
+    xctx.beginPath(); xctx.moveTo(X-4,yC); xctx.lineTo(X+4,yC); xctx.stroke();
+    /* demanda: punto lleno */
+    xctx.fillStyle= over? '#f07b70' : '#6dbb96';
+    xctx.beginPath(); xctx.arc(X,yD,3.4,0,Math.PI*2); xctx.fill();
+  });
+
+  /* período del sitio */
+  var Xs=tx(SOILS[st.soil].tsite);
+  xctx.strokeStyle='rgba(232,169,74,0.4)'; xctx.setLineDash([3,4]); xctx.lineWidth=1;
+  xctx.beginPath(); xctx.moveTo(Xs,Tp); xctx.lineTo(Xs,Tp+ph); xctx.stroke();
+  xctx.setLineDash([]);
+  xctx.fillStyle='#c98f36'; xctx.textAlign='left'; xctx.font='9px "IBM Plex Mono", monospace';
+  xctx.fillText('T del sitio', Math.min(Xs+3, XW-58), Tp+10);
+}
+
+/* =======================================================================
+   10. BUCLE DE ANIMACIÓN Y MÁQUINA DE FASES
+   ======================================================================= */
+function loop(now){
+  var dt = st.last ? Math.min(0.06, (now-st.last)/1000) : 0;
+  st.last = now;
+  if(st.running){
+    st.t += dt*(st.fast?3:1);
+    stepPhases();
+  } else {
+    st.t += dt*0.5;   // sólo para el parpadeo del cielo
+  }
+  drawScene();
+  pushSeismo(currentTw(), dt*(st.fast?3:1));
+  drawSeismo();
+  if(st.running) drawPlan();
+  requestAnimationFrame(loop);
+}
+
+function stepPhases(){
+  var d=st.derived;
+  var t=st.t;
+
+  if(t < T_STRESS){
+    if(st.phase!=='stress'){ setPhase('stress','Acumulando esfuerzo tectónico'); }
+    st.stress = t/T_STRESS;
+    if(st.stress>0.33) once('s33', function(){ log('La falla permanece <span class="hl">bloqueada</span> por la fricción. La roca se deforma elásticamente y almacena energía.'); });
+    if(st.stress>0.72) once('s72', function(){ log('El esfuerzo se aproxima a la resistencia al corte de la roca. Observe cómo se curvan las líneas de referencia junto a la falla.'); });
+    return;
+  }
+
+  if(t < T_STRESS+T_RUP){
+    if(st.phase!=='rupture'){
+      setPhase('rupture','Ruptura de la falla');
+      log('<span class="bad">RUPTURA.</span> La falla cede en el hipocentro, a '+st.depth+' km de profundidad.', 'bad');
+      log('La ruptura se propaga a ≈ '+fmt(V_RUP,1)+' km/s a lo largo de '+fmt(d.wc.srl,1)+' km de falla.');
+    }
+    st.stress = 1;
+    st.rupProg = Math.min(1, (t-T_STRESS)/T_RUP);
+    if(st.rupProg>0.9) once('reb', function(){
+      log('<span class="hl">Rebote elástico:</span> los bloques se enderezan y quedan desplazados '+fmt(d.wc.ad,2)+' m en promedio.');
+      if(d.superficial) log('La ruptura <span class="hl">alcanza la superficie</span>: aparece un escarpe de falla permanente.');
+      else if(st.depth>45) log('Foco a '+st.depth+' km: la ruptura ocurre <span class="hl">dentro de la placa fría que se hunde</span>, muy por debajo de la corteza, y no deja huella en la superficie.');
+      else log('Ruptura ciega: no llega a la superficie, aunque el terreno se deforma por encima del foco.');
+    });
+    return;
+  }
+
+  var tw = t-(T_STRESS+T_RUP);
+
+  if(tw < d.tP){
+    if(st.phase!=='travel'){ setPhase('travel','Ondas viajando por la corteza'); }
+    return;
+  }
+  once('p', function(){ log('Llega la <span class="hl">onda P</span> a la ciudad ('+fmt(d.tP,1)+' s): golpe seco, sin daño relevante.'); });
+
+  if(tw >= d.tS) once('s', function(){
+    log('Llega la <span class="hl">onda S</span> ('+fmt(d.tS,1)+' s): sacudida lateral. Diferencia S−P = '+fmt(d.tS-d.tP,1)+' s.');
+    setPhase('shaking','Sacudida principal');
+  });
+  if(tw >= d.tL) once('l', function(){
+    log('Llegan las <span class="hl">ondas superficiales</span> ('+fmt(d.tL,1)+' s): período largo y máxima amplitud.');
+    log('PGA en el sitio: '+fmt(d.pgaG,3)+' g · intensidad Mercalli '+romano(d.mmi)+'.');
+  });
+
+  if(tw >= d.tS && st.phase==='travel') setPhase('shaking','Sacudida principal');
+
+  /* licuefacción progresiva */
+  if(d.licua && tw>d.tS+1.5){
+    st.liqLevel = Math.min(1, st.liqLevel + 0.012*(st.fast?3:1));
+    once('liq', function(){ log('<span class="bad">LICUEFACCIÓN:</span> la arena saturada pierde capacidad de carga y se comporta como un líquido.','bad'); });
+  }
+
+  /* colapsos */
+  st.buildings.forEach(function(b){
+    if(b.willCollapse && tw>=b.collapseAt){
+      b.collapseProgress = Math.min(1,(tw-b.collapseAt)/1.2);
+      if(b.collapseProgress>0 && !b.logged){
+        b.logged=true;
+        log('Colapsa: <span class="bad">'+b.def.nombre+'</span> (demanda '+fmt(b.sa,2)+' g frente a capacidad '+fmt(b.def.cap,2)+' g).','bad');
+      }
+    }
+  });
+
+  var tEnd = d.tL + st.dur;
+  if(tw > tEnd && st.phase!=='after' && st.phase!=='done'){
+    setPhase('after','Secuencia de réplicas');
+    log('Cesa la sacudida principal. Comienza la secuencia de <span class="hl">réplicas</span> (ley de Omori).');
+  }
+  if(tw > tEnd + 12){
+    st.running=false;
+    setPhase('done','Evento finalizado');
+    finish();
+  }
+}
+
+function finish(){
+  var col=0, dam=0, ok=0;
+  st.buildings.forEach(function(b){
+    if(b.outcome==='collapsed') col++; else if(b.outcome==='damaged') dam++; else ok++;
+  });
+  log('<span class="ok">Balance:</span> '+ok+' intactas · '+dam+' dañadas · '+col+' colapsadas.','');
+  renderResults();
+  $('triggerBtn').disabled=false;
+  $('triggerBtn').textContent='Repetir ciclo sísmico';
+  var chips=$('phaseStrip').querySelectorAll('.phase-chip');
+  for(var i=0;i<chips.length;i++) chips[i].className='phase-chip done';
+}
+
+function renderResults(){
+  var ul=$('resultList');
+  ul.innerHTML='';
+  st.buildings.forEach(function(b){
+    var li=document.createElement('li');
+    var mark = b.outcome==='collapsed'?'✕':(b.outcome==='damaged'?'▲':'●');
+    var cls  = b.outcome==='collapsed'?'st-cl':(b.outcome==='damaged'?'st-dm':'st-ok');
+    var txt  = b.outcome==='collapsed'?'Colapsado':(b.outcome==='damaged'?'Dañado':'Intacto');
+    li.innerHTML = '<span class="mark '+cls+'" aria-hidden="true">'+mark+'</span>'+
+                   '<span class="nm">'+b.def.nombre+' <span style="color:#8d97a6">('+b.def.pisos+' pisos)</span></span>'+
+                   '<span class="per">T='+fmt(b.def.T,2)+'s<br>'+fmt(b.sa,2)+'/'+fmt(b.def.cap,2)+' g</span>'+
+                   '<span class="st '+cls+'">'+txt+'</span>';
+    ul.appendChild(li);
+  });
+}
+
+/* =======================================================================
+   11. CONTROLES
+   ======================================================================= */
+function bindSlider(id, key, after){
+  var el=$(id);
+  el.addEventListener('input', function(){
+    st[key] = parseFloat(el.value);
+    updateReadouts();
+    if(after) after();
+  });
+}
+bindSlider('magSlider','mw');
+bindSlider('depthSlider','depth');
+bindSlider('distSlider','dist');
+bindSlider('durSlider','dur');
+
+function segHandler(segId, attr, key, onSet){
+  var seg=$(segId);
+  seg.addEventListener('click', function(e){
+    var btn=e.target.closest('button');
+    if(!btn) return;
+    var val=btn.getAttribute(attr);
+    if(!val) return;
+    var btns=seg.querySelectorAll('button');
+    for(var i=0;i<btns.length;i++) btns[i].setAttribute('aria-pressed', btns[i]===btn?'true':'false');
+    if(key) st[key]=val;
+    if(onSet) onSet(val);
+    updateReadouts();
+  });
+}
+segHandler('faultSeg','data-fault','fault');
+segHandler('soilSeg','data-soil','soil');
+
+var PRESETS = {
+  mexico:   { mw:8.0, depth:18, dist:60, dur:50, fault:'inversa',  soil:'cuenca',
+              nota:'Ciudad de México, 19 de septiembre de 1985. El sismo se originó en la costa del Pacífico, a más de 350 km. Las arcillas del antiguo lago amplificaron los períodos largos y los edificios de 10 a 20 pisos entraron en resonancia.' },
+  guanica:  { mw:6.4, depth:6,  dist:12, dur:18, fault:'normal',   soil:'arena',
+              nota:'Guánica, Puerto Rico, 7 de enero de 2020. Sismo somero de falla normal frente a la costa suroeste; se documentaron deslizamientos y efectos de suelo blando en la zona costera.' },
+  sf:       { mw:7.9, depth:8,  dist:10, dur:45, fault:'desgarre', soil:'roca',
+              nota:'San Francisco, 18 de abril de 1906. Ruptura de desgarre de la falla de San Andrés a lo largo de casi 480 km; el estudio de sus desplazamientos dio origen a la teoría del rebote elástico.' },
+  haiti:    { mw:7.0, depth:13, dist:25, dur:30, fault:'desgarre', soil:'arena',
+              nota:'Haití, 12 de enero de 2010. Sismo somero muy próximo a Puerto Príncipe: la combinación de poca profundidad, suelo blando y construcción vulnerable resultó devastadora.' },
+  profundo: { mw:6.5, depth:90, dist:10, dur:22, fault:'inversa', soil:'roca',
+              nota:'Foco intermedio a 90 km. Compárelo después con el mismo sismo a 5 km de profundidad: idéntica magnitud, distancia hipocentral muy distinta y, por tanto, intensidades separadas por varios grados de Mercalli.' },
+  somero:   { mw:6.5, depth:5,  dist:10, dur:22, fault:'inversa', soil:'roca',
+              nota:'Foco somero a 5 km, misma magnitud y misma distancia epicentral que el escenario anterior. El foco queda prácticamente bajo los cimientos: aquí es donde se fragua el desastre.' }
+};
+$('presetSeg').addEventListener('click', function(e){
+  var btn=e.target.closest('button'); if(!btn) return;
+  var p=PRESETS[btn.getAttribute('data-preset')]; if(!p) return;
+  st.mw=p.mw; st.depth=p.depth; st.dist=p.dist; st.dur=p.dur; st.fault=p.fault; st.soil=p.soil;
+  $('magSlider').value=p.mw; $('depthSlider').value=p.depth;
+  $('distSlider').value=p.dist; $('durSlider').value=p.dur;
+  syncSeg('faultSeg','data-fault',p.fault);
+  syncSeg('soilSeg','data-soil',p.soil);
+  var btns=$('presetSeg').querySelectorAll('button');
+  for(var i=0;i<btns.length;i++) btns[i].setAttribute('aria-pressed', btns[i]===btn?'true':'false');
+  updateReadouts();
+  clearLog('<span class="hl">Escenario cargado.</span> '+p.nota);
+});
+function syncSeg(id, attr, val){
+  var btns=$(id).querySelectorAll('button');
+  for(var i=0;i<btns.length;i++) btns[i].setAttribute('aria-pressed', btns[i].getAttribute(attr)===val?'true':'false');
+}
+
+$('reduceMotion').addEventListener('change', function(){ st.reduce=this.checked; });
+$('fastMode').addEventListener('change', function(){ st.fast=this.checked; });
+if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  $('reduceMotion').checked=true; st.reduce=true;
+}
+
+$('triggerBtn').addEventListener('click', function(){
+  computeDerived();
+  resetBuildings();
+  rollOutcomes();
+  genAftershocks();
+  st.t=0; st.last=0; st.stress=0; st.rupProg=0; st.liqLevel=0;
+  st.seis=[]; st.mP=null; st.mS=null; st.mL=null;
+  st.logged={}; st.running=true;
+  clearLog('<span class="hl">Ciclo sísmico iniciado.</span> Fase intersísmica: la falla acumula esfuerzo durante décadas o siglos, comprimidos aquí en segundos.');
+  setPhase('stress','Acumulando esfuerzo tectónico');
+  this.disabled=true; this.textContent='Simulación en curso…';
+  $('resultList').innerHTML='<li><span class="mark" aria-hidden="true">●</span><span class="nm">Evaluando respuesta estructural…</span><span class="per"></span><span class="st"></span></li>';
+});
+
+$('resetBtn').addEventListener('click', function(){
+  st.running=false; st.t=0; st.stress=0; st.rupProg=0; st.liqLevel=0;
+  st.seis=[]; st.mP=null; st.mS=null; st.mL=null; st.logged={};
+  resetBuildings(); st.aftershocks=[];
+  setPhase('idle','En reposo');
+  var chips=$('phaseStrip').querySelectorAll('.phase-chip');
+  for(var i=0;i<chips.length;i++) chips[i].className='phase-chip';
+  clearLog('Sistema reiniciado. Ajuste los parámetros y pulse «Iniciar ciclo sísmico».');
+  $('triggerBtn').disabled=false;
+  $('triggerBtn').textContent='Iniciar ciclo sísmico';
+  $('resultList').innerHTML='<li><span class="mark" aria-hidden="true">●</span><span class="nm">Sin simulación ejecutada</span><span class="per"></span><span class="st"></span></li>';
+  updateReadouts();
+});
+
+/* =======================================================================
+   12. AUTOEVALUACIÓN
+   ======================================================================= */
+var QUIZ=[
+  { q:'Durante la fase intersísmica, ¿qué ocurre en la falla?',
+    o:['La roca se desliza lentamente y libera energía poco a poco.',
+       'La falla está bloqueada por la fricción y la roca se deforma elásticamente acumulando energía.',
+       'La falla emite ondas P de baja intensidad de forma continua.'],
+    c:1, f:'La fricción estática impide el deslizamiento: la roca se comporta como un resorte que se carga durante décadas o siglos. El terremoto es la descarga súbita de esa energía.' },
+  { q:'Un sismo de magnitud 7,0 comparado con uno de magnitud 6,0 libera aproximadamente:',
+    o:['El doble de energía.','Diez veces más energía.','Unas 32 veces más energía.'],
+    c:2, f:'La escala es logarítmica: cada unidad multiplica la amplitud por 10 y la energía por 10^1,5 ≈ 32. Por eso M 8 no es «un poco peor» que M 7.' },
+  { q:'¿Por qué las ondas S no atraviesan el núcleo externo de la Tierra?',
+    o:['Porque pierden toda su energía por el camino.',
+       'Porque son ondas de corte y los fluidos no resisten esfuerzos cortantes.',
+       'Porque el núcleo externo es demasiado denso.'],
+    c:1, f:'La ausencia de ondas S al otro lado del planeta —la zona de sombra— fue la prueba de que el núcleo externo es líquido.' },
+  { q:'En Ciudad de México, en 1985, colapsaron sobre todo los edificios de 10 a 20 pisos. La causa principal fue:',
+    o:['Que eran los edificios más antiguos de la ciudad.',
+       'Que su período natural coincidía con el período de 2 segundos del suelo arcilloso: resonancia.',
+       'Que estaban más cerca del epicentro que el resto.'],
+    c:1, f:'Las casas bajas y la Torre Latinoamericana, de 44 pisos, quedaron casi ilesas porque no estaban en fase con el terreno. El suelo decide tanto como la magnitud.' },
+  { q:'La diferencia entre magnitud e intensidad Mercalli es que:',
+    o:['La magnitud es única por sismo; la intensidad varía de un lugar a otro.',
+       'La magnitud la miden los sismólogos y la intensidad los ingenieros.',
+       'Son dos nombres para la misma medida.'],
+    c:0, f:'La magnitud describe el tamaño de la ruptura en el foco. La intensidad describe los efectos observados en cada punto, y depende de la distancia, la profundidad y el suelo.' },
+  { q:'Dos sismos de magnitud 6,5 ocurren a la misma distancia epicentral, uno con el foco a 5 km y otro a 90 km. ¿Cuál causa más daño y por qué?',
+    o:['El de 90 km, porque libera la energía en una zona más amplia.',
+       'El de 5 km, porque el foco está mucho más cerca y la aceleración llega sin atenuarse.',
+       'Los dos por igual: la magnitud es la misma.'],
+    c:1, f:'La magnitud mide el tamaño de la ruptura, no lo que llega a la superficie. La aceleración se atenúa con la distancia hipocentral R = √(d² + h²): a 90 km de profundidad esa distancia es casi veinte veces mayor y la intensidad puede caer de grado VIII a grado V.' },
+  { q:'Si la roca deja de ser frágil por debajo de unos 15 a 20 km, ¿cómo puede romperse a 90 km de profundidad?',
+    o:['Porque a esa profundidad la presión vuelve frágil a cualquier roca.',
+       'Porque la ruptura ocurre dentro de una placa oceánica que se hunde y que, al entrar fría en el manto, conserva su rigidez.',
+       'Porque en realidad esos sismos se originan en la superficie y solo se registran como profundos.'],
+    c:1, f:'La transición frágil-dúctil de los 15 km vale para la corteza continental. Los sismos intermedios y profundos ocurren dentro de la losa subducida, que tarda millones de años en calentarse.' },
+  { q:'La licuefacción del suelo consiste en que:',
+    o:['El agua subterránea se calienta y se evapora durante la sacudida.',
+       'Las arenas saturadas pierden su capacidad de carga y se comportan como un líquido denso.',
+       'La roca se funde por el rozamiento de la falla.'],
+    c:1, f:'La presión del agua en los poros supera el contacto entre granos. Un edificio bien diseñado puede volcarse igualmente si desaparece el suelo que lo sostiene.' }
+];
+
+(function buildQuiz(){
+  var box=$('quiz');
+  QUIZ.forEach(function(item, qi){
+    var d=document.createElement('div'); d.className='quiz-item';
+    var p=document.createElement('p'); p.className='quiz-q';
+    p.textContent=(qi+1)+'. '+item.q;
+    d.appendChild(p);
+    var opts=document.createElement('div'); opts.className='quiz-opts';
+    item.o.forEach(function(txt, oi){
+      var b=document.createElement('button');
+      b.type='button'; b.textContent=txt;
+      b.addEventListener('click', function(){
+        var all=opts.querySelectorAll('button');
+        for(var i=0;i<all.length;i++){ all[i].className=''; }
+        if(oi===item.c){
+          b.className='correct';
+          fb.innerHTML='<span class="ok">Correcto.</span> '+item.f;
+        } else {
+          b.className='wrong';
+          all[item.c].className='correct';
+          fb.innerHTML='<span class="no">Revise esta idea.</span> '+item.f;
+        }
+      });
+      opts.appendChild(b);
+    });
+    d.appendChild(opts);
+    var fb=document.createElement('div');
+    fb.className='quiz-fb'; fb.setAttribute('role','status'); fb.setAttribute('aria-live','polite');
+    d.appendChild(fb);
+    box.appendChild(d);
+  });
+})();
+
+/* =======================================================================
+   13. ARRANQUE
+   ======================================================================= */
+resetBuildings();
+resize();
+updateReadouts();
+setPhase('idle','En reposo');
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

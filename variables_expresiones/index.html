@@ -1,375 +1,936 @@
-<!DOCTYPE html>
+<!doctype html>
+<!--
+  Interactivo 4.1 · Variables, expresiones algebraicas y traducción
+  Spanish ASE Math · Nivel 3 · Tema 4 · Álgebra lineal
+  José M. Fernández, ABE/ASE Math Master Teacher
+  Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álgebra: Variables y Expresiones</title>
-    <style>
-      :root {
-        --primary: #bf360c;
-        --secondary: #f7d9d3;
-        --dark: #333333;
-        --light: #f4f7f6;
-        --correct: #2ecc71;
-        --incorrect: #8c2708;
-      }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interactivo 4.1 · Variables, expresiones algebraicas y traducción</title>
+<meta name="description" content="Práctica generativa de variables, expresiones algebraicas, simplificación y evaluación para el Tema 4 del Nivel 3 de Spanish ASE Math." />
+<meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+<meta name="license" content="CC BY-NC-SA 4.0" />
+<link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+<style>
+  :root {
+    --tema:      #bf360c;
+    --tema-d:    #8c2708;
+    --tema-bg:   #fbe9e7;
+    --tema-bg2:  #f7d9d3;
+    --acento:    #1565c0;
+    --acento-d:  #0d47a1;
+    --txt:       #222222;
+    --txt-2:     #555555;
+    --bg:        #f5f7fa;
+    --correcto:  #1b5e20;
+    --correcto-bg: #e8f5e9;
+    --error:     #b71c1c;
+    --error-bg:  #ffebee;
+    --borde:     #d0d7de;
+  }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+  * { box-sizing: border-box; }
 
-        body {
-            background-color: var(--light);
-            color: var(--dark);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+  body {
+    margin: 0;
+    padding: 24px 16px 40px;
+    background: var(--bg);
+    color: var(--txt);
+    font-family: 'Segoe UI', system-ui, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            width: 100%;
-            max-width: 500px;
-        }
+  .contenedor { max-width: 720px; margin: 0 auto; }
 
-        h1 {
-            color: var(--primary);
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
 
-        p.subtitle {
-            font-size: 0.9rem;
-            color: #666;
-        }
+  /* ── Encabezado ─────────────────────────────────────────── */
+  header.principal {
+    background: var(--tema);
+    color: #ffffff;
+    padding: 26px 28px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+  }
+  header.principal .ruta {
+    font-size: 13px; letter-spacing: .4px; text-transform: uppercase;
+  }
+  header.principal h1 { margin: 8px 0 6px; font-size: 24px; font-weight: 700; }
+  header.principal .meta { font-size: 14px; }
 
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            text-align: center;
-        }
+  /* ── Tarjetas ───────────────────────────────────────────── */
+  .tarjeta {
+    background: #ffffff;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    padding: 22px 24px;
+    box-shadow: 0 2px 6px #dfe4ea;
+  }
+  .tarjeta h2 { color: var(--tema-d); font-size: 19px; margin: 0 0 4px; }
+  .tarjeta .intro { color: var(--txt-2); font-size: 15px; margin: 0 0 18px; }
 
-        /* Menu */
-        .menu-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+  .caja-objetivos {
+    background: var(--tema-bg);
+    border-left: 6px solid var(--tema);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .caja-objetivos h2 { margin: 0 0 8px; color: var(--tema-d); font-size: 18px; }
+  .caja-objetivos ul { margin: 0; padding-left: 22px; }
+  .caja-objetivos li { margin: 4px 0; }
 
-      .menu-btn:hover,
-      .menu-btn:active {
-        background-color: #c08d15;
-      }
+  /* ── Botones de categoría ───────────────────────────────── */
+  .lista-menu { list-style: none; margin: 0; padding: 0; }
+  .lista-menu li { margin: 0 0 12px; }
 
-        /* Quiz */
-        #quiz-section {
-            display: none;
-        }
+  .btn-menu {
+    display: block; width: 100%;
+    padding: 14px 18px;
+    background: var(--tema); color: #ffffff;
+    border: 2px solid var(--tema);
+    border-radius: 10px;
+    font: inherit; font-weight: 600; font-size: 17px;
+    text-align: left; cursor: pointer;
+  }
+  .btn-menu .num { font-weight: 700; margin-right: 8px; }
+  .btn-menu .desc { display: block; font-weight: 400; font-size: 14px; margin-top: 3px; }
+  .btn-menu:hover { background: var(--tema-d); border-color: var(--tema-d); }
 
-        .question-text {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
+  /* ── Progreso ───────────────────────────────────────────── */
+  .barra-marco {
+    height: 10px; background: var(--tema-bg2);
+    border-radius: 6px; overflow: hidden; margin: 6px 0 18px;
+  }
+  .barra-relleno { height: 100%; width: 0; background: var(--tema); }
+  .progreso-txt { color: var(--txt-2); font-size: 14px; }
 
-        .option-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background-color: white;
-            color: var(--dark);
-            border: 2px solid var(--primary);
-            border-radius: 10px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+  /* ── Pregunta y opciones ────────────────────────────────── */
+  h2.enunciado {
+    font-size: 20px; color: var(--txt); margin: 0 0 18px; line-height: 1.45;
+  }
+  h2.enunciado:focus { outline: 3px solid var(--acento); outline-offset: 4px; }
 
-        .option-btn:hover {
-            background-color: #e8f0fe;
-        }
+  .opciones { list-style: none; margin: 0; padding: 0; }
+  .opciones li { margin: 0 0 10px; }
 
-        .option-btn.correct {
-            background-color: var(--correct);
-            border-color: var(--correct);
-            color: white;
-        }
+  .opcion {
+    display: flex; align-items: baseline; gap: 10px;
+    width: 100%; padding: 13px 16px;
+    background: #ffffff; color: var(--txt);
+    border: 2px solid var(--tema);
+    border-radius: 10px;
+    font: inherit; font-size: 17px; text-align: left; cursor: pointer;
+  }
+  .opcion .letra {
+    flex: 0 0 auto; font-weight: 700; color: var(--tema-d);
+  }
+  .opcion .marca { flex: 0 0 auto; margin-left: auto; font-weight: 700; }
+  .opcion:hover { background: var(--tema-bg); }
+  .opcion[disabled] {
+    cursor: default; color: var(--txt);
+    border-color: #757575; background: #ffffff;
+  }
+  .opcion[disabled] .letra { color: var(--txt-2); }
+  .opcion.correcta, .opcion[disabled].correcta {
+    background: var(--correcto-bg); border-color: var(--correcto); color: var(--correcto);
+  }
+  .opcion.correcta .letra, .opcion[disabled].correcta .letra { color: var(--correcto); }
+  .opcion.incorrecta, .opcion[disabled].incorrecta {
+    background: var(--error-bg); border-color: var(--error); color: var(--error);
+  }
+  .opcion.incorrecta .letra, .opcion[disabled].incorrecta .letra { color: var(--error); }
 
-        .option-btn.incorrect {
-            background-color: var(--incorrect);
-            border-color: var(--incorrect);
-            color: white;
-        }
+  /* ── Retroalimentación ──────────────────────────────────── */
+  .retro { margin-top: 18px; }
+  .retro:empty { margin-top: 0; }
+  .retro .caja {
+    border-radius: 10px; padding: 14px 18px; border-left: 6px solid var(--tema);
+  }
+  .retro .caja.bien { background: var(--correcto-bg); border-left-color: var(--correcto); }
+  .retro .caja.mal  { background: var(--error-bg);    border-left-color: var(--error); }
+  .retro .titulo { font-weight: 700; margin: 0 0 6px; }
+  .retro .caja.bien .titulo { color: var(--correcto); }
+  .retro .caja.mal  .titulo { color: var(--error); }
+  .retro p { margin: 0 0 6px; }
+  .retro p:last-child { margin-bottom: 0; }
 
-        .feedback {
-            margin-top: 15px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            min-height: 25px;
-        }
+  /* ── Navegación ─────────────────────────────────────────── */
+  .fila-nav {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--borde);
+  }
+  .btn-accion {
+    padding: 12px 24px;
+    background: var(--acento); color: #ffffff;
+    border: 2px solid var(--acento); border-radius: 8px;
+    font: inherit; font-weight: 600; cursor: pointer;
+  }
+  .btn-accion:hover { background: var(--acento-d); border-color: var(--acento-d); }
+  .btn-secundario {
+    padding: 12px 24px;
+    background: #ffffff; color: var(--tema-d);
+    border: 2px solid var(--tema-d); border-radius: 8px;
+    font: inherit; font-weight: 600; cursor: pointer;
+  }
+  .btn-secundario:hover { background: var(--tema-bg); }
 
-        .nav-btn {
-            margin-top: 20px;
-            padding: 12px 25px;
-            background-color: var(--dark);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            display: none;
-        }
+  /* ── Resultados ─────────────────────────────────────────── */
+  .marcador {
+    font-size: 34px; font-weight: 700; color: var(--tema-d);
+    margin: 10px 0 4px;
+  }
+  .marcador-etq { color: var(--txt-2); font-size: 15px; margin: 0 0 16px; }
 
-        .back-btn {
-            background-color: transparent;
-            color: var(--primary);
-            border: none;
-            font-size: 1rem;
-            margin-top: 20px;
-            cursor: pointer;
-            text-decoration: underline;
-        }
+  details.repaso {
+    border: 1px solid var(--borde); border-radius: 10px;
+    padding: 12px 16px; margin-top: 18px; background: var(--tema-bg);
+  }
+  details.repaso > summary {
+    cursor: pointer; font-weight: 600; color: var(--tema-d);
+  }
+  details.repaso ol { margin: 12px 0 0; padding-left: 22px; }
+  details.repaso li { margin-bottom: 14px; }
+  details.repaso .tuya { color: var(--error); }
+  details.repaso .buena { color: var(--correcto); }
 
-        #score-section {
-            display: none;
-        }
+  /* ── Foco visible en todo control ───────────────────────── */
+  button:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--acento); outline-offset: 3px;
+  }
 
-        .score-text {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin: 20px 0;
-            font-weight: bold;
-        }
-    </style>
+  /* ── Pie ────────────────────────────────────────────────── */
+  footer.licencia {
+    margin-top: 26px; padding-top: 16px;
+    border-top: 1px solid var(--borde);
+    font-size: 13px; color: var(--txt-2); text-align: center;
+  }
+  footer.licencia a { color: var(--acento-d); }
+
+  .oculto { display: none; }
+
+  @media (max-width: 480px) {
+    header.principal { padding: 20px; }
+    header.principal h1 { font-size: 21px; }
+    .tarjeta { padding: 18px 16px; }
+    h2.enunciado { font-size: 18px; }
+    .btn-accion, .btn-secundario { width: 100%; }
+  }
+</style>
 </head>
 <body>
+<div class="contenedor">
 
-    <header>
-        <h1>Variables, Expresiones y Traducción</h1>
-        <p class="subtitle">Práctica Generativa - Álgebra</p>
-    </header>
+  <header class="principal">
+    <div class="ruta">Spanish ASE Math · Nivel 3 · Tema 4 · Álgebra lineal</div>
+    <h1>Interactivo 4.1 · Variables, expresiones algebraicas y traducción</h1>
+    <div class="meta">Práctica generativa · 10 preguntas por categoría · Brightspace D2L</div>
+  </header>
 
-    <div class="container" id="menu-section">
-        <h2>Selecciona un tema:</h2>
-        <br>
-        <button class="menu-btn" onclick="startQuiz('traduccion')">1. Traducción al Lenguaje Algebraico</button>
-        <button class="menu-btn" onclick="startQuiz('identificacion')">2. Términos y Coeficientes</button>
-        <button class="menu-btn" onclick="startQuiz('simplificacion')">3. Simplificación de Expresiones</button>
-        <button class="menu-btn" onclick="startQuiz('evaluacion')">4. Evaluación de Expresiones</button>
+  <!-- ══════════════ MENÚ ══════════════ -->
+  <section class="tarjeta" id="seccion-menu" aria-labelledby="tit-menu">
+    <div class="caja-objetivos">
+      <h2>Qué se practica aquí</h2>
+      <ul>
+        <li>Traducir enunciados verbales al lenguaje algebraico.</li>
+        <li>Identificar términos, coeficientes, constantes y términos semejantes.</li>
+        <li>Simplificar expresiones con la propiedad distributiva y términos semejantes.</li>
+        <li>Evaluar expresiones sustituyendo valores numéricos.</li>
+      </ul>
     </div>
 
-    <div class="container" id="quiz-section">
-        <div id="progress-text" style="color: #888; font-size: 0.9rem; margin-bottom: 10px;"></div>
-        <div class="question-text" id="question"></div>
-        <div id="options-container"></div>
-        <div class="feedback" id="feedback"></div>
-        <button class="nav-btn" id="next-btn" onclick="nextQuestion()">Siguiente</button>
-        <br>
-        <button class="back-btn" onclick="returnToMenu()">Volver al Menú</button>
+    <h2 id="tit-menu">Selecciona una categoría</h2>
+    <p class="intro">Cada categoría genera diez preguntas nuevas cada vez. Al responder se explica por qué la opción elegida es correcta o incorrecta.</p>
+
+    <ul class="lista-menu">
+      <li>
+        <button type="button" class="btn-menu" data-cat="traduccion">
+          <span class="num" aria-hidden="true">1.</span>Traducción al lenguaje algebraico
+          <span class="desc">Del enunciado verbal a la expresión.</span>
+        </button>
+      </li>
+      <li>
+        <button type="button" class="btn-menu" data-cat="identificacion">
+          <span class="num" aria-hidden="true">2.</span>Términos, coeficientes y constantes
+          <span class="desc">Reconocer las partes de una expresión.</span>
+        </button>
+      </li>
+      <li>
+        <button type="button" class="btn-menu" data-cat="simplificacion">
+          <span class="num" aria-hidden="true">3.</span>Simplificación de expresiones
+          <span class="desc">Términos semejantes y propiedad distributiva.</span>
+        </button>
+      </li>
+      <li>
+        <button type="button" class="btn-menu" data-cat="evaluacion">
+          <span class="num" aria-hidden="true">4.</span>Evaluación de expresiones
+          <span class="desc">Sustituir valores y calcular el resultado.</span>
+        </button>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ══════════════ PRÁCTICA ══════════════ -->
+  <section class="tarjeta oculto" id="seccion-quiz" aria-labelledby="enunciado">
+    <p class="progreso-txt" id="progreso" role="status" aria-live="polite"></p>
+    <div class="barra-marco" aria-hidden="true"><div class="barra-relleno" id="barra"></div></div>
+
+    <h2 class="enunciado" id="enunciado" tabindex="-1"></h2>
+
+    <ul class="opciones" id="opciones"></ul>
+
+    <div class="retro" id="retro" role="status" aria-live="polite"></div>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion oculto" id="btn-siguiente">Siguiente pregunta</button>
+      <button type="button" class="btn-secundario" id="btn-salir">Volver al menú</button>
     </div>
+  </section>
 
-    <div class="container" id="score-section">
-        <h2>¡Práctica Completada!</h2>
-        <div class="score-text" id="final-score"></div>
-        <p id="score-message"></p>
-        <br>
-        <button class="menu-btn" onclick="returnToMenu()">Volver al Menú Principal</button>
+  <!-- ══════════════ RESULTADOS ══════════════ -->
+  <section class="tarjeta oculto" id="seccion-resultado" aria-labelledby="tit-resultado">
+    <h2 id="tit-resultado">Práctica completada</h2>
+    <p class="marcador" id="marcador"></p>
+    <p class="marcador-etq" id="marcador-etq"></p>
+    <p id="mensaje-final"></p>
+
+    <div id="contenedor-repaso"></div>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion" id="btn-repetir">Repetir esta categoría</button>
+      <button type="button" class="btn-secundario" id="btn-menu-final">Volver al menú</button>
     </div>
+  </section>
 
-    <script>
-        let currentQuizData = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let answered = false;
+  <footer class="licencia">
+    <p>José M. Fernández, ABE/ASE Math Master Teacher · Harry S. Truman College — City Colleges of Chicago</p>
+    <p>Esta obra está bajo una licencia
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" rel="license">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.</p>
+  </footer>
 
-        const menuSection = document.getElementById('menu-section');
-        const quizSection = document.getElementById('quiz-section');
-        const scoreSection = document.getElementById('score-section');
-        const questionEl = document.getElementById('question');
-        const optionsContainer = document.getElementById('options-container');
-        const feedbackEl = document.getElementById('feedback');
-        const nextBtn = document.getElementById('next-btn');
-        const progressText = document.getElementById('progress-text');
+</div>
 
-        // Función auxiliar para obtener números aleatorios sin repetir
-        function getUniqueRandoms(count, min, max) {
-            let nums = new Set();
-            while(nums.size < count) {
-                nums.add(Math.floor(Math.random() * (max - min + 1)) + min);
-            }
-            return Array.from(nums);
-        }
+<script>
+/* ═══════════════════════════════════════════════════════════
+   1. Utilidades
+   ═══════════════════════════════════════════════════════════ */
 
-        // Generador dinámico de preguntas
-        function generateQuestions(category) {
-            let questions = [];
-            for (let i = 0; i < 10; i++) {
-                let r = getUniqueRandoms(4, 2, 9);
-                let a = r[0], b = r[1], c = r[2];
-                let type = Math.floor(Math.random() * 5);
-                let q, ans, w1, w2, w3;
+function ent(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-                if (category === 'traduccion') {
-                    if(type === 0) { q=`El doble de un número más ${a}`; ans=`2x + ${a}`; w1=`x/2 + ${a}`; w2=`2(x + ${a})`; w3=`x + 2 + ${a}`; }
-                    else if(type === 1) { q=`Un número disminuido en ${b}`; ans=`x - ${b}`; w1=`${b} - x`; w2=`${b}x`; w3=`x / ${b}`; }
-                    else if(type === 2) { q=`El triple de la suma de un número y ${c}`; ans=`3(x + ${c})`; w1=`3x + ${c}`; w2=`x + 3(${c})`; w3=`3x - ${c}`; }
-                    else if(type === 3) { q=`La mitad de un número aumentada en ${a}`; ans=`x/2 + ${a}`; w1=`2x + ${a}`; w2=`x/2 - ${a}`; w3=`(x + ${a})/2`; }
-                    else { q=`El cuádruple de un número menos ${b}`; ans=`4x - ${b}`; w1=`4(x - ${b})`; w2=`${b}x - 4`; w3=`x/4 - ${b}`; }
-                }
-                else if (category === 'identificacion') {
-                    if(type === 0) { q=`En la expresión '${a}x + ${b}', ¿cuál es el coeficiente?`; ans=`${a}`; w1=`${b}`; w2=`x`; w3=`${a+b}`; }
-                    else if(type === 1) { q=`En la expresión '${a}y - ${b}', ¿cuál es la constante?`; ans=`-${b}`; w1=`${a}`; w2=`y`; w3=`${b}`; }
-                    else if(type === 2) { q=`¿Cuántos términos tiene la expresión '${a}x² - ${b}x + ${c}'?`; ans=`3`; w1=`1`; w2=`2`; w3=`4`; }
-                    else if(type === 3) { q=`Identifica los términos semejantes: '${a}x + ${b}y - ${c}x'`; ans=`${a}x y -${c}x`; w1=`${a}x y ${b}y`; w2=`${b}y y -${c}x`; w3=`Todos son semejantes`; }
-                    else { q=`En la expresión 'x + ${a}', ¿cuál es el coeficiente de x?`; ans=`1`; w1=`0`; w2=`${a}`; w3=`No tiene`; }
-                }
-                else if (category === 'simplificacion') {
-                    if(type === 0) { q=`Simplifica: ${a}x + ${b}x`; ans=`${a+b}x`; w1=`${a*b}x`; w2=`${Math.abs(a-b)}x`; w3=`${a+b}x²`; }
-                    else if(type === 1) { q=`Simplifica: ${a}y - ${b}y + y`; ans=`${a-b+1}y`; w1=`${a-b}y`; w2=`${a-b-1}y`; w3=`${a+b+1}y`; }
-                    else if(type === 2) { q=`Aplica la propiedad distributiva: ${a}(x + ${b})`; ans=`${a}x + ${a*b}`; w1=`${a}x + ${b}`; w2=`x + ${a*b}`; w3=`${a+b}x`; }
-                    else if(type === 3) { q=`Aplica la propiedad distributiva: ${a}(y - ${b})`; ans=`${a}y - ${a*b}`; w1=`${a}y - ${b}`; w2=`${a}y + ${a*b}`; w3=`${a-b}y`; }
-                    else { q=`Combina términos: ${a+c}a + ${b} - ${c}a`; ans=`${a}a + ${b}`; w1=`${a+2*c}a + ${b}`; w2=`${a}a - ${b}`; w3=`${a+b}a`; }
-                }
-                else if (category === 'evaluacion') {
-                    let x = Math.floor(Math.random() * 4) + 2;
-                    let y = Math.floor(Math.random() * 4) + 2;
-                    if(type === 0) { q=`Evalúa '${a}x + ${b}' si x = ${x}`; ans=`${a*x + b}`; w1=`${a*x - b}`; w2=`${a+x+b}`; w3=`${a*x}`; }
-                    else if(type === 1) { q=`Evalúa '${a}y - ${b}' si y = ${y}`; ans=`${a*y - b}`; w1=`${a*y + b}`; w2=`${a+y-b}`; w3=`${a*b - y}`; }
-                    else if(type === 2) { q=`Evalúa 'x² + ${a}' si x = ${x}`; ans=`${x*x + a}`; w1=`${2*x + a}`; w2=`${x*x - a}`; w3=`${x*a}`; }
-                    else if(type === 3) { q=`Evalúa '${a}x + y' si x = ${x} e y = ${y}`; ans=`${a*x + y}`; w1=`${a*y + x}`; w2=`${a*(x+y)}`; w3=`${x+y}`; }
-                    else { q=`Evalúa '${a}(x + ${b})' si x = ${x}`; ans=`${a*(x+b)}`; w1=`${a*x + b}`; w2=`${x+b}`; w3=`${a+x+b}`; }
-                }
+function distintos(cantidad, min, max) {
+  const s = new Set();
+  while (s.size < cantidad) { s.add(ent(min, max)); }
+  return Array.from(s);
+}
 
-                // Generar array de opciones y evitar duplicidades absolutas
-                let optionsArray = [ans.toString(), w1.toString(), w2.toString(), w3.toString()];
-                optionsArray = [...new Set(optionsArray)];
-                while(optionsArray.length < 4) {
-                    optionsArray.push((Math.floor(Math.random() * 50) + 10).toString());
-                    optionsArray = [...new Set(optionsArray)];
-                }
-                
-                // Mezclar opciones
-                let shuffled = [...optionsArray];
-                for (let j = shuffled.length - 1; j > 0; j--) {
-                    const k = Math.floor(Math.random() * (j + 1));
-                    [shuffled[j], shuffled[k]] = [shuffled[k], shuffled[j]];
-                }
-                
-                questions.push({ q: q, options: shuffled, a: shuffled.indexOf(ans.toString()) });
-            }
-            return questions;
-        }
+function mezclar(arreglo) {
+  const a = arreglo.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
 
-        function startQuiz(category) {
-            currentQuizData = generateQuestions(category); // Genera 10 preguntas nuevas
-            currentQuestionIndex = 0;
-            score = 0;
-            menuSection.style.display = 'none';
-            scoreSection.style.display = 'none';
-            quizSection.style.display = 'block';
-            loadQuestion();
-        }
+/* Escribe un término respetando la convención algebraica:
+   1x se escribe x, -1x se escribe -x y 0x se escribe 0. */
+function termino(coef, letra) {
+  if (coef === 0) { return '0'; }
+  if (coef === 1) { return letra; }
+  if (coef === -1) { return '-' + letra; }
+  return coef + letra;
+}
 
-        function loadQuestion() {
-            answered = false;
-            feedbackEl.innerText = '';
-            feedbackEl.style.color = '';
-            nextBtn.style.display = 'none';
-            optionsContainer.innerHTML = '';
+/* Relleno numérico: valor cercano a la respuesta, nunca negativo */
+function rellenoNum(resp) {
+  return function () {
+    let v = resp + ent(1, 9) * (Math.random() < 0.5 ? -1 : 1);
+    if (v < 0) { v = resp + ent(1, 9); }
+    return { t: String(v), e: 'Ese resultado no se obtiene al sustituir y operar correctamente.' };
+  };
+}
 
-            const currentQuestion = currentQuizData[currentQuestionIndex];
+/* Ensambla el ítem: elimina duplicados, completa a cuatro opciones
+   con rellenos del MISMO tipo sintáctico y mezcla. */
+function armarItem(base) {
+  const vistos = new Set([base.correcta.t]);
+  const opciones = [base.correcta];
 
-            progressText.innerText = `Pregunta ${currentQuestionIndex + 1} de ${currentQuizData.length}`;
-            questionEl.innerText = currentQuestion.q;
+  for (let i = 0; i < base.distractores.length && opciones.length < 4; i++) {
+    const d = base.distractores[i];
+    if (!vistos.has(d.t)) { vistos.add(d.t); opciones.push(d); }
+  }
 
-            currentQuestion.options.forEach((option, index) => {
-                const btn = document.createElement('button');
-                btn.innerText = option;
-                btn.classList.add('option-btn');
-                btn.onclick = () => checkAnswer(index, btn);
-                optionsContainer.appendChild(btn);
-            });
-        }
+  let guardia = 0;
+  while (opciones.length < 4 && guardia < 60) {
+    const f = base.relleno();
+    if (!vistos.has(f.t)) { vistos.add(f.t); opciones.push(f); }
+    guardia++;
+  }
 
-        function checkAnswer(selectedIndex, selectedBtn) {
-            if (answered) return; 
-            answered = true;
+  return {
+    enunciado: base.enunciado,
+    aria: base.aria || null,
+    opciones: mezclar(opciones),
+    correcta: base.correcta.t,
+    porQue: base.correcta.e
+  };
+}
 
-            const currentQuestion = currentQuizData[currentQuestionIndex];
-            const correctIndex = currentQuestion.a;
-            const allBtns = optionsContainer.children;
+/* ═══════════════════════════════════════════════════════════
+   2. Generadores por categoría
+   ═══════════════════════════════════════════════════════════ */
 
-            if (selectedIndex === correctIndex) {
-                selectedBtn.classList.add('correct');
-                feedbackEl.innerText = '¡Correcto! 🎉';
-                feedbackEl.style.color = 'var(--correct)';
-                score++;
-            } else {
-                selectedBtn.classList.add('incorrect');
-                allBtns[correctIndex].classList.add('correct'); 
-                feedbackEl.innerText = 'Incorrecto. La respuesta era: ' + currentQuestion.options[correctIndex];
-                feedbackEl.style.color = 'var(--incorrect)';
-            }
+/* --- 1. Traducción al lenguaje algebraico --- */
+function genTraduccion(tipo) {
+  const n = ent(2, 9);
 
-            for (let btn of allBtns) {
-                btn.style.cursor = 'default';
-            }
+  if (tipo === 0) {
+    return armarItem({
+      enunciado: 'Traduce al lenguaje algebraico: «el doble de un número, más ' + n + '».',
+      correcta: { t: '2x + ' + n, e: '«El doble» multiplica la variable por 2 y «más ' + n + '» añade la constante.' },
+      distractores: [
+        { t: 'x/2 + ' + n, e: 'x/2 representa «la mitad» de un número, no «el doble».' },
+        { t: '2(x + ' + n + ')', e: 'Los paréntesis duplicarían también el ' + n + '; el enunciado solo duplica el número.' },
+        { t: 'x + 2 + ' + n, e: '«El doble» indica multiplicación por 2, no una suma de 2.' }
+      ],
+      relleno: function () { return { t: ent(3, 9) + 'x + ' + n, e: 'Ese coeficiente no corresponde a «el doble».' }; }
+    });
+  }
+  if (tipo === 1) {
+    return armarItem({
+      enunciado: 'Traduce al lenguaje algebraico: «un número disminuido en ' + n + '».',
+      correcta: { t: 'x - ' + n, e: '«Disminuido en» resta la cantidad al número, y ese orden no se puede invertir.' },
+      distractores: [
+        { t: n + ' - x', e: 'La resta no es conmutativa; esa expresión dice «' + n + ' disminuido en un número».' },
+        { t: n + 'x', e: 'Escribir el número junto a la variable indica multiplicación, no resta.' },
+        { t: 'x + ' + n, e: '«Disminuido» indica resta; esa expresión aumenta el número.' }
+      ],
+      relleno: function () { return { t: 'x - ' + ent(2, 9), e: 'La cantidad restada no es la del enunciado.' }; }
+    });
+  }
+  if (tipo === 2) {
+    return armarItem({
+      enunciado: 'Traduce al lenguaje algebraico: «el triple de la suma de un número y ' + n + '».',
+      correcta: { t: '3(x + ' + n + ')', e: 'Se triplica la suma completa, así que la suma debe agruparse entre paréntesis.' },
+      distractores: [
+        { t: '3x + ' + n, e: 'Ahí solo se triplica el número; falta triplicar también el ' + n + '.' },
+        { t: 'x + 3(' + n + ')', e: 'Ahí se triplica únicamente el ' + n + ', no la suma.' },
+        { t: '3x - ' + n, e: 'El enunciado indica una suma dentro del paréntesis, no una resta.' }
+      ],
+      relleno: function () { return { t: ent(4, 9) + '(x + ' + n + ')', e: 'Ese factor no corresponde a «el triple».' }; }
+    });
+  }
+  if (tipo === 3) {
+    return armarItem({
+      enunciado: 'Traduce al lenguaje algebraico: «la mitad de un número, aumentada en ' + n + '».',
+      correcta: { t: 'x/2 + ' + n, e: 'Primero se divide el número entre 2 y después se suma la constante.' },
+      distractores: [
+        { t: '2x + ' + n, e: '2x es «el doble» del número; «la mitad» corresponde a x/2.' },
+        { t: 'x/2 - ' + n, e: '«Aumentada en» indica suma, no resta.' },
+        { t: '(x + ' + n + ')/2', e: 'Ahí se divide entre 2 la suma completa; solo el número se divide entre 2.' }
+      ],
+      relleno: function () { return { t: 'x/' + ent(3, 9) + ' + ' + n, e: 'Ese divisor no corresponde a «la mitad».' }; }
+    });
+  }
+  return armarItem({
+    enunciado: 'Traduce al lenguaje algebraico: «el cuádruple de un número, menos ' + n + '».',
+    correcta: { t: '4x - ' + n, e: 'Se multiplica el número por 4 y a ese producto se le resta la constante.' },
+    distractores: [
+      { t: '4(x - ' + n + ')', e: 'Los paréntesis harían que el 4 multiplique también al ' + n + '.' },
+      { t: n + 'x - 4', e: 'Los papeles del ' + n + ' y del 4 están intercambiados.' },
+      { t: 'x/4 - ' + n, e: 'x/4 es «la cuarta parte»; «el cuádruple» es 4x.' }
+    ],
+    relleno: function () {
+      const posibles = [2, 3, 5, 6, 7, 8, 9];
+      return { t: posibles[ent(0, posibles.length - 1)] + 'x - ' + n, e: 'Ese coeficiente no corresponde a «el cuádruple».' };
+    }
+  });
+}
 
-            nextBtn.style.display = 'inline-block';
-        }
+/* --- 2. Términos, coeficientes y constantes --- */
+function genIdentificacion(tipo) {
+  const r = distintos(3, 2, 9);
+  const a = r[0], b = r[1], c = r[2];
 
-        function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < currentQuizData.length) {
-                loadQuestion();
-            } else {
-                showResults();
-            }
-        }
+  if (tipo === 0) {
+    return armarItem({
+      enunciado: 'En la expresión ' + a + 'x + ' + b + ', ¿cuál es el coeficiente de x?',
+      correcta: { t: String(a), e: 'El coeficiente es el número que multiplica a la variable.' },
+      distractores: [
+        { t: String(b), e: 'El ' + b + ' es el término constante: no multiplica a ninguna variable.' },
+        { t: '1', e: 'El coeficiente sería 1 solo si la x apareciera sola, sin número delante.' },
+        { t: String(a + b), e: 'El coeficiente y la constante no se suman entre sí.' }
+      ],
+      relleno: rellenoNum(a)
+    });
+  }
+  if (tipo === 1) {
+    return armarItem({
+      enunciado: 'En la expresión ' + a + 'y - ' + b + ', ¿cuál es el término constante?',
+      correcta: { t: '-' + b, e: 'El signo que precede al número forma parte del término, por eso es negativo.' },
+      distractores: [
+        { t: String(b), e: 'Falta el signo: el término va restando, así que es negativo.' },
+        { t: String(a), e: 'El ' + a + ' es el coeficiente de y, no el término constante.' },
+        { t: '-' + a, e: 'El ' + a + ' acompaña a la variable y además va sumando.' }
+      ],
+      relleno: function () { return { t: '-' + ent(10, 30), e: 'Ese valor no aparece en la expresión.' }; }
+    });
+  }
+  if (tipo === 2) {
+    return armarItem({
+      enunciado: '¿Cuántos términos tiene la expresión ' + a + 'x² - ' + b + 'x + ' + c + '?',
+      aria: '¿Cuántos términos tiene la expresión ' + a + ' x al cuadrado, menos ' + b + ' x, más ' + c + '?',
+      correcta: { t: '3', e: 'Los términos se separan por los signos de suma y resta: ' + a + 'x², -' + b + 'x y +' + c + '.' },
+      distractores: [
+        { t: '1', e: 'Habría un solo término si toda la expresión fuera un único producto, sin sumas ni restas.' },
+        { t: '2', e: 'La constante ' + c + ' también cuenta como término.' },
+        { t: '4', e: 'La expresión tiene tres signos de operación visibles, pero solo separan tres términos.' }
+      ],
+      relleno: function () { return { t: String(ent(5, 8)), e: 'La expresión no llega a esa cantidad de términos.' }; }
+    });
+  }
+  if (tipo === 3) {
+    return armarItem({
+      enunciado: 'Identifica los términos semejantes en la expresión ' + a + 'x + ' + b + 'y - ' + c + 'x.',
+      correcta: { t: '{' + a + 'x, -' + c + 'x}', e: 'Son semejantes porque tienen la misma variable elevada al mismo exponente.' },
+      distractores: [
+        { t: '{' + a + 'x, ' + b + 'y}', e: 'x e y son variables distintas, así que esos términos no son semejantes.' },
+        { t: '{' + b + 'y, -' + c + 'x}', e: 'Esos términos tienen variables diferentes.' },
+        { t: 'Los tres son semejantes', e: 'El término ' + b + 'y tiene otra variable y queda fuera del grupo.' }
+      ],
+      relleno: function () { return { t: 'Ninguno es semejante', e: 'Los dos términos en x sí son semejantes entre sí.' }; }
+    });
+  }
+  return armarItem({
+    enunciado: 'En la expresión x + ' + a + ', ¿cuál es el coeficiente de x?',
+    correcta: { t: '1', e: 'Cuando la variable aparece sola, su coeficiente es 1 aunque no se escriba.' },
+    distractores: [
+      { t: '0', e: 'Un coeficiente 0 eliminaría el término; la x sí está presente.' },
+      { t: String(a), e: 'El ' + a + ' es el término constante, no el coeficiente de x.' },
+      { t: 'x no tiene coeficiente', e: 'Toda variable tiene coeficiente; si no se escribe, es 1.' }
+    ],
+    relleno: function () { return { t: String(ent(2, 9)), e: 'Ese número no multiplica a la x en la expresión.' }; }
+  });
+}
 
-        function showResults() {
-            quizSection.style.display = 'none';
-            scoreSection.style.display = 'block';
-            
-            const total = currentQuizData.length;
-            document.getElementById('final-score').innerText = `${score} / ${total}`;
-            
-            const messageEl = document.getElementById('score-message');
-            if(score === total) {
-                messageEl.innerText = "¡Excelente! Dominas este tema perfectamente.";
-            } else if(score >= total / 2) {
-                messageEl.innerText = "¡Buen trabajo! Sigue practicando para alcanzar la perfección.";
-            } else {
-                messageEl.innerText = "No te rindas. Revisa los conceptos y vuelve a intentarlo.";
-            }
-        }
+/* --- 3. Simplificación de expresiones --- */
+function genSimplificacion(tipo) {
+  if (tipo === 0) {
+    const r = distintos(2, 2, 9);
+    const a = r[0], b = r[1];
+    return armarItem({
+      enunciado: 'Simplifica: ' + a + 'x + ' + b + 'x',
+      correcta: { t: termino(a + b, 'x'), e: 'Al ser términos semejantes se suman los coeficientes y la variable no cambia.' },
+      distractores: [
+        { t: termino(a * b, 'x'), e: 'Los coeficientes se suman, no se multiplican: la operación indicada es una suma.' },
+        { t: termino(Math.abs(a - b), 'x'), e: 'Los dos términos van sumando, así que los coeficientes se suman.' },
+        { t: termino(a + b, 'x²'), e: 'Al sumar términos semejantes el exponente de la variable no cambia.' }
+      ],
+      relleno: function () { return { t: termino(ent(11, 20), 'x'), e: 'Ese coeficiente no resulta de sumar los dos coeficientes dados.' }; }
+    });
+  }
+  if (tipo === 1) {
+    const b = ent(2, 5);
+    const a = ent(b + 2, 9);
+    return armarItem({
+      enunciado: 'Simplifica: ' + a + 'y - ' + b + 'y + y',
+      correcta: { t: termino(a - b + 1, 'y'), e: 'Se operan los coeficientes en orden: ' + a + ' - ' + b + ' + 1 = ' + (a - b + 1) + '.' },
+      distractores: [
+        { t: termino(a - b, 'y'), e: 'La y sola tiene coeficiente 1 y también debe sumarse.' },
+        { t: termino(a - b - 1, 'y'), e: 'El último término va sumando, no restando.' },
+        { t: termino(a + b + 1, 'y'), e: 'El segundo término va restando: ' + b + ' no se suma.' }
+      ],
+      relleno: function () { return { t: termino(ent(11, 20), 'y'), e: 'Ese coeficiente no resulta de operar ' + a + ' - ' + b + ' + 1.' }; }
+    });
+  }
+  if (tipo === 2) {
+    const r = distintos(2, 2, 9);
+    const a = r[0], b = r[1];
+    return armarItem({
+      enunciado: 'Aplica la propiedad distributiva: ' + a + '(x + ' + b + ')',
+      correcta: { t: a + 'x + ' + (a * b), e: 'El factor ' + a + ' multiplica a los dos términos del paréntesis.' },
+      distractores: [
+        { t: a + 'x + ' + b, e: 'Falta multiplicar el ' + a + ' por el ' + b + '.' },
+        { t: 'x + ' + (a * b), e: 'Falta multiplicar el ' + a + ' por la x.' },
+        { t: termino(a + b, 'x'), e: 'La x y la constante no son términos semejantes y no se pueden combinar.' }
+      ],
+      relleno: function () { return { t: a + 'x + ' + ent(11, 60), e: 'El segundo término no es el producto ' + a + ' × ' + b + '.' }; }
+    });
+  }
+  if (tipo === 3) {
+    const r = distintos(2, 2, 9);
+    const a = r[0], b = r[1];
+    return armarItem({
+      enunciado: 'Aplica la propiedad distributiva: ' + a + '(y - ' + b + ')',
+      correcta: { t: a + 'y - ' + (a * b), e: 'El factor ' + a + ' multiplica a los dos términos y el signo de resta se conserva.' },
+      distractores: [
+        { t: a + 'y - ' + b, e: 'Falta multiplicar el ' + a + ' por el ' + b + '.' },
+        { t: a + 'y + ' + (a * b), e: 'El signo cambió: dentro del paréntesis hay una resta.' },
+        { t: a + 'y - ' + (a + b), e: 'La distributiva multiplica; no suma el ' + a + ' con el ' + b + '.' }
+      ],
+      relleno: function () { return { t: a + 'y - ' + ent(11, 60), e: 'El segundo término no es el producto ' + a + ' × ' + b + '.' }; }
+    });
+  }
+  const r = distintos(3, 2, 9);
+  const a = r[0], b = r[1], c = r[2];
+  return armarItem({
+    enunciado: 'Combina los términos semejantes: ' + (a + c) + 'm + ' + b + ' - ' + c + 'm',
+    correcta: { t: termino(a, 'm') + ' + ' + b, e: 'Los términos en m se restan: ' + (a + c) + ' - ' + c + ' = ' + a + '. La constante ' + b + ' queda igual.' },
+    distractores: [
+      { t: termino(a + 2 * c, 'm') + ' + ' + b, e: 'El último término va restando, no sumando.' },
+      { t: termino(a, 'm') + ' - ' + b, e: 'La constante ' + b + ' va sumando y conserva su signo.' },
+      { t: termino(a + b, 'm'), e: 'La constante ' + b + ' no es semejante a los términos en m.' }
+    ],
+    relleno: function () { return { t: termino(ent(11, 20), 'm') + ' + ' + b, e: 'Ese coeficiente no resulta de restar los términos en m.' }; }
+  });
+}
 
-        function returnToMenu() {
-            quizSection.style.display = 'none';
-            scoreSection.style.display = 'none';
-            menuSection.style.display = 'block';
-        }
-    </script>
+/* --- 4. Evaluación de expresiones --- */
+function genEvaluacion(tipo) {
+  const r = distintos(2, 2, 9);
+  const a = r[0], b = r[1];
+
+  if (tipo === 0) {
+    const v = ent(2, 6);
+    const resp = a * v + b;
+    return armarItem({
+      enunciado: 'Evalúa la expresión ' + a + 'x + ' + b + ' para x = ' + v + '.',
+      correcta: { t: String(resp), e: 'Se sustituye y se opera: ' + a + '(' + v + ') + ' + b + ' = ' + (a * v) + ' + ' + b + ' = ' + resp + '.' },
+      distractores: [
+        { t: String(a * v - b), e: 'La expresión suma la constante; ahí se restó.' },
+        { t: String(a + v + b), e: 'El ' + a + ' multiplica a la x, no se le suma.' },
+        { t: String(a * v), e: 'Falta sumar el término constante ' + b + '.' }
+      ],
+      relleno: rellenoNum(resp)
+    });
+  }
+  if (tipo === 1) {
+    let v = ent(2, 6);
+    if (a * v <= b) { v = Math.floor(b / a) + 1; }
+    const resp = a * v - b;
+    return armarItem({
+      enunciado: 'Evalúa la expresión ' + a + 'y - ' + b + ' para y = ' + v + '.',
+      correcta: { t: String(resp), e: 'Se sustituye y se opera: ' + a + '(' + v + ') - ' + b + ' = ' + (a * v) + ' - ' + b + ' = ' + resp + '.' },
+      distractores: [
+        { t: String(a * v + b), e: 'La expresión resta la constante; ahí se sumó.' },
+        { t: String(a + v - b), e: 'El ' + a + ' multiplica a la y, no se le suma.' },
+        { t: String(a * b - v), e: 'Se multiplicaron los números equivocados: el ' + a + ' multiplica al valor de y.' }
+      ],
+      relleno: rellenoNum(resp)
+    });
+  }
+  if (tipo === 2) {
+    const v = ent(3, 6);
+    const resp = v * v + a;
+    return armarItem({
+      enunciado: 'Evalúa la expresión x² + ' + a + ' para x = ' + v + '.',
+      aria: 'Evalúa la expresión x al cuadrado más ' + a + ' para x = ' + v + '.',
+      correcta: { t: String(resp), e: 'Primero el cuadrado y después la suma: ' + v + '² = ' + (v * v) + ', y ' + (v * v) + ' + ' + a + ' = ' + resp + '.' },
+      distractores: [
+        { t: String(2 * v + a), e: 'Elevar al cuadrado es multiplicar el número por sí mismo, no por 2.' },
+        { t: String(v * v - a), e: 'La expresión suma el ' + a + '; ahí se restó.' },
+        { t: String(v * a), e: 'El ' + a + ' se suma al cuadrado; no multiplica a la x.' }
+      ],
+      relleno: rellenoNum(resp)
+    });
+  }
+  if (tipo === 3) {
+    const v = ent(2, 6);
+    let w = ent(2, 6);
+    if (w === v) { w = v === 6 ? 2 : v + 1; }
+    const resp = a * v + w;
+    return armarItem({
+      enunciado: 'Evalúa la expresión ' + a + 'x + y para x = ' + v + ' e y = ' + w + '.',
+      correcta: { t: String(resp), e: 'Se sustituye cada variable: ' + a + '(' + v + ') + ' + w + ' = ' + (a * v) + ' + ' + w + ' = ' + resp + '.' },
+      distractores: [
+        { t: String(a * w + v), e: 'Los valores de x e y quedaron intercambiados.' },
+        { t: String(a * (v + w)), e: 'El ' + a + ' multiplica solo a la x; la y se suma después.' },
+        { t: String(v + w), e: 'Falta multiplicar el valor de x por el coeficiente ' + a + '.' }
+      ],
+      relleno: rellenoNum(resp)
+    });
+  }
+  const v = ent(2, 6);
+  const resp = a * (v + b);
+  return armarItem({
+    enunciado: 'Evalúa la expresión ' + a + '(x + ' + b + ') para x = ' + v + '.',
+    correcta: { t: String(resp), e: 'Se resuelve primero el paréntesis: ' + v + ' + ' + b + ' = ' + (v + b) + ', y ' + a + '(' + (v + b) + ') = ' + resp + '.' },
+    distractores: [
+      { t: String(a * v + b), e: 'El ' + a + ' multiplica a toda la suma del paréntesis, no solo a la x.' },
+      { t: String(v + b), e: 'Falta multiplicar el resultado del paréntesis por ' + a + '.' },
+      { t: String(a + v + b), e: 'El ' + a + ' multiplica, no se suma.' }
+    ],
+    relleno: rellenoNum(resp)
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3. Catálogo de categorías
+   ═══════════════════════════════════════════════════════════ */
+
+const CATEGORIAS = {
+  traduccion:     { rotulo: 'Traducción al lenguaje algebraico',      gen: genTraduccion },
+  identificacion: { rotulo: 'Términos, coeficientes y constantes',    gen: genIdentificacion },
+  simplificacion: { rotulo: 'Simplificación de expresiones',          gen: genSimplificacion },
+  evaluacion:     { rotulo: 'Evaluación de expresiones',              gen: genEvaluacion }
+};
+
+const TOTAL_PREGUNTAS = 10;
+const LETRAS = ['A', 'B', 'C', 'D'];
+
+/* Los cinco tipos aparecen dos veces cada uno: cobertura garantizada. */
+function construirPractica(clave) {
+  const generador = CATEGORIAS[clave].gen;
+  const tipos = mezclar([0, 1, 2, 3, 4, 0, 1, 2, 3, 4]).slice(0, TOTAL_PREGUNTAS);
+  return tipos.map(function (t) { return generador(t); });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   4. Estado y elementos
+   ═══════════════════════════════════════════════════════════ */
+
+let items = [];
+let indice = 0;
+let aciertos = 0;
+let respondido = false;
+let claveActual = null;
+let registro = [];
+
+const secMenu      = document.getElementById('seccion-menu');
+const secQuiz      = document.getElementById('seccion-quiz');
+const secResultado = document.getElementById('seccion-resultado');
+const elProgreso   = document.getElementById('progreso');
+const elBarra      = document.getElementById('barra');
+const elEnunciado  = document.getElementById('enunciado');
+const elOpciones   = document.getElementById('opciones');
+const elRetro      = document.getElementById('retro');
+const btnSiguiente = document.getElementById('btn-siguiente');
+
+/* ═══════════════════════════════════════════════════════════
+   5. Flujo de la práctica
+   ═══════════════════════════════════════════════════════════ */
+
+function mostrar(seccion) {
+  secMenu.classList.add('oculto');
+  secQuiz.classList.add('oculto');
+  secResultado.classList.add('oculto');
+  seccion.classList.remove('oculto');
+}
+
+function iniciar(clave) {
+  claveActual = clave;
+  items = construirPractica(clave);
+  indice = 0;
+  aciertos = 0;
+  registro = [];
+  mostrar(secQuiz);
+  cargarPregunta();
+}
+
+function cargarPregunta() {
+  respondido = false;
+  elRetro.innerHTML = '';
+  btnSiguiente.classList.add('oculto');
+  elOpciones.innerHTML = '';
+
+  const item = items[indice];
+
+  elProgreso.textContent = CATEGORIAS[claveActual].rotulo +
+    ' · pregunta ' + (indice + 1) + ' de ' + items.length +
+    ' · aciertos: ' + aciertos;
+  elBarra.style.width = Math.round((indice / items.length) * 100) + '%';
+
+  elEnunciado.textContent = item.enunciado;
+  if (item.aria) { elEnunciado.setAttribute('aria-label', item.aria); }
+  else { elEnunciado.removeAttribute('aria-label'); }
+
+  item.opciones.forEach(function (op, i) {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'opcion';
+
+    const spanLetra = document.createElement('span');
+    spanLetra.className = 'letra';
+    spanLetra.textContent = LETRAS[i] + '.';
+
+    const spanTexto = document.createElement('span');
+    spanTexto.className = 'texto';
+    spanTexto.textContent = op.t;
+
+    btn.appendChild(spanLetra);
+    btn.appendChild(spanTexto);
+    btn.setAttribute('aria-label', LETRAS[i] + '. ' + (op.aria || op.t));
+
+    btn.addEventListener('click', function () { verificar(op, btn); });
+    li.appendChild(btn);
+    elOpciones.appendChild(li);
+  });
+
+  elEnunciado.focus();
+}
+
+function marcar(btn, tipo) {
+  btn.classList.add(tipo === 'bien' ? 'correcta' : 'incorrecta');
+  const marca = document.createElement('span');
+  marca.className = 'marca';
+  marca.setAttribute('aria-hidden', 'true');
+  marca.textContent = tipo === 'bien' ? '✓' : '✗';
+  const sr = document.createElement('span');
+  sr.className = 'sr-only';
+  sr.textContent = tipo === 'bien' ? ' Respuesta correcta.' : ' Respuesta incorrecta.';
+  btn.appendChild(marca);
+  btn.appendChild(sr);
+}
+
+function verificar(opcion, btn) {
+  if (respondido) { return; }
+  respondido = true;
+
+  const item = items[indice];
+  const acerto = opcion.t === item.correcta;
+  if (acerto) { aciertos++; }
+
+  registro.push({
+    enunciado: item.enunciado,
+    elegida: opcion.t,
+    correcta: item.correcta,
+    acerto: acerto,
+    explicacion: acerto ? item.porQue : opcion.e
+  });
+
+  const botones = elOpciones.querySelectorAll('button');
+  botones.forEach(function (b) {
+    b.disabled = true;
+    const texto = b.querySelector('.texto').textContent;
+    if (texto === item.correcta) { marcar(b, 'bien'); }
+  });
+  if (!acerto) { marcar(btn, 'mal'); }
+
+  const caja = document.createElement('div');
+  caja.className = 'caja ' + (acerto ? 'bien' : 'mal');
+
+  const titulo = document.createElement('p');
+  titulo.className = 'titulo';
+  titulo.textContent = acerto ? 'Correcto' : 'Incorrecto';
+  caja.appendChild(titulo);
+
+  if (acerto) {
+    const p = document.createElement('p');
+    p.textContent = item.porQue;
+    caja.appendChild(p);
+  } else {
+    const p1 = document.createElement('p');
+    p1.textContent = 'La opción ' + opcion.t + ' no es correcta. ' + opcion.e;
+    const p2 = document.createElement('p');
+    p2.textContent = 'La respuesta correcta es ' + item.correcta + '. ' + item.porQue;
+    caja.appendChild(p1);
+    caja.appendChild(p2);
+  }
+
+  elRetro.appendChild(caja);
+  btnSiguiente.textContent = (indice + 1 < items.length) ? 'Siguiente pregunta' : 'Ver resultados';
+  btnSiguiente.classList.remove('oculto');
+  btnSiguiente.focus();
+}
+
+function avanzar() {
+  indice++;
+  if (indice < items.length) { cargarPregunta(); }
+  else { mostrarResultados(); }
+}
+
+function mostrarResultados() {
+  mostrar(secResultado);
+
+  const total = items.length;
+  const pct = Math.round((aciertos / total) * 100);
+
+  document.getElementById('marcador').textContent = aciertos + ' / ' + total;
+  document.getElementById('marcador-etq').textContent =
+    CATEGORIAS[claveActual].rotulo + ' · ' + pct + ' % de aciertos';
+
+  let mensaje;
+  if (pct === 100) {
+    mensaje = 'Dominio completo de la categoría. Continúa con otra categoría del interactivo.';
+  } else if (pct >= 80) {
+    mensaje = 'Buen dominio. Revisa los errores señalados abajo y repite la práctica una vez más.';
+  } else if (pct >= 50) {
+    mensaje = 'Base sólida con puntos por afinar. Revisa las explicaciones y vuelve a intentarlo.';
+  } else {
+    mensaje = 'Conviene repasar la Lección 4.1 antes de repetir la práctica. Las explicaciones de abajo indican dónde reforzar.';
+  }
+  document.getElementById('mensaje-final').textContent = mensaje;
+
+  const cont = document.getElementById('contenedor-repaso');
+  cont.innerHTML = '';
+  const fallos = registro.filter(function (r) { return !r.acerto; });
+  if (fallos.length > 0) {
+    const det = document.createElement('details');
+    det.className = 'repaso';
+    const sum = document.createElement('summary');
+    sum.textContent = 'Repaso de las ' + fallos.length + ' preguntas falladas';
+    det.appendChild(sum);
+
+    const ol = document.createElement('ol');
+    fallos.forEach(function (f) {
+      const li = document.createElement('li');
+      const p1 = document.createElement('p');
+      p1.textContent = f.enunciado;
+      const p2 = document.createElement('p');
+      const s1 = document.createElement('span');
+      s1.className = 'tuya';
+      s1.textContent = 'Tu respuesta: ' + f.elegida + '. ';
+      const s2 = document.createElement('span');
+      s2.className = 'buena';
+      s2.textContent = 'Respuesta correcta: ' + f.correcta + '.';
+      p2.appendChild(s1);
+      p2.appendChild(s2);
+      const p3 = document.createElement('p');
+      p3.textContent = f.explicacion;
+      li.appendChild(p1);
+      li.appendChild(p2);
+      li.appendChild(p3);
+      ol.appendChild(li);
+    });
+    det.appendChild(ol);
+    cont.appendChild(det);
+  }
+
+  document.getElementById('tit-resultado').focus();
+}
+
+function volverAlMenu() {
+  mostrar(secMenu);
+  document.querySelector('.btn-menu').focus();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   6. Enlaces de eventos
+   ═══════════════════════════════════════════════════════════ */
+
+document.querySelectorAll('.btn-menu').forEach(function (b) {
+  b.addEventListener('click', function () { iniciar(b.getAttribute('data-cat')); });
+});
+
+btnSiguiente.addEventListener('click', avanzar);
+document.getElementById('btn-salir').addEventListener('click', volverAlMenu);
+document.getElementById('btn-menu-final').addEventListener('click', volverAlMenu);
+document.getElementById('btn-repetir').addEventListener('click', function () { iniciar(claveActual); });
+
+document.getElementById('tit-resultado').setAttribute('tabindex', '-1');
+</script>
 </body>
 </html>

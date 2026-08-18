@@ -1,1 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica Interactiva de Potencias</title>
+    <style>
+        :root {
+            --primary: #4338ca;
+            --primary-hover: #3730a3;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --correct: #10b981;
+            --incorrect: #ef4444;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: var(--primary);
+            width: 100%;
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button.nav-btn {
+            background-color: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        button.nav-btn:hover, button.nav-btn.active {
+            background-color: white;
+            color: var(--primary);
+            border-color: white;
+        }
+        .main-container {
+            max-width: 600px;
+            width: 90%;
+            margin: 2rem auto;
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: var(--primary);
+            text-align: center;
+        }
+        .desc {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        .question-box {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .math-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e1;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        button.option-btn {
+            background-color: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        button.option-btn:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+        button.option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .correct-btn {
+            background-color: #d1fae5 !important;
+            border-color: var(--correct) !important;
+            color: #065f46;
+        }
+        .incorrect-btn {
+            background-color: #fee2e2 !important;
+            border-color: var(--incorrect) !important;
+            color: #991b1b;
+        }
+        #feedback-box {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        .text-correct { color: var(--correct); }
+        .text-incorrect { color: var(--incorrect); }
+        .next-btn {
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .next-btn:hover {
+            background-color: var(--primary-hover);
+        }
+        .hidden { display: none !important; }
+        .stats-box {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #475569;
+        }
+        .stats-highlight {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
 
+    <header>
+        <div class="nav-container">
+            <button class="nav-btn active" onclick="changeLesson(1)">Lección 1</button>
+            <button class="nav-btn" onclick="changeLesson(2)">Lección 2</button>
+            <button class="nav-btn" onclick="changeLesson(3)">Lección 3</button>
+            <button class="nav-btn" onclick="changeLesson(4)">Práctica Final</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <h2 id="lesson-title">Lección 1</h2>
+        <p id="lesson-desc" class="desc">Cargando...</p>
+
+        <div class="question-box">
+            <div id="q-text">Simplifica la siguiente expresión:</div>
+            <div id="q-math" class="math-display">x<sup>2</sup> &middot; x<sup>3</sup></div>
+        </div>
+
+        <div class="options-grid" id="options-container">
+            <!-- Botones inyectados por JS -->
+        </div>
+
+        <div id="feedback-box"></div>
+        <button id="next-btn" class="next-btn hidden" onclick="loadQuestion()">Siguiente Ejercicio</button>
+
+        <div class="stats-box">
+            Aciertos: <span id="stat-correct">0</span> / <span id="stat-total">0</span> 
+            (<span id="stat-percent" class="stats-highlight">0%</span>)
+        </div>
+    </div>
+
+    <script>
+        // Configuración de las lecciones
+        const lessons = {
+            1: {
+                title: "1. Regla del Producto y Potencias",
+                desc: "Aplica la regla del producto (aᵐ·aⁿ=aᵐ⁺ⁿ), potencia de una potencia ((aᵐ)ⁿ=aᵐⁿ) y potencia de un producto ((ab)ⁿ=aⁿbⁿ)."
+            },
+            2: {
+                title: "2. Cocientes y Exponentes Especiales",
+                desc: "Aplica la regla del cociente (aᵐ÷aⁿ=aᵐ⁻ⁿ), justifica el exponente cero (a⁰=1) y trabaja exponentes negativos (a⁻ⁿ=1/aⁿ)."
+            },
+            3: {
+                title: "3. Múltiples Reglas",
+                desc: "Simplifica expresiones complejas siguiendo el orden correcto. El resultado siempre debe tener exponentes positivos."
+            },
+            4: {
+                title: "4. Práctica Final Mezclada",
+                desc: "¡Pon a prueba todo lo aprendido! Ejercicios aleatorios de las tres lecciones anteriores."
+            }
+        };
+
+        // Estado global
+        let currentLesson = 1;
+        let stats = { 1: {t:0, c:0}, 2: {t:0, c:0}, 3: {t:0, c:0}, 4: {t:0, c:0} };
+        let currentCorrectAnswer = "";
+        let answered = false;
+
+        // Utilidad: Aleatorizar arreglos (Fisher-Yates)
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Generador Lección 1
+        function getGen1() {
+            let a, b;
+            do {
+                a = Math.floor(Math.random() * 5) + 2;
+                b = Math.floor(Math.random() * 5) + 2;
+            } while (a + b === a * b); // Evitar 2+2=4 y 2*2=4
+            
+            const vars = ['x', 'y', 'a', 'm'];
+            const v = vars[Math.floor(Math.random() * vars.length)];
+            const type = Math.floor(Math.random() * 3);
+            let math, ans, w1, w2, w3, text;
+
+            if (type === 0) { // Producto
+                text = "Aplica la regla del producto:";
+                math = `${v}<sup>${a}</sup> &middot; ${v}<sup>${b}</sup>`;
+                ans = `${v}<sup>${a+b}</sup>`;
+                w1 = `${v}<sup>${a*b}</sup>`;
+                w2 = `${v}<sup>${Math.abs(a-b)}</sup>`;
+                w3 = `2${v}<sup>${a+b}</sup>`;
+            } else if (type === 1) { // Potencia de potencia
+                text = "Aplica la regla de la potencia de una potencia:";
+                math = `(${v}<sup>${a}</sup>)<sup>${b}</sup>`;
+                ans = `${v}<sup>${a*b}</sup>`;
+                w1 = `${v}<sup>${a+b}</sup>`;
+                w2 = `(${v})<sup>${a+b}</sup>`;
+                w3 = `${v}<sup>${Math.pow(a,2)}</sup>`;
+            } else { // Potencia de un producto
+                let coef = Math.floor(Math.random() * 4) + 2;
+                text = "Aplica la regla de la potencia de un producto:";
+                math = `(${coef}${v})<sup>${a}</sup>`;
+                ans = `${Math.pow(coef,a)}${v}<sup>${a}</sup>`;
+                w1 = `${coef}${v}<sup>${a}</sup>`;
+                w2 = `${coef*a}${v}<sup>${a}</sup>`;
+                w3 = `${Math.pow(coef,a)}${v}`;
+            }
+            return { text, math, ans, options: shuffle([ans, w1, w2, w3]) };
+        }
+
+        // Generador Lección 2
+        function getGen2() {
+            let a = Math.floor(Math.random() * 6) + 3;
+            let b = Math.floor(Math.random() * 6) + 3;
+            const vars = ['m', 'n', 'p', 'z'];
+            const v = vars[Math.floor(Math.random() * vars.length)];
+            const type = Math.floor(Math.random() * 4); // 0,1=Cociente, 2=Cero, 3=Negativo
+            let math, ans, w1, w2, w3, text;
+
+            if (type === 0) { // Cociente normal
+                while(a <= b) { a = Math.floor(Math.random()*6)+4; b = Math.floor(Math.random()*3)+1; }
+                text = "Aplica la regla del cociente:";
+                math = `${v}<sup>${a}</sup> / ${v}<sup>${b}</sup>`;
+                ans = `${v}<sup>${a-b}</sup>`;
+                w1 = `${v}<sup>${a+b}</sup>`;
+                w2 = `1 / ${v}<sup>${a-b}</sup>`;
+                w3 = `${v}<sup>${a*b}</sup>`;
+            } else if (type === 1) { // Cociente igual (prepara exponente cero)
+                text = "Si aplicas la regla del cociente a esta expresión, ¿cuál es el resultado final?";
+                math = `${v}<sup>${a}</sup> / ${v}<sup>${a}</sup>`;
+                ans = `1`;
+                w1 = `0`;
+                w2 = `${v}`;
+                w3 = `${v}<sup>2</sup>`;
+            } else if (type === 2) { // Exponente cero directo
+                text = "Calcula el valor del exponente cero:";
+                let coef = Math.floor(Math.random() * 8) + 2;
+                math = `(${coef}${v}<sup>${a}</sup>)<sup>0</sup>`;
+                ans = `1`;
+                w1 = `0`;
+                w2 = `${coef}`;
+                w3 = `${v}`;
+            } else { // Exponente negativo
+                text = "Reescribe con exponente positivo:";
+                math = `${v}<sup>-${a}</sup>`;
+                ans = `1 / ${v}<sup>${a}</sup>`;
+                w1 = `-${v}<sup>${a}</sup>`;
+                w2 = `1 / ${v}<sup>-${a}</sup>`;
+                w3 = `-${a}${v}`;
+            }
+            return { text, math, ans, options: shuffle([ans, w1, w2, w3]) };
+        }
+
+        // Generador Lección 3
+        function getGen3() {
+            let a = Math.floor(Math.random() * 3) + 2;
+            let b = Math.floor(Math.random() * 3) + 2;
+            let c = Math.floor(Math.random() * 3) + 2;
+            const vars = ['x', 'y'];
+            const v = vars[Math.floor(Math.random() * vars.length)];
+            const type = Math.floor(Math.random() * 2);
+            let math, ans, w1, w2, w3, text;
+
+            text = "Simplifica la expresión respetando la jerarquía:";
+            if (type === 0) { // (x^a * x^b)^c
+                math = `(${v}<sup>${a}</sup> &middot; ${v}<sup>${b}</sup>)<sup>${c}</sup>`;
+                ans = `${v}<sup>${(a+b)*c}</sup>`;
+                w1 = `${v}<sup>${a*b*c}</sup>`;
+                w2 = `${v}<sup>${a+b+c}</sup>`;
+                w3 = `${v}<sup>${(a*b)+c}</sup>`;
+            } else { // (x^a)^b / x^c (Asegurando exponente positivo)
+                let numExp = a * b;
+                while(c >= numExp) { c = Math.floor(Math.random() * 3) + 1; }
+                math = `(${v}<sup>${a}</sup>)<sup>${b}</sup> / ${v}<sup>${c}</sup>`;
+                ans = `${v}<sup>${numExp - c}</sup>`;
+                w1 = `${v}<sup>${(a+b)-c}</sup>`;
+                w2 = `${v}<sup>${numExp + c}</sup>`;
+                w3 = `1 / ${v}<sup>${numExp - c}</sup>`;
+            }
+            return { text, math, ans, options: shuffle([ans, w1, w2, w3]) };
+        }
+
+        // Cambiar de lección
+        function changeLesson(num) {
+            currentLesson = num;
+            
+            // Actualizar botones UI
+            document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
+                if (idx + 1 === num) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // Actualizar textos
+            document.getElementById('lesson-title').innerText = lessons[num].title;
+            document.getElementById('lesson-desc').innerText = lessons[num].desc;
+
+            updateStatsDisplay();
+            loadQuestion();
+        }
+
+        // Cargar nueva pregunta
+        function loadQuestion() {
+            answered = false;
+            document.getElementById('feedback-box').className = '';
+            document.getElementById('feedback-box').innerText = '';
+            document.getElementById('next-btn').classList.add('hidden');
+
+            let qData;
+            if (currentLesson === 1) qData = getGen1();
+            else if (currentLesson === 2) qData = getGen2();
+            else if (currentLesson === 3) qData = getGen3();
+            else { // Lección 4: Aleatorio entre las 3
+                let r = Math.floor(Math.random() * 3) + 1;
+                if(r===1) qData = getGen1();
+                else if(r===2) qData = getGen2();
+                else qData = getGen3();
+            }
+
+            currentCorrectAnswer = qData.ans;
+            document.getElementById('q-text').innerText = qData.text;
+            document.getElementById('q-math').innerHTML = qData.math;
+
+            // Renderizar opciones
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            qData.options.forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = opt;
+                btn.onclick = () => checkAnswer(btn, opt);
+                container.appendChild(btn);
+            });
+        }
+
+        // Verificar respuesta
+        function checkAnswer(btnClicked, selectedOpt) {
+            if (answered) return;
+            answered = true;
+
+            let fbBox = document.getElementById('feedback-box');
+            let isCorrect = (selectedOpt === currentCorrectAnswer);
+            
+            stats[currentLesson].t += 1;
+
+            if (isCorrect) {
+                stats[currentLesson].c += 1;
+                btnClicked.classList.add('correct-btn');
+                fbBox.innerText = "¡Excelente! Respuesta correcta.";
+                fbBox.className = "text-correct";
+            } else {
+                btnClicked.classList.add('incorrect-btn');
+                fbBox.innerHTML = `Incorrecto. La respuesta correcta era: <b>${currentCorrectAnswer}</b>`;
+                fbBox.className = "text-incorrect";
+                
+                // Mostrar la correcta
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    if(btn.innerHTML === currentCorrectAnswer) {
+                        btn.classList.add('correct-btn');
+                    }
+                });
+            }
+
+            // Deshabilitar botones
+            document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+            
+            updateStatsDisplay();
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        // Actualizar estadísticas
+        function updateStatsDisplay() {
+            let t = stats[currentLesson].t;
+            let c = stats[currentLesson].c;
+            let percent = t === 0 ? 0 : Math.round((c / t) * 100);
+            
+            document.getElementById('stat-correct').innerText = c;
+            document.getElementById('stat-total').innerText = t;
+            document.getElementById('stat-percent').innerText = percent + "%";
+        }
+
+        // Inicializar
+        changeLesson(1);
+    </script>
+</body>
+</html>

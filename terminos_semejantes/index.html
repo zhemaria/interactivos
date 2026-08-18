@@ -1,1 +1,528 @@
+<!doctype html>
+<!--
+  Interactivo 4.1c · Evaluar expresiones algebraicas
+  Spanish ASE Math · Nivel 3 · Tema 4 · Álgebra lineal
+  José M. Fernández, ABE/ASE Math Master Teacher
+  Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interactivo 4.1c · Evaluar expresiones algebraicas</title>
+  <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23ffffff%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%2294%22%20height%3D%2294%22%20fill%3D%22none%22%20stroke%3D%22%23002060%22%20stroke-width%3D%226%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20fill%3D%22%23002060%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22700%22%20font-size%3D%2278%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%26%23209%3B%3C%2Ftext%3E%3C%2Fsvg%3E" />
+    
+<meta name="description" content="Sustitución de variables y orden de las operaciones: demostración paso a paso y práctica guiada con pistas escalonadas." />
+<meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+<meta name="license" content="CC BY-NC-SA 4.0" />
+<link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+<style>
+  :root {
+    --tema:#bf360c; --tema-d:#8c2708; --tema-bg:#fbe9e7; --tema-bg2:#f7d9d3;
+    --acento:#1565c0; --acento-d:#0d47a1;
+    --txt:#222222; --txt-2:#555555; --bg:#f5f7fa;
+    --correcto:#1b5e20; --correcto-bg:#e8f5e9;
+    --error:#b71c1c; --error-bg:#ffebee;
+    --borde:#d0d7de;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:24px 16px 40px; background:var(--bg); color:var(--txt);
+    font-family:'Segoe UI', system-ui, Roboto, Helvetica, Arial, sans-serif;
+    font-size:16px; line-height:1.6;
+  }
+  .contenedor { max-width:760px; margin:0 auto; }
+  .sr-only {
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  header.principal {
+    background:var(--tema); color:#ffffff; padding:26px 28px;
+    border-radius:14px; margin-bottom:20px;
+  }
+  header.principal .ruta { font-size:13px; letter-spacing:.4px; text-transform:uppercase; }
+  header.principal h1 { margin:8px 0 6px; font-size:24px; font-weight:700; }
+  header.principal .meta { font-size:14px; }
 
+  .tarjeta {
+    background:#ffffff; border:1px solid var(--borde); border-radius:12px;
+    padding:22px 24px; margin-bottom:20px; box-shadow:0 2px 6px #dfe4ea;
+  }
+  .tarjeta h2 { color:var(--tema-d); font-size:20px; margin:0 0 6px; }
+  .tarjeta h3 { color:var(--tema-d); font-size:17px; margin:20px 0 8px; }
+  .tarjeta .intro { color:var(--txt-2); font-size:15px; margin:0 0 18px; }
+
+  .caja-objetivos {
+    background:var(--tema-bg); border-left:6px solid var(--tema);
+    border-radius:0 10px 10px 0; padding:16px 20px; margin-bottom:20px;
+  }
+  .caja-objetivos h2 { margin:0 0 8px; color:var(--tema-d); font-size:18px; }
+  .caja-objetivos p { margin:0 0 8px; }
+  .caja-objetivos p:last-child { margin-bottom:0; }
+
+  /* Orden de operaciones */
+  ol.orden { list-style:none; margin:10px 0 0; padding:0; counter-reset:orden; }
+  ol.orden li {
+    counter-increment:orden; position:relative;
+    padding:8px 12px 8px 46px; margin-bottom:8px;
+    background:#ffffff; border-radius:8px;
+  }
+  ol.orden li::before {
+    content:counter(orden); position:absolute; left:12px; top:8px;
+    width:24px; height:24px; line-height:24px; text-align:center;
+    background:var(--tema-d); color:#ffffff; border-radius:50%; font-weight:700; font-size:13px;
+  }
+  ol.orden strong { color:var(--tema-d); }
+
+  /* Expresión */
+  .expresion {
+    font-size:27px; font-weight:600; text-align:center;
+    padding:18px 12px; background:var(--tema-bg); border-radius:10px; margin:0 0 10px;
+  }
+  .variable { padding:2px 8px; border-radius:6px; background:var(--tema); color:#ffffff; }
+  .valor { padding:2px 8px; border-radius:6px; background:#1565c0; color:#ffffff; }
+  .datos {
+    text-align:center; font-size:18px; font-weight:600; color:var(--tema-d); margin:0 0 16px;
+  }
+
+  /* Pasos */
+  ol.pasos { list-style:none; margin:14px 0 0; padding:0; counter-reset:paso; }
+  ol.pasos li {
+    counter-increment:paso; position:relative;
+    background:var(--bg); border:1px solid var(--borde); border-left:6px solid var(--tema);
+    border-radius:0 10px 10px 0; padding:12px 16px 12px 52px; margin-bottom:10px;
+  }
+  ol.pasos li::before {
+    content:counter(paso); position:absolute; left:14px; top:12px;
+    width:26px; height:26px; line-height:26px; text-align:center;
+    background:var(--tema); color:#ffffff; border-radius:50%; font-weight:700; font-size:14px;
+  }
+  ol.pasos .titulo-paso { font-weight:700; color:var(--tema-d); display:block; }
+  ol.pasos .calculo { font-size:21px; font-weight:600; margin-top:4px; }
+
+  /* Práctica */
+  .fila-campo {
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px;
+    padding:14px 0; border-bottom:1px solid var(--borde);
+  }
+  .fila-campo .etq { font-weight:600; }
+  input.campo {
+    width:130px; padding:10px 12px; font:inherit; font-size:19px;
+    border:2px solid var(--borde); border-radius:8px; background:#ffffff; color:var(--txt);
+  }
+  input.campo:focus { border-color:var(--acento); }
+  input.campo.bien { border-color:var(--correcto); background:var(--correcto-bg); }
+  input.campo.mal { border-color:var(--error); background:var(--error-bg); }
+  .marca-campo { font-weight:700; font-size:20px; }
+  .marca-campo.bien { color:var(--correcto); }
+  .marca-campo.mal { color:var(--error); }
+
+  .contador { color:var(--txt-2); font-size:14px; margin:12px 0 0; }
+
+  .retro { margin-top:16px; }
+  .retro .caja { border-radius:10px; padding:14px 18px; border-left:6px solid var(--tema); background:var(--tema-bg); }
+  .retro .caja.bien { background:var(--correcto-bg); border-left-color:var(--correcto); }
+  .retro .caja.mal { background:var(--error-bg); border-left-color:var(--error); }
+  .retro .titulo { font-weight:700; margin:0 0 6px; }
+  .retro .caja.bien .titulo { color:var(--correcto); }
+  .retro .caja.mal .titulo { color:var(--error); }
+  .retro p { margin:0 0 6px; }
+  .retro p:last-child { margin-bottom:0; }
+
+  ol.pistas { margin:14px 0 0; padding-left:22px; }
+  ol.pistas li { margin-bottom:8px; }
+  ol.pistas .calculo { font-weight:600; }
+
+  .fila-nav { display:flex; flex-wrap:wrap; gap:12px; margin-top:20px; }
+  .btn-accion {
+    padding:12px 22px; background:var(--acento); color:#ffffff;
+    border:2px solid var(--acento); border-radius:8px; font:inherit; font-weight:600; cursor:pointer;
+  }
+  .btn-accion:hover { background:var(--acento-d); border-color:var(--acento-d); }
+  .btn-accion[disabled] { background:#757575; border-color:#757575; cursor:default; }
+  .btn-secundario {
+    padding:12px 22px; background:#ffffff; color:var(--tema-d);
+    border:2px solid var(--tema-d); border-radius:8px; font:inherit; font-weight:600; cursor:pointer;
+  }
+  .btn-secundario:hover { background:var(--tema-bg); }
+  .btn-secundario[disabled] { color:var(--txt-2); border-color:#757575; cursor:default; background:#ffffff; }
+
+  button:focus-visible, input:focus-visible, summary:focus-visible {
+    outline:3px solid var(--acento); outline-offset:3px;
+  }
+  h2:focus, h3:focus { outline:3px solid var(--acento); outline-offset:4px; }
+
+  footer.licencia {
+    margin-top:24px; padding-top:16px; border-top:1px solid var(--borde);
+    font-size:13px; color:var(--txt-2); text-align:center;
+  }
+  footer.licencia a { color:var(--acento-d); }
+  .oculto { display:none; }
+
+  @media (max-width:520px) {
+    header.principal { padding:20px; }
+    header.principal h1 { font-size:21px; }
+    .tarjeta { padding:18px 16px; }
+    .expresion { font-size:22px; }
+    .btn-accion, .btn-secundario { width:100%; }
+  }
+</style>
+</head>
+<body>
+<div class="contenedor">
+
+  <header class="principal">
+    <div class="ruta">Spanish ASE Math · Nivel 3 · Tema 4 · Lección 4.1</div>
+    <h1>Evaluar expresiones algebraicas</h1>
+    <div class="meta">Sustitución y orden de las operaciones · Demostración y práctica guiada</div>
+  </header>
+
+  <div class="caja-objetivos">
+    <h2>Idea central</h2>
+    <p><strong>Evaluar</strong> una expresión es sustituir cada variable por el valor que se indica y resolver la operación resultante. La clave está en dos hábitos: escribir el valor <strong>entre paréntesis</strong> al sustituir, y respetar el orden de las operaciones.</p>
+    <ol class="orden">
+      <li><strong>Paréntesis:</strong> se resuelve primero lo que está agrupado.</li>
+      <li><strong>Exponentes:</strong> potencias y raíces.</li>
+      <li><strong>Multiplicación y división:</strong> de izquierda a derecha.</li>
+      <li><strong>Suma y resta:</strong> de izquierda a derecha.</li>
+    </ol>
+  </div>
+
+  <!-- ══════════ DEMOSTRACIÓN ══════════ -->
+  <section class="tarjeta" aria-labelledby="tit-demo">
+    <h2 id="tit-demo" tabindex="-1">Paso a paso</h2>
+    <p class="intro">Observa cómo se sustituye y en qué orden se opera. Genera todos los ejemplos que necesites.</p>
+
+    <p class="expresion" id="demo-expresion" aria-hidden="true"></p>
+    <p class="datos" id="demo-datos" aria-hidden="true"></p>
+    <p class="sr-only" id="demo-expresion-sr"></p>
+
+    <ol class="pasos" id="demo-pasos"></ol>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion" id="demo-siguiente">Siguiente paso</button>
+      <button type="button" class="btn-secundario" id="demo-otro">Otro ejemplo</button>
+    </div>
+  </section>
+
+  <!-- ══════════ PRÁCTICA ══════════ -->
+  <section class="tarjeta" aria-labelledby="tit-practica">
+    <h2 id="tit-practica" tabindex="-1">Tu turno</h2>
+    <p class="intro">Evalúa la expresión y escribe el resultado. Si te trabas, pide una pista: cada pista descubre un paso más.</p>
+
+    <p class="expresion" id="pr-expresion" aria-hidden="true"></p>
+    <p class="datos" id="pr-datos" aria-hidden="true"></p>
+    <p class="sr-only" id="pr-expresion-sr"></p>
+
+    <div class="fila-campo">
+      <span class="etq" id="etq-resultado">Resultado:</span>
+      <input type="text" class="campo" id="campo-resultado" inputmode="text" />
+      <span class="marca-campo" id="marca-resultado"></span>
+    </div>
+
+    <ol class="pistas oculto" id="lista-pistas"></ol>
+    <p class="contador" id="contador-pistas"></p>
+
+    <div class="retro" id="pr-retro" role="status" aria-live="polite"></div>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion" id="btn-comprobar">Comprobar</button>
+      <button type="button" class="btn-secundario" id="btn-pista">Dame una pista</button>
+      <button type="button" class="btn-secundario" id="btn-otro-ejercicio">Otro ejercicio</button>
+    </div>
+  </section>
+
+  <footer class="licencia">
+    <p>José M. Fernández, ABE/ASE Math Master Teacher · Harry S. Truman College — City Colleges of Chicago</p>
+    <p>Esta obra está bajo una licencia
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" rel="license">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.</p>
+  </footer>
+
+</div>
+
+<script>
+/* ═════════ Utilidades ═════════ */
+function ent(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function el(tag, clase, texto) {
+  const n = document.createElement(tag);
+  if (clase) { n.className = clase; }
+  if (texto !== undefined) { n.textContent = texto; }
+  return n;
+}
+
+/* ═════════ Generación ═════════
+   Cinco moldes, todos con resultado entero.
+   Cada caso trae: piezas visuales, valores y guion de pasos. */
+function generarCaso() {
+  const molde = ent(0, 4);
+
+  /* Molde 0:  ax + b       */
+  if (molde === 0) {
+    const a = ent(2, 9), b = ent(2, 12), x = ent(2, 9);
+    return {
+      piezas: [{ t: String(a), c: null }, { t: 'x', c: 'variable' }, { t: ' + ' + b, c: null }],
+      sr: a + ' por x más ' + b,
+      vars: [{ n: 'x', v: x }],
+      resultado: a * x + b,
+      pasos: [
+        { titulo: 'Sustituye la variable', texto: 'Se escribe el valor entre paréntesis para no perder la multiplicación.',
+          calculo: a + '(' + x + ') + ' + b },
+        { titulo: 'Multiplica', texto: 'La multiplicación va antes que la suma.',
+          calculo: (a * x) + ' + ' + b },
+        { titulo: 'Suma', texto: 'Se completa la última operación pendiente.',
+          calculo: String(a * x + b) }
+      ]
+    };
+  }
+
+  /* Molde 1:  x² + bx      */
+  if (molde === 1) {
+    const b = ent(2, 8), x = ent(2, 7);
+    return {
+      piezas: [{ t: 'x²', c: 'variable' }, { t: ' + ' + b, c: null }, { t: 'x', c: 'variable' }],
+      sr: 'x al cuadrado más ' + b + ' por x',
+      vars: [{ n: 'x', v: x }],
+      resultado: x * x + b * x,
+      pasos: [
+        { titulo: 'Sustituye la variable', texto: 'La misma x se sustituye en los dos términos.',
+          calculo: '(' + x + ')² + ' + b + '(' + x + ')' },
+        { titulo: 'Resuelve el exponente', texto: 'Elevar al cuadrado es multiplicar el número por sí mismo: ' + x + ' × ' + x + '.',
+          calculo: (x * x) + ' + ' + b + '(' + x + ')' },
+        { titulo: 'Multiplica', texto: 'La multiplicación va antes que la suma.',
+          calculo: (x * x) + ' + ' + (b * x) },
+        { titulo: 'Suma', texto: 'Última operación pendiente.',
+          calculo: String(x * x + b * x) }
+      ]
+    };
+  }
+
+  /* Molde 2:  a(x + b)     */
+  if (molde === 2) {
+    const a = ent(2, 8), b = ent(2, 9), x = ent(2, 9);
+    return {
+      piezas: [{ t: String(a), c: null }, { t: '(', c: null }, { t: 'x', c: 'variable' }, { t: ' + ' + b + ')', c: null }],
+      sr: a + ' por, abre paréntesis, x más ' + b + ', cierra paréntesis',
+      vars: [{ n: 'x', v: x }],
+      resultado: a * (x + b),
+      pasos: [
+        { titulo: 'Sustituye la variable', texto: 'El paréntesis del enunciado se conserva.',
+          calculo: a + '(' + x + ' + ' + b + ')' },
+        { titulo: 'Resuelve el paréntesis', texto: 'Lo agrupado se resuelve primero, antes de multiplicar.',
+          calculo: a + '(' + (x + b) + ')' },
+        { titulo: 'Multiplica', texto: 'Ya se puede aplicar el factor de afuera.',
+          calculo: String(a * (x + b)) }
+      ]
+    };
+  }
+
+  /* Molde 3:  ax - by      */
+  if (molde === 3) {
+    let a, b, x, y, intentos = 0;
+    do {
+      a = ent(2, 9); b = ent(2, 6); x = ent(3, 9); y = ent(2, 7);
+      intentos++;
+    } while (a * x - b * y < 2 && intentos < 200);
+    if (a * x - b * y < 2) { a = 9; x = 8; b = 2; y = 3; }
+    return {
+      piezas: [{ t: String(a), c: null }, { t: 'x', c: 'variable' }, { t: ' - ' + b, c: null }, { t: 'y', c: 'variable' }],
+      sr: a + ' por x menos ' + b + ' por y',
+      vars: [{ n: 'x', v: x }, { n: 'y', v: y }],
+      resultado: a * x - b * y,
+      pasos: [
+        { titulo: 'Sustituye las dos variables', texto: 'Cada letra recibe su propio valor; conviene revisarlo dos veces.',
+          calculo: a + '(' + x + ') - ' + b + '(' + y + ')' },
+        { titulo: 'Multiplica', texto: 'Las dos multiplicaciones van antes que la resta.',
+          calculo: (a * x) + ' - ' + (b * y) },
+        { titulo: 'Resta', texto: 'Última operación pendiente.',
+          calculo: String(a * x - b * y) }
+      ]
+    };
+  }
+
+  /* Molde 4:  ax² - b      */
+  const a = ent(2, 5), x = ent(2, 6);
+  const b = ent(3, Math.min(15, a * x * x - 1));
+  return {
+    piezas: [{ t: String(a), c: null }, { t: 'x²', c: 'variable' }, { t: ' - ' + b, c: null }],
+    sr: a + ' por x al cuadrado menos ' + b,
+    vars: [{ n: 'x', v: x }],
+    resultado: a * x * x - b,
+    pasos: [
+      { titulo: 'Sustituye la variable', texto: 'El exponente afecta solo a la x, no al coeficiente.',
+        calculo: a + '(' + x + ')² - ' + b },
+      { titulo: 'Resuelve el exponente', texto: 'Primero el cuadrado: ' + x + ' × ' + x + ' = ' + (x * x) + '. El ' + a + ' no se eleva.',
+        calculo: a + '(' + (x * x) + ') - ' + b },
+      { titulo: 'Multiplica', texto: 'Ahora sí se aplica el coeficiente.',
+        calculo: (a * x * x) + ' - ' + b },
+      { titulo: 'Resta', texto: 'Última operación pendiente.',
+        calculo: String(a * x * x - b) }
+    ]
+  };
+}
+
+/* ═════════ Pintado ═════════ */
+function pintarCaso(destExpr, destDatos, destSr, caso, sustituido) {
+  destExpr.innerHTML = '';
+  caso.piezas.forEach(function (p) {
+    if (p.c === 'variable' && sustituido) {
+      const v = caso.vars.filter(function (x) { return p.t.charAt(0) === x.n; })[0];
+      const txt = p.t.replace(v.n, '(' + v.v + ')');
+      destExpr.appendChild(el('span', 'valor', txt));
+    } else {
+      destExpr.appendChild(el('span', p.c || null, p.t));
+    }
+  });
+
+  destDatos.textContent = 'con ' + caso.vars.map(function (v) { return v.n + ' = ' + v.v; }).join('  y  ');
+  destSr.textContent = 'Evalúa la expresión ' + caso.sr + ', con ' +
+    caso.vars.map(function (v) { return v.n + ' igual a ' + v.v; }).join(' y ') + '.';
+}
+
+/* ═════════ Demostración ═════════ */
+const demoExpr = document.getElementById('demo-expresion');
+const demoDatos = document.getElementById('demo-datos');
+const demoSr = document.getElementById('demo-expresion-sr');
+const demoPasos = document.getElementById('demo-pasos');
+const btnDemoSig = document.getElementById('demo-siguiente');
+
+let demoCaso = null;
+let demoPaso = 0;
+
+function nuevoDemo() {
+  demoCaso = generarCaso();
+  demoPaso = 0;
+  demoPasos.innerHTML = '';
+  pintarCaso(demoExpr, demoDatos, demoSr, demoCaso, false);
+  btnDemoSig.disabled = false;
+  btnDemoSig.textContent = 'Siguiente paso';
+}
+
+btnDemoSig.addEventListener('click', function () {
+  if (demoPaso >= demoCaso.pasos.length) { return; }
+  const p = demoCaso.pasos[demoPaso];
+  const li = el('li');
+  li.appendChild(el('span', 'titulo-paso', p.titulo));
+  li.appendChild(el('span', null, p.texto));
+  li.appendChild(el('div', 'calculo', p.calculo));
+  demoPasos.appendChild(li);
+  if (demoPaso === 0) { pintarCaso(demoExpr, demoDatos, demoSr, demoCaso, true); }
+  demoPaso++;
+  if (demoPaso >= demoCaso.pasos.length) {
+    btnDemoSig.disabled = true;
+    btnDemoSig.textContent = 'Demostración completa';
+  }
+});
+
+document.getElementById('demo-otro').addEventListener('click', function () {
+  nuevoDemo();
+  document.getElementById('tit-demo').focus();
+});
+
+/* ═════════ Práctica ═════════ */
+const prExpr = document.getElementById('pr-expresion');
+const prDatos = document.getElementById('pr-datos');
+const prSr = document.getElementById('pr-expresion-sr');
+const campo = document.getElementById('campo-resultado');
+const marca = document.getElementById('marca-resultado');
+const prRetro = document.getElementById('pr-retro');
+const listaPistas = document.getElementById('lista-pistas');
+const contadorPistas = document.getElementById('contador-pistas');
+const btnPista = document.getElementById('btn-pista');
+
+let prCaso = null;
+let pistasDadas = 0;
+
+function nuevoEjercicio() {
+  prCaso = generarCaso();
+  pistasDadas = 0;
+  campo.value = '';
+  campo.className = 'campo';
+  marca.textContent = '';
+  marca.className = 'marca-campo';
+  prRetro.innerHTML = '';
+  listaPistas.innerHTML = '';
+  listaPistas.classList.add('oculto');
+  btnPista.disabled = false;
+  btnPista.textContent = 'Dame una pista';
+  contadorPistas.textContent = 'Pistas disponibles: ' + prCaso.pasos.length + '.';
+
+  pintarCaso(prExpr, prDatos, prSr, prCaso, false);
+  campo.setAttribute('aria-label',
+    'Resultado de evaluar ' + prCaso.sr + ' con ' +
+    prCaso.vars.map(function (v) { return v.n + ' igual a ' + v.v; }).join(' y '));
+}
+
+function mostrarRetro(tipo, titulo, parrafos) {
+  prRetro.innerHTML = '';
+  const caja = el('div', 'caja ' + tipo);
+  caja.appendChild(el('p', 'titulo', titulo));
+  parrafos.forEach(function (p) { caja.appendChild(el('p', null, p)); });
+  prRetro.appendChild(caja);
+}
+
+btnPista.addEventListener('click', function () {
+  if (pistasDadas >= prCaso.pasos.length) { return; }
+  const p = prCaso.pasos[pistasDadas];
+  const li = el('li');
+  li.appendChild(el('span', null, p.titulo + '. ' + p.texto + ' '));
+  li.appendChild(el('span', 'calculo', p.calculo));
+  listaPistas.appendChild(li);
+  listaPistas.classList.remove('oculto');
+  if (pistasDadas === 0) { pintarCaso(prExpr, prDatos, prSr, prCaso, true); }
+  pistasDadas++;
+
+  const quedan = prCaso.pasos.length - pistasDadas;
+  contadorPistas.textContent = quedan > 0
+    ? 'Pistas disponibles: ' + quedan + '.'
+    : 'Ya se descubrieron todos los pasos.';
+  if (quedan === 0) {
+    btnPista.disabled = true;
+    btnPista.textContent = 'No quedan pistas';
+  }
+});
+
+document.getElementById('btn-comprobar').addEventListener('click', function () {
+  const valor = campo.value.replace(/\s/g, '').replace('−', '-');
+  if (valor === '') {
+    mostrarRetro('mal', 'Falta el resultado', ['Escribe el valor de la expresión antes de comprobar.']);
+    return;
+  }
+  if (isNaN(Number(valor))) {
+    mostrarRetro('mal', 'Escribe solo un número', ['El resultado de evaluar es un número, sin letras: ya no quedan variables una vez sustituidas.']);
+    return;
+  }
+
+  const bien = Number(valor) === prCaso.resultado;
+  campo.className = 'campo ' + (bien ? 'bien' : 'mal');
+  marca.className = 'marca-campo ' + (bien ? 'bien' : 'mal');
+  marca.textContent = bien ? '✓' : '✗';
+
+  if (bien) {
+    mostrarRetro('bien', 'Correcto',
+      ['El valor de la expresión es ' + prCaso.resultado + '.',
+       pistasDadas === 0
+         ? 'Además lo resolviste sin pistas.'
+         : 'Vuelve a intentar el próximo ejercicio usando menos pistas.']);
+    return;
+  }
+
+  mostrarRetro('mal', 'Ese no es el valor',
+    ['Repasa dos puntos: que cada variable haya recibido su valor correcto y que el orden de las operaciones se haya respetado (paréntesis, exponentes, multiplicación y división, suma y resta).',
+     'Pide una pista para descubrir el siguiente paso, o revisa los pasos ya visibles.']);
+});
+
+document.getElementById('btn-otro-ejercicio').addEventListener('click', function () {
+  nuevoEjercicio();
+  document.getElementById('tit-practica').focus();
+});
+
+/* ═════════ Arranque ═════════ */
+nuevoDemo();
+nuevoEjercicio();
+</script>
+</body>
+</html>

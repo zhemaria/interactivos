@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Álgebra: Variables y Expresiones</title>
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --secondary: #50E3C2;
+            --dark: #333333;
+            --light: #F4F7F6;
+            --correct: #2ECC71;
+            --incorrect: #E74C3C;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Menu */
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .menu-btn:hover, .menu-btn:active {
+            background-color: #357ABD;
+        }
+
+        /* Quiz */
+        #quiz-section {
+            display: none;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: white;
+            color: var(--dark);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            background-color: #e8f0fe;
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct);
+            border-color: var(--correct);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background-color: var(--incorrect);
+            border-color: var(--incorrect);
+            color: white;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 25px;
+        }
+
+        .nav-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: var(--dark);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        .back-btn {
+            background-color: transparent;
+            color: var(--primary);
+            border: none;
+            font-size: 1rem;
+            margin-top: 20px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        #score-section {
+            display: none;
+        }
+
+        .score-text {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Variables, Expresiones y Traducción</h1>
+        <p class="subtitle">Ejercicios de preparación para Álgebra</p>
+    </header>
+
+    <!-- Menú Principal -->
+    <div class="container" id="menu-section">
+        <h2>Selecciona un tema:</h2>
+        <br>
+        <button class="menu-btn" onclick="startQuiz('traduccion')">1. Traducción al Lenguaje Algebraico</button>
+        <button class="menu-btn" onclick="startQuiz('identificacion')">2. Términos y Coeficientes</button>
+        <button class="menu-btn" onclick="startQuiz('simplificacion')">3. Simplificación de Expresiones</button>
+        <button class="menu-btn" onclick="startQuiz('evaluacion')">4. Evaluación de Expresiones</button>
+    </div>
+
+    <!-- Sección de Quiz -->
+    <div class="container" id="quiz-section">
+        <div id="progress-text" style="color: #888; font-size: 0.9rem; margin-bottom: 10px;"></div>
+        <div class="question-text" id="question"></div>
+        <div id="options-container"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="nav-btn" id="next-btn" onclick="nextQuestion()">Siguiente</button>
+        <br>
+        <button class="back-btn" onclick="returnToMenu()">Volver al Menú</button>
+    </div>
+
+    <!-- Sección de Resultados -->
+    <div class="container" id="score-section">
+        <h2>¡Práctica Completada!</h2>
+        <div class="score-text" id="final-score"></div>
+        <p id="score-message"></p>
+        <br>
+        <button class="menu-btn" onclick="returnToMenu()">Volver al Menú Principal</button>
+    </div>
+
+    <script>
+        // Base de datos de preguntas
+        const quizData = {
+            traduccion: [
+                { q: "El doble de un número más cinco", options: ["2x + 5", "x/2 + 5", "2(x + 5)", "x + 2 + 5"], a: 0 },
+                { q: "Un número disminuido en siete", options: ["7 - x", "x - 7", "7/x", "-7x"], a: 1 },
+                { q: "La mitad de un número", options: ["2x", "x + 2", "x / 2", "x - 2"], a: 2 },
+                { q: "El triple de la suma de un número y dos", options: ["3x + 2", "3(x + 2)", "x + 3(2)", "3x - 2"], a: 1 }
+            ],
+            identificacion: [
+                { q: "En la expresión '5x - 3', ¿cuál es el coeficiente?", options: ["x", "-3", "5", "8"], a: 2 },
+                { q: "En la expresión '2y + 7', ¿cuál es la constante?", options: ["2", "y", "7", "9"], a: 2 },
+                { q: "¿Cuáles son términos semejantes?", options: ["3x y 3y", "4a y -2a", "5 y 5x", "x² y x"], a: 1 },
+                { q: "¿Cuántos términos tiene la expresión '4x² - 3x + 8'?", options: ["1", "2", "3", "4"], a: 2 }
+            ],
+            simplificacion: [
+                { q: "Simplifica: 3x + 2x - x", options: ["4x", "5x", "6x", "x"], a: 0 },
+                { q: "Aplica la propiedad distributiva: 2(x + 4)", options: ["2x + 4", "2x + 8", "x + 8", "6x"], a: 1 },
+                { q: "Combina los términos: 5a - 2 + 3a + 7", options: ["8a + 5", "2a - 5", "8a + 9", "15a"], a: 0 },
+                { q: "Simplifica: -3(y - 2)", options: ["-3y - 6", "-3y - 2", "-3y + 6", "y + 6"], a: 2 }
+            ],
+            evaluacion: [
+                { q: "Evalúa '4x - 2' si x = 3", options: ["10", "12", "14", "8"], a: 0 },
+                { q: "Evalúa 'y/2 + 5' si y = 10", options: ["15", "10", "5", "20"], a: 1 },
+                { q: "Evalúa '2a²' si a = 3", options: ["12", "36", "18", "6"], a: 2 },
+                { q: "Evalúa '3x + y' si x=2 y y=-1", options: ["7", "5", "6", "4"], a: 1 }
+            ]
+        };
+
+        let currentCategory = '';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        // Elementos del DOM
+        const menuSection = document.getElementById('menu-section');
+        const quizSection = document.getElementById('quiz-section');
+        const scoreSection = document.getElementById('score-section');
+        const questionEl = document.getElementById('question');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const progressText = document.getElementById('progress-text');
+
+        function startQuiz(category) {
+            currentCategory = category;
+            currentQuestionIndex = 0;
+            score = 0;
+            menuSection.style.display = 'none';
+            scoreSection.style.display = 'none';
+            quizSection.style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answered = false;
+            feedbackEl.innerText = '';
+            feedbackEl.style.color = '';
+            nextBtn.style.display = 'none';
+            optionsContainer.innerHTML = '';
+
+            const categoryData = quizData[currentCategory];
+            const currentQuestion = categoryData[currentQuestionIndex];
+
+            progressText.innerText = `Pregunta ${currentQuestionIndex + 1} de ${categoryData.length}`;
+            questionEl.innerText = currentQuestion.q;
+
+            currentQuestion.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.innerText = option;
+                btn.classList.add('option-btn');
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, selectedBtn) {
+            if (answered) return; // Evita múltiples clics
+            answered = true;
+
+            const categoryData = quizData[currentCategory];
+            const currentQuestion = categoryData[currentQuestionIndex];
+            const correctIndex = currentQuestion.a;
+            
+            const allBtns = optionsContainer.children;
+
+            if (selectedIndex === correctIndex) {
+                selectedBtn.classList.add('correct');
+                feedbackEl.innerText = '¡Correcto! 🎉';
+                feedbackEl.style.color = 'var(--correct)';
+                score++;
+            } else {
+                selectedBtn.classList.add('incorrect');
+                allBtns[correctIndex].classList.add('correct'); // Muestra la correcta
+                feedbackEl.innerText = 'Incorrecto. La respuesta era: ' + currentQuestion.options[correctIndex];
+                feedbackEl.style.color = 'var(--incorrect)';
+            }
+
+            // Deshabilitar botones
+            for (let btn of allBtns) {
+                btn.style.cursor = 'default';
+            }
+
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            const categoryData = quizData[currentCategory];
+
+            if (currentQuestionIndex < categoryData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizSection.style.display = 'none';
+            scoreSection.style.display = 'block';
+            
+            const total = quizData[currentCategory].length;
+            document.getElementById('final-score').innerText = `${score} / ${total}`;
+            
+            const messageEl = document.getElementById('score-message');
+            if(score === total) {
+                messageEl.innerText = "¡Excelente! Dominas este tema perfectamente.";
+            } else if(score >= total / 2) {
+                messageEl.innerText = "¡Buen trabajo! Sigue practicando para alcanzar la perfección.";
+            } else {
+                messageEl.innerText = "No te rindas. Revisa los conceptos y vuelve a intentarlo.";
+            }
+        }
+
+        function returnToMenu() {
+            quizSection.style.display = 'none';
+            scoreSection.style.display = 'none';
+            menuSection.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

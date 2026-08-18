@@ -1,0 +1,538 @@
+<!doctype html>
+<!--
+  Interactivo 4.1b · La propiedad distributiva
+  Spanish ASE Math · Nivel 3 · Tema 4 · Álgebra lineal
+  José M. Fernández, ABE/ASE Math Master Teacher
+  Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interactivo 4.1b · La propiedad distributiva</title>
+<meta name="description" content="Modelo de área, demostración paso a paso y práctica guiada de la propiedad distributiva con expresiones algebraicas." />
+<meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+<meta name="license" content="CC BY-NC-SA 4.0" />
+<link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+<style>
+  :root {
+    --tema:#bf360c; --tema-d:#8c2708; --tema-bg:#fbe9e7; --tema-bg2:#f7d9d3;
+    --acento:#1565c0; --acento-d:#0d47a1;
+    --txt:#222222; --txt-2:#555555; --bg:#f5f7fa;
+    --correcto:#1b5e20; --correcto-bg:#e8f5e9;
+    --error:#b71c1c; --error-bg:#ffebee;
+    --borde:#d0d7de;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:24px 16px 40px; background:var(--bg); color:var(--txt);
+    font-family:'Segoe UI', system-ui, Roboto, Helvetica, Arial, sans-serif;
+    font-size:16px; line-height:1.6;
+  }
+  .contenedor { max-width:760px; margin:0 auto; }
+  .sr-only {
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  header.principal {
+    background:var(--tema); color:#ffffff; padding:26px 28px;
+    border-radius:14px; margin-bottom:20px;
+  }
+  header.principal .ruta { font-size:13px; letter-spacing:.4px; text-transform:uppercase; }
+  header.principal h1 { margin:8px 0 6px; font-size:24px; font-weight:700; }
+  header.principal .meta { font-size:14px; }
+
+  .tarjeta {
+    background:#ffffff; border:1px solid var(--borde); border-radius:12px;
+    padding:22px 24px; margin-bottom:20px; box-shadow:0 2px 6px #dfe4ea;
+  }
+  .tarjeta h2 { color:var(--tema-d); font-size:20px; margin:0 0 6px; }
+  .tarjeta h3 { color:var(--tema-d); font-size:17px; margin:20px 0 8px; }
+  .tarjeta .intro { color:var(--txt-2); font-size:15px; margin:0 0 18px; }
+
+  .caja-objetivos {
+    background:var(--tema-bg); border-left:6px solid var(--tema);
+    border-radius:0 10px 10px 0; padding:16px 20px; margin-bottom:20px;
+  }
+  .caja-objetivos h2 { margin:0 0 8px; color:var(--tema-d); font-size:18px; }
+  .caja-objetivos p { margin:0 0 8px; }
+  .caja-objetivos p:last-child { margin-bottom:0; }
+  .regla {
+    text-align:center; font-size:22px; font-weight:700; color:var(--tema-d);
+    background:#ffffff; border-radius:8px; padding:10px; margin:10px 0;
+  }
+
+  /* Modelo de área */
+  .modelo { margin:6px 0 4px; }
+  .modelo-fila { display:flex; align-items:stretch; }
+  .modelo-alto {
+    width:42px; display:flex; align-items:center; justify-content:center;
+    background:var(--tema); color:#ffffff; font-weight:700; font-size:20px;
+    border-radius:8px 0 0 8px;
+  }
+  .modelo-partes { flex:1; display:flex; }
+  .parte {
+    padding:22px 10px; text-align:center; color:#ffffff; font-weight:600;
+    border-left:2px solid #ffffff;
+  }
+  .parte.p1 { background:#1565c0; flex:3; }
+  .parte.p2 { background:#37474f; flex:2; border-radius:0 8px 8px 0; }
+  .parte .medida { display:block; font-size:14px; font-weight:400; margin-bottom:4px; }
+  .parte .area { font-size:20px; }
+  .pie-modelo { text-align:center; color:var(--txt-2); font-size:14px; margin:8px 0 0; }
+
+  /* Expresión */
+  .expresion {
+    font-size:28px; font-weight:600; text-align:center;
+    padding:18px 12px; background:var(--tema-bg); border-radius:10px; margin:0 0 16px;
+  }
+  .factor { padding:2px 8px; border-radius:6px; background:var(--tema); color:#ffffff; }
+  .t1 { padding:2px 8px; border-radius:6px; background:#1565c0; color:#ffffff; }
+  .t2 { padding:2px 8px; border-radius:6px; background:#37474f; color:#ffffff; }
+  .apagado { padding:2px 8px; border-radius:6px; background:#eceff1; color:var(--txt-2); }
+  .parentesis { color:var(--txt-2); }
+
+  /* Pasos */
+  ol.pasos { list-style:none; margin:14px 0 0; padding:0; counter-reset:paso; }
+  ol.pasos li {
+    counter-increment:paso; position:relative;
+    background:var(--bg); border:1px solid var(--borde); border-left:6px solid var(--tema);
+    border-radius:0 10px 10px 0; padding:12px 16px 12px 52px; margin-bottom:10px;
+  }
+  ol.pasos li::before {
+    content:counter(paso); position:absolute; left:14px; top:12px;
+    width:26px; height:26px; line-height:26px; text-align:center;
+    background:var(--tema); color:#ffffff; border-radius:50%; font-weight:700; font-size:14px;
+  }
+  ol.pasos .titulo-paso { font-weight:700; color:var(--tema-d); display:block; }
+  ol.pasos .calculo { font-size:20px; font-weight:600; margin-top:4px; }
+
+  /* Práctica */
+  .fila-campo {
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    padding:12px 0; border-bottom:1px solid var(--borde);
+  }
+  .fila-campo .etq { min-width:230px; font-weight:600; }
+  input.campo {
+    width:130px; padding:8px 10px; font:inherit; font-size:17px;
+    border:2px solid var(--borde); border-radius:8px; background:#ffffff; color:var(--txt);
+  }
+  input.campo:focus { border-color:var(--acento); }
+  input.campo.bien { border-color:var(--correcto); background:var(--correcto-bg); }
+  input.campo.mal { border-color:var(--error); background:var(--error-bg); }
+  .marca-campo { font-weight:700; }
+  .marca-campo.bien { color:var(--correcto); }
+  .marca-campo.mal { color:var(--error); }
+
+  .retro { margin-top:16px; }
+  .retro .caja { border-radius:10px; padding:14px 18px; border-left:6px solid var(--tema); background:var(--tema-bg); }
+  .retro .caja.bien { background:var(--correcto-bg); border-left-color:var(--correcto); }
+  .retro .caja.mal { background:var(--error-bg); border-left-color:var(--error); }
+  .retro .titulo { font-weight:700; margin:0 0 6px; }
+  .retro .caja.bien .titulo { color:var(--correcto); }
+  .retro .caja.mal .titulo { color:var(--error); }
+  .retro p { margin:0 0 6px; }
+  .retro p:last-child { margin-bottom:0; }
+
+  details.pista {
+    border:1px solid var(--borde); border-radius:10px; padding:12px 16px;
+    margin-top:14px; background:var(--tema-bg);
+  }
+  details.pista > summary { cursor:pointer; font-weight:600; color:var(--tema-d); }
+  details.pista p { margin:10px 0 0; }
+
+  .fila-nav { display:flex; flex-wrap:wrap; gap:12px; margin-top:20px; }
+  .btn-accion {
+    padding:12px 22px; background:var(--acento); color:#ffffff;
+    border:2px solid var(--acento); border-radius:8px; font:inherit; font-weight:600; cursor:pointer;
+  }
+  .btn-accion:hover { background:var(--acento-d); border-color:var(--acento-d); }
+  .btn-accion[disabled] { background:#757575; border-color:#757575; cursor:default; }
+  .btn-secundario {
+    padding:12px 22px; background:#ffffff; color:var(--tema-d);
+    border:2px solid var(--tema-d); border-radius:8px; font:inherit; font-weight:600; cursor:pointer;
+  }
+  .btn-secundario:hover { background:var(--tema-bg); }
+
+  button:focus-visible, input:focus-visible, summary:focus-visible {
+    outline:3px solid var(--acento); outline-offset:3px;
+  }
+  h2:focus, h3:focus { outline:3px solid var(--acento); outline-offset:4px; }
+
+  footer.licencia {
+    margin-top:24px; padding-top:16px; border-top:1px solid var(--borde);
+    font-size:13px; color:var(--txt-2); text-align:center;
+  }
+  footer.licencia a { color:var(--acento-d); }
+  .oculto { display:none; }
+
+  @media (max-width:520px) {
+    header.principal { padding:20px; }
+    header.principal h1 { font-size:21px; }
+    .tarjeta { padding:18px 16px; }
+    .expresion { font-size:22px; }
+    .regla { font-size:18px; }
+    .btn-accion, .btn-secundario { width:100%; }
+    .fila-campo .etq { min-width:100%; }
+  }
+</style>
+</head>
+<body>
+<div class="contenedor">
+
+  <header class="principal">
+    <div class="ruta">Spanish ASE Math · Nivel 3 · Tema 4 · Lección 4.1</div>
+    <h1>La propiedad distributiva</h1>
+    <div class="meta">Modelo de área, demostración paso a paso y práctica guiada</div>
+  </header>
+
+  <div class="caja-objetivos">
+    <h2>Idea central</h2>
+    <p>Cuando un factor multiplica a una suma o a una resta encerrada entre paréntesis, ese factor multiplica a <strong>cada uno</strong> de los términos de adentro, no solo al primero.</p>
+    <p class="regla">a(b + c) = ab + ac</p>
+    <p>El signo que hay dentro del paréntesis se conserva en el resultado: si adentro se resta, en el resultado también se resta.</p>
+  </div>
+
+  <!-- ══════════ MODELO DE ÁREA ══════════ -->
+  <section class="tarjeta" aria-labelledby="tit-modelo">
+    <h2 id="tit-modelo">Por qué funciona: el modelo de área</h2>
+    <p class="intro">Un rectángulo de altura 3 y base (x + 4) se puede partir en dos rectángulos. El área total es la misma, se calcule como se calcule.</p>
+
+    <div class="modelo" aria-hidden="true">
+      <div class="modelo-fila">
+        <div class="modelo-alto">3</div>
+        <div class="modelo-partes">
+          <div class="parte p1"><span class="medida">base x</span><span class="area">3x</span></div>
+          <div class="parte p2"><span class="medida">base 4</span><span class="area">12</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="sr-only">Diagrama: un rectángulo de altura 3 y base x más 4 se divide en dos partes. La primera tiene base x y área 3x. La segunda tiene base 4 y área 12.</p>
+    <p class="pie-modelo">Área de una sola pieza: 3(x + 4) &nbsp;·&nbsp; Área por partes: 3x + 12 &nbsp;·&nbsp; Son iguales.</p>
+  </section>
+
+  <!-- ══════════ DEMOSTRACIÓN ══════════ -->
+  <section class="tarjeta" aria-labelledby="tit-demo">
+    <h2 id="tit-demo" tabindex="-1">Paso a paso</h2>
+    <p class="intro">Sigue el procedimiento completo. Genera todos los ejemplos que necesites, incluidos los que llevan resta y los de factor negativo.</p>
+
+    <p class="expresion" id="demo-expresion" aria-hidden="true"></p>
+    <p class="sr-only" id="demo-expresion-sr"></p>
+
+    <ol class="pasos" id="demo-pasos"></ol>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion" id="demo-siguiente">Siguiente paso</button>
+      <button type="button" class="btn-secundario" id="demo-otro">Otro ejemplo</button>
+    </div>
+  </section>
+
+  <!-- ══════════ PRÁCTICA ══════════ -->
+  <section class="tarjeta" aria-labelledby="tit-practica">
+    <h2 id="tit-practica" tabindex="-1">Tu turno</h2>
+    <p class="intro">Escribe cada producto por separado. Incluye el signo cuando sea negativo.</p>
+
+    <p class="expresion" id="pr-expresion" aria-hidden="true"></p>
+    <p class="sr-only" id="pr-expresion-sr"></p>
+
+    <div class="fila-campo">
+      <span class="etq" id="etq-p1"></span>
+      <input type="text" class="campo" id="campo-1" inputmode="text" />
+      <span class="marca-campo" id="marca-1"></span>
+    </div>
+    <div class="fila-campo">
+      <span class="etq" id="etq-p2"></span>
+      <input type="text" class="campo" id="campo-2" inputmode="text" />
+      <span class="marca-campo" id="marca-2"></span>
+    </div>
+
+    <details class="pista">
+      <summary>Necesito una pista</summary>
+      <p id="texto-pista"></p>
+    </details>
+
+    <div class="retro" id="pr-retro" role="status" aria-live="polite"></div>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion" id="btn-comprobar">Comprobar</button>
+      <button type="button" class="btn-secundario" id="btn-otro-ejercicio">Otro ejercicio</button>
+    </div>
+  </section>
+
+  <footer class="licencia">
+    <p>José M. Fernández, ABE/ASE Math Master Teacher · Harry S. Truman College — City Colleges of Chicago</p>
+    <p>Esta obra está bajo una licencia
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" rel="license">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.</p>
+  </footer>
+
+</div>
+
+<script>
+/* ═════════ Utilidades ═════════ */
+function ent(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function el(tag, clase, texto) {
+  const n = document.createElement(tag);
+  if (clase) { n.className = clase; }
+  if (texto !== undefined) { n.textContent = texto; }
+  return n;
+}
+/* 1x se escribe x; -1x se escribe -x */
+function termino(coef, letra) {
+  if (coef === 0) { return '0'; }
+  if (coef === 1) { return letra; }
+  if (coef === -1) { return '-' + letra; }
+  return coef + letra;
+}
+function terminoSr(coef, letra) {
+  if (coef === 1) { return letra; }
+  if (coef === -1) { return 'menos ' + letra; }
+  if (coef < 0) { return 'menos ' + Math.abs(coef) + ' por ' + letra; }
+  return coef + ' por ' + letra;
+}
+
+/* ═════════ Generación ═════════
+   Formato: f(cx ± k)  con f positivo o negativo   */
+function generarCaso() {
+  const letra = Math.random() < 0.5 ? 'x' : 'y';
+  const magFactor = ent(2, 8);
+  const factor = Math.random() < 0.25 ? -magFactor : magFactor;
+  const c = Math.random() < 0.45 ? 1 : ent(2, 7);
+  const k = ent(2, 9);
+  const resta = Math.random() < 0.5;
+
+  return {
+    letra: letra,
+    factor: factor,
+    c: c,
+    k: k,
+    resta: resta,
+    dentro1: termino(c, letra),
+    dentro2: String(k),
+    prod1: factor * c,
+    prod2: factor * k * (resta ? -1 : 1)
+  };
+}
+
+function textoResultado(caso) {
+  const t1 = termino(caso.prod1, caso.letra);
+  const t2 = Math.abs(caso.prod2);
+  return t1 + (caso.prod2 < 0 ? ' - ' : ' + ') + t2;
+}
+
+/* ═════════ Pintado de la expresión ═════════ */
+function pintarExpresion(destino, destinoSr, caso, resaltar) {
+  destino.innerHTML = '';
+
+  const spFactor = el('span', resaltar === 'nada' ? 'apagado' : 'factor', String(caso.factor));
+  destino.appendChild(spFactor);
+
+  destino.appendChild(el('span', 'parentesis', '('));
+
+  const c1 = (resaltar === 't2' || resaltar === 'nada') ? 'apagado' : 't1';
+  destino.appendChild(el('span', c1, caso.dentro1));
+
+  destino.appendChild(el('span', 'parentesis', caso.resta ? ' - ' : ' + '));
+
+  const c2 = (resaltar === 't1' || resaltar === 'nada') ? 'apagado' : 't2';
+  destino.appendChild(el('span', c2, caso.dentro2));
+
+  destino.appendChild(el('span', 'parentesis', ')'));
+
+  destinoSr.textContent = 'Expresión: ' + caso.factor + ' por, abre paréntesis, ' +
+    terminoSr(caso.c, caso.letra) + (caso.resta ? ' menos ' : ' más ') + caso.k + ', cierra paréntesis.';
+}
+
+/* ═════════ Demostración ═════════ */
+const demoExpr = document.getElementById('demo-expresion');
+const demoExprSr = document.getElementById('demo-expresion-sr');
+const demoPasos = document.getElementById('demo-pasos');
+const btnDemoSig = document.getElementById('demo-siguiente');
+
+let demoCaso = null;
+let demoGuion = [];
+let demoPaso = 0;
+
+function construirGuion(caso) {
+  const signoDentro = caso.resta ? 'una resta' : 'una suma';
+  const g = [];
+
+  g.push({
+    titulo: 'Identifica el factor y los términos del paréntesis',
+    texto: 'El factor que está afuera es ' + caso.factor + '. Dentro del paréntesis hay ' + signoDentro +
+           ' con dos términos: ' + caso.dentro1 + ' y ' + caso.dentro2 + '.',
+    resaltar: null
+  });
+
+  g.push({
+    titulo: 'Multiplica el factor por el primer término',
+    texto: 'El factor entra al paréntesis y multiplica al primer término.',
+    calculo: '(' + caso.factor + ')(' + caso.dentro1 + ') = ' + termino(caso.prod1, caso.letra),
+    resaltar: 't1'
+  });
+
+  g.push({
+    titulo: 'Multiplica el factor por el segundo término',
+    texto: caso.resta
+      ? 'El segundo término va restando, así que el producto conserva ese signo negativo.'
+      : 'El segundo término va sumando, así que el producto se suma.',
+    calculo: '(' + caso.factor + ')(' + (caso.resta ? '-' : '+') + caso.k + ') = ' +
+             (caso.prod2 < 0 ? '-' : '+') + Math.abs(caso.prod2),
+    resaltar: 't2'
+  });
+
+  g.push({
+    titulo: 'Escribe la expresión sin paréntesis',
+    texto: 'Se juntan los dos productos. Los términos no son semejantes, así que aquí termina la simplificación.',
+    calculo: caso.factor + '(' + caso.dentro1 + (caso.resta ? ' - ' : ' + ') + caso.dentro2 + ') = ' + textoResultado(caso),
+    resaltar: null
+  });
+
+  return g;
+}
+
+function nuevoDemo() {
+  demoCaso = generarCaso();
+  demoGuion = construirGuion(demoCaso);
+  demoPaso = 0;
+  demoPasos.innerHTML = '';
+  pintarExpresion(demoExpr, demoExprSr, demoCaso, null);
+  btnDemoSig.disabled = false;
+  btnDemoSig.textContent = 'Siguiente paso';
+}
+
+btnDemoSig.addEventListener('click', function () {
+  if (demoPaso >= demoGuion.length) { return; }
+  const p = demoGuion[demoPaso];
+  const li = el('li');
+  li.appendChild(el('span', 'titulo-paso', p.titulo));
+  li.appendChild(el('span', null, p.texto));
+  if (p.calculo) { li.appendChild(el('div', 'calculo', p.calculo)); }
+  demoPasos.appendChild(li);
+  pintarExpresion(demoExpr, demoExprSr, demoCaso, p.resaltar);
+  demoPaso++;
+  if (demoPaso >= demoGuion.length) {
+    btnDemoSig.disabled = true;
+    btnDemoSig.textContent = 'Demostración completa';
+  }
+});
+
+document.getElementById('demo-otro').addEventListener('click', function () {
+  nuevoDemo();
+  document.getElementById('tit-demo').focus();
+});
+
+/* ═════════ Práctica ═════════ */
+const prExpr = document.getElementById('pr-expresion');
+const prExprSr = document.getElementById('pr-expresion-sr');
+const campo1 = document.getElementById('campo-1');
+const campo2 = document.getElementById('campo-2');
+const marca1 = document.getElementById('marca-1');
+const marca2 = document.getElementById('marca-2');
+const prRetro = document.getElementById('pr-retro');
+
+let prCaso = null;
+
+function normaliza(txt) {
+  return txt.toLowerCase().replace(/\s/g, '').replace(/−/g, '-').replace(/\*/g, '').replace(/^\+/, '');
+}
+
+/* Acepta 3x, +3x, x (si el coeficiente es 1) y también 1x */
+function aceptaTermino(entrada, coef, letra) {
+  const v = normaliza(entrada);
+  const opciones = [termino(coef, letra), coef + letra];
+  if (coef === 1) { opciones.push('1' + letra); }
+  if (coef === -1) { opciones.push('-1' + letra); }
+  return opciones.some(function (o) { return normaliza(o) === v; });
+}
+function aceptaNumero(entrada, valor) {
+  const v = normaliza(entrada);
+  if (v === '') { return false; }
+  return Number(v) === valor;
+}
+
+function nuevoEjercicio() {
+  prCaso = generarCaso();
+  campo1.value = '';
+  campo2.value = '';
+  campo1.className = 'campo';
+  campo2.className = 'campo';
+  marca1.textContent = '';
+  marca2.textContent = '';
+  prRetro.innerHTML = '';
+
+  pintarExpresion(prExpr, prExprSr, prCaso, null);
+
+  const etq1 = 'Producto del factor por ' + prCaso.dentro1 + ':';
+  const etq2 = 'Producto del factor por ' + (prCaso.resta ? '-' : '+') + prCaso.dentro2 + ':';
+  document.getElementById('etq-p1').textContent = etq1;
+  document.getElementById('etq-p2').textContent = etq2;
+  campo1.setAttribute('aria-label', etq1);
+  campo2.setAttribute('aria-label', etq2 + ' escribe el número con su signo');
+
+  document.getElementById('texto-pista').textContent =
+    'El factor ' + prCaso.factor + ' multiplica a los dos términos del paréntesis. ' +
+    'Para el primero: ' + prCaso.factor + ' × ' + prCaso.c + ' y la letra ' + prCaso.letra + ' se conserva. ' +
+    'Para el segundo: ' + prCaso.factor + ' × ' + prCaso.k +
+    (prCaso.resta
+      ? ', y como dentro del paréntesis va restando, el resultado lleva signo negativo.'
+      : ', y como dentro del paréntesis va sumando, el resultado es positivo.');
+}
+
+function mostrarRetro(tipo, titulo, parrafos) {
+  prRetro.innerHTML = '';
+  const caja = el('div', 'caja ' + tipo);
+  caja.appendChild(el('p', 'titulo', titulo));
+  parrafos.forEach(function (p) { caja.appendChild(el('p', null, p)); });
+  prRetro.appendChild(caja);
+}
+
+document.getElementById('btn-comprobar').addEventListener('click', function () {
+  if (campo1.value.trim() === '' || campo2.value.trim() === '') {
+    mostrarRetro('mal', 'Faltan datos', ['Completa las dos casillas antes de comprobar.']);
+    return;
+  }
+
+  const bien1 = aceptaTermino(campo1.value, prCaso.prod1, prCaso.letra);
+  const bien2 = aceptaNumero(campo2.value, prCaso.prod2);
+
+  campo1.className = 'campo ' + (bien1 ? 'bien' : 'mal');
+  campo2.className = 'campo ' + (bien2 ? 'bien' : 'mal');
+  marca1.className = 'marca-campo ' + (bien1 ? 'bien' : 'mal');
+  marca2.className = 'marca-campo ' + (bien2 ? 'bien' : 'mal');
+  marca1.textContent = bien1 ? '✓' : '✗';
+  marca2.textContent = bien2 ? '✓' : '✗';
+
+  if (bien1 && bien2) {
+    mostrarRetro('bien', 'Correcto',
+      ['El resultado es ' + textoResultado(prCaso) + '.',
+       'Los dos términos del paréntesis quedaron multiplicados por el factor y el signo se conservó.']);
+    return;
+  }
+
+  const avisos = [];
+  if (!bien1) {
+    avisos.push('Primer producto: multiplica ' + prCaso.factor + ' por ' + prCaso.c +
+      ' y conserva la letra ' + prCaso.letra + '. El resultado es ' + termino(prCaso.prod1, prCaso.letra) + '.');
+  }
+  if (!bien2) {
+    avisos.push('Segundo producto: multiplica ' + prCaso.factor + ' por ' + prCaso.k +
+      (prCaso.resta ? ' y aplica el signo negativo del paréntesis' : ' y conserva el signo positivo') +
+      '. El resultado es ' + prCaso.prod2 + '.');
+  }
+  avisos.push('Expresión completa: ' + textoResultado(prCaso) + '.');
+  mostrarRetro('mal', 'Revisa lo marcado', avisos);
+});
+
+document.getElementById('btn-otro-ejercicio').addEventListener('click', function () {
+  nuevoEjercicio();
+  document.getElementById('tit-practica').focus();
+});
+
+/* ═════════ Arranque ═════════ */
+nuevoDemo();
+nuevoEjercicio();
+</script>
+</body>
+</html>

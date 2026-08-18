@@ -1,0 +1,632 @@
+<!doctype html>
+<!--
+  Interactivo 4.1a · Combinar términos semejantes
+  Spanish ASE Math · Nivel 3 · Tema 4 · Álgebra lineal
+  José M. Fernández, ABE/ASE Math Master Teacher
+  Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interactivo 4.1a · Combinar términos semejantes</title>
+<meta name="description" content="Demostración paso a paso y práctica guiada para identificar familias de términos semejantes y combinar sus coeficientes." />
+<meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+<meta name="license" content="CC BY-NC-SA 4.0" />
+<link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+<style>
+  :root {
+    --tema:#bf360c; --tema-d:#8c2708; --tema-bg:#fbe9e7; --tema-bg2:#f7d9d3;
+    --acento:#1565c0; --acento-d:#0d47a1;
+    --txt:#222222; --txt-2:#555555; --bg:#f5f7fa;
+    --correcto:#1b5e20; --correcto-bg:#e8f5e9;
+    --error:#b71c1c; --error-bg:#ffebee;
+    --borde:#d0d7de;
+    --fam-x:#bf360c; --fam-y:#1565c0; --fam-k:#37474f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; padding:24px 16px 40px; background:var(--bg); color:var(--txt);
+    font-family:'Segoe UI', system-ui, Roboto, Helvetica, Arial, sans-serif;
+    font-size:16px; line-height:1.6;
+  }
+  .contenedor { max-width:760px; margin:0 auto; }
+  .sr-only {
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  header.principal {
+    background:var(--tema); color:#ffffff; padding:26px 28px;
+    border-radius:14px; margin-bottom:20px;
+  }
+  header.principal .ruta { font-size:13px; letter-spacing:.4px; text-transform:uppercase; }
+  header.principal h1 { margin:8px 0 6px; font-size:24px; font-weight:700; }
+  header.principal .meta { font-size:14px; }
+
+  .tarjeta {
+    background:#ffffff; border:1px solid var(--borde); border-radius:12px;
+    padding:22px 24px; margin-bottom:20px; box-shadow:0 2px 6px #dfe4ea;
+  }
+  .tarjeta h2 { color:var(--tema-d); font-size:20px; margin:0 0 6px; }
+  .tarjeta h3 { color:var(--tema-d); font-size:17px; margin:20px 0 8px; }
+  .tarjeta .intro { color:var(--txt-2); font-size:15px; margin:0 0 18px; }
+
+  .caja-objetivos {
+    background:var(--tema-bg); border-left:6px solid var(--tema);
+    border-radius:0 10px 10px 0; padding:16px 20px; margin-bottom:20px;
+  }
+  .caja-objetivos h2 { margin:0 0 8px; color:var(--tema-d); font-size:18px; }
+  .caja-objetivos ul { margin:0; padding-left:22px; }
+  .caja-objetivos li { margin:4px 0; }
+
+  /* Expresión y términos */
+  .expresion {
+    font-size:26px; font-weight:600; text-align:center;
+    padding:18px 12px; background:var(--tema-bg); border-radius:10px;
+    margin:0 0 16px; word-spacing:2px;
+  }
+  .expresion .signo { color:var(--txt-2); margin:0 6px; }
+  .termino { padding:2px 8px; border-radius:6px; }
+  .termino.fam-x { background:var(--fam-x); color:#ffffff; }
+  .termino.fam-y { background:var(--fam-y); color:#ffffff; }
+  .termino.fam-k { background:var(--fam-k); color:#ffffff; }
+  .termino.apagado { background:#eceff1; color:var(--txt-2); }
+
+  .leyenda { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; font-size:14px; margin-bottom:6px; }
+  .leyenda span { padding:3px 10px; border-radius:6px; color:#ffffff; }
+
+  /* Pasos */
+  ol.pasos { list-style:none; margin:14px 0 0; padding:0; counter-reset:paso; }
+  ol.pasos li {
+    counter-increment:paso; position:relative;
+    background:var(--bg); border:1px solid var(--borde); border-left:6px solid var(--tema);
+    border-radius:0 10px 10px 0; padding:12px 16px 12px 52px; margin-bottom:10px;
+  }
+  ol.pasos li::before {
+    content:counter(paso); position:absolute; left:14px; top:12px;
+    width:26px; height:26px; line-height:26px; text-align:center;
+    background:var(--tema); color:#ffffff; border-radius:50%;
+    font-weight:700; font-size:14px;
+  }
+  ol.pasos .titulo-paso { font-weight:700; color:var(--tema-d); display:block; }
+  ol.pasos .calculo { font-size:19px; font-weight:600; margin-top:4px; }
+
+  /* Clasificación */
+  table.clasifica { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.clasifica caption { text-align:left; font-size:14px; color:var(--txt-2); padding-bottom:8px; }
+  table.clasifica th, table.clasifica td {
+    border-bottom:1px solid var(--borde); padding:10px 8px; text-align:left; vertical-align:middle;
+  }
+  table.clasifica th { font-size:14px; color:var(--txt-2); text-transform:uppercase; letter-spacing:.3px; }
+  table.clasifica td.term { font-size:20px; font-weight:600; white-space:nowrap; }
+  .grupo-fam { display:flex; flex-wrap:wrap; gap:8px; }
+  .btn-fam {
+    padding:8px 14px; background:#ffffff; color:var(--txt);
+    border:2px solid var(--borde); border-radius:8px; font:inherit; font-size:15px; cursor:pointer;
+  }
+  .btn-fam:hover { background:var(--tema-bg); border-color:var(--tema); }
+  .btn-fam[aria-pressed="true"] { background:var(--tema); border-color:var(--tema); color:#ffffff; }
+  .veredicto { font-weight:700; white-space:nowrap; }
+  .veredicto.bien { color:var(--correcto); }
+  .veredicto.mal { color:var(--error); }
+
+  /* Entradas de coeficientes */
+  .fila-suma {
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    padding:10px 0; border-bottom:1px solid var(--borde);
+  }
+  .fila-suma .etq { min-width:170px; font-weight:600; }
+  input.coef {
+    width:90px; padding:8px 10px; font:inherit; font-size:17px;
+    border:2px solid var(--borde); border-radius:8px; background:#ffffff; color:var(--txt);
+  }
+  input.coef:focus { border-color:var(--acento); }
+  input.coef.bien { border-color:var(--correcto); background:var(--correcto-bg); }
+  input.coef.mal { border-color:var(--error); background:var(--error-bg); }
+
+  /* Retroalimentación */
+  .retro { margin-top:16px; }
+  .retro .caja { border-radius:10px; padding:14px 18px; border-left:6px solid var(--tema); background:var(--tema-bg); }
+  .retro .caja.bien { background:var(--correcto-bg); border-left-color:var(--correcto); }
+  .retro .caja.mal { background:var(--error-bg); border-left-color:var(--error); }
+  .retro .titulo { font-weight:700; margin:0 0 6px; }
+  .retro .caja.bien .titulo { color:var(--correcto); }
+  .retro .caja.mal .titulo { color:var(--error); }
+  .retro p { margin:0 0 6px; }
+  .retro p:last-child { margin-bottom:0; }
+
+  .fila-nav { display:flex; flex-wrap:wrap; gap:12px; margin-top:20px; }
+  .btn-accion {
+    padding:12px 22px; background:var(--acento); color:#ffffff;
+    border:2px solid var(--acento); border-radius:8px; font:inherit; font-weight:600; cursor:pointer;
+  }
+  .btn-accion:hover { background:var(--acento-d); border-color:var(--acento-d); }
+  .btn-accion[disabled] { background:#757575; border-color:#757575; cursor:default; }
+  .btn-secundario {
+    padding:12px 22px; background:#ffffff; color:var(--tema-d);
+    border:2px solid var(--tema-d); border-radius:8px; font:inherit; font-weight:600; cursor:pointer;
+  }
+  .btn-secundario:hover { background:var(--tema-bg); }
+
+  button:focus-visible, input:focus-visible, summary:focus-visible {
+    outline:3px solid var(--acento); outline-offset:3px;
+  }
+  h2:focus, h3:focus { outline:3px solid var(--acento); outline-offset:4px; }
+
+  footer.licencia {
+    margin-top:24px; padding-top:16px; border-top:1px solid var(--borde);
+    font-size:13px; color:var(--txt-2); text-align:center;
+  }
+  footer.licencia a { color:var(--acento-d); }
+  .oculto { display:none; }
+
+  @media (max-width:520px) {
+    header.principal { padding:20px; }
+    header.principal h1 { font-size:21px; }
+    .tarjeta { padding:18px 16px; }
+    .expresion { font-size:21px; }
+    .btn-accion, .btn-secundario { width:100%; }
+    .fila-suma .etq { min-width:100%; }
+  }
+</style>
+</head>
+<body>
+<div class="contenedor">
+
+  <header class="principal">
+    <div class="ruta">Spanish ASE Math · Nivel 3 · Tema 4 · Lección 4.1</div>
+    <h1>Combinar términos semejantes</h1>
+    <div class="meta">Demostración paso a paso y práctica guiada</div>
+  </header>
+
+  <div class="caja-objetivos">
+    <h2>Idea central</h2>
+    <p style="margin:0 0 8px">Dos términos son <strong>semejantes</strong> cuando tienen exactamente la misma parte literal: la misma variable elevada al mismo exponente. Solo los términos semejantes se pueden combinar, y al combinarlos se suman o restan los <strong>coeficientes</strong>; la parte literal no cambia.</p>
+    <ul>
+      <li>3x y −7x son semejantes: los dos tienen x.</li>
+      <li>3x y 3y no son semejantes: las variables son distintas.</li>
+      <li>3x y 3x² no son semejantes: los exponentes son distintos.</li>
+      <li>Los números sueltos forman su propia familia: las constantes.</li>
+    </ul>
+  </div>
+
+  <!-- ══════════ DEMOSTRACIÓN ══════════ -->
+  <section class="tarjeta" aria-labelledby="tit-demo">
+    <h2 id="tit-demo" tabindex="-1">Paso a paso</h2>
+    <p class="intro">Observa el procedimiento completo antes de practicarlo. Puedes generar todos los ejemplos que necesites.</p>
+
+    <div class="leyenda" aria-hidden="true">
+      <span style="background:#bf360c">términos en x</span>
+      <span style="background:#1565c0">términos en y</span>
+      <span style="background:#37474f">constantes</span>
+    </div>
+
+    <p class="expresion" id="demo-expresion" aria-hidden="true"></p>
+    <p class="sr-only" id="demo-expresion-sr"></p>
+
+    <ol class="pasos" id="demo-pasos"></ol>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion" id="demo-siguiente">Siguiente paso</button>
+      <button type="button" class="btn-secundario" id="demo-otro">Otro ejemplo</button>
+    </div>
+  </section>
+
+  <!-- ══════════ PRÁCTICA ══════════ -->
+  <section class="tarjeta" aria-labelledby="tit-practica">
+    <h2 id="tit-practica" tabindex="-1">Tu turno</h2>
+    <p class="intro">Primero clasifica cada término en su familia. Después escribe el coeficiente que resulta de combinar cada familia.</p>
+
+    <p class="expresion" id="pr-expresion" aria-hidden="true"></p>
+    <p class="sr-only" id="pr-expresion-sr"></p>
+
+    <h3 id="tit-fase1">Fase 1 · Clasifica cada término</h3>
+    <table class="clasifica" id="tabla-clasifica">
+      <caption>Selecciona la familia a la que pertenece cada término de la expresión.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Término</th>
+          <th scope="col">Familia</th>
+          <th scope="col">Resultado</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpo-clasifica"></tbody>
+    </table>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion" id="btn-comprobar-1">Comprobar clasificación</button>
+    </div>
+
+    <div id="fase2" class="oculto">
+      <h3 id="tit-fase2" tabindex="-1">Fase 2 · Combina los coeficientes</h3>
+      <p class="intro" id="pista-fase2"></p>
+      <div id="filas-suma"></div>
+      <div class="fila-nav">
+        <button type="button" class="btn-accion" id="btn-comprobar-2">Comprobar los coeficientes</button>
+      </div>
+    </div>
+
+    <div class="retro" id="pr-retro" role="status" aria-live="polite"></div>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-secundario" id="btn-otro-ejercicio">Otro ejercicio</button>
+    </div>
+  </section>
+
+  <footer class="licencia">
+    <p>José M. Fernández, ABE/ASE Math Master Teacher · Harry S. Truman College — City Colleges of Chicago</p>
+    <p>Esta obra está bajo una licencia
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" rel="license">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.</p>
+  </footer>
+
+</div>
+
+<script>
+/* ═════════ Utilidades ═════════ */
+function ent(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function mezclar(a) {
+  const c = a.slice();
+  for (let i = c.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = c[i]; c[i] = c[j]; c[j] = t;
+  }
+  return c;
+}
+function el(tag, clase, texto) {
+  const n = document.createElement(tag);
+  if (clase) { n.className = clase; }
+  if (texto !== undefined) { n.textContent = texto; }
+  return n;
+}
+
+const FAMILIAS = [
+  { id: 'x', rotulo: 'Términos en x', clase: 'fam-x' },
+  { id: 'y', rotulo: 'Términos en y', clase: 'fam-y' },
+  { id: 'k', rotulo: 'Constantes',     clase: 'fam-k' }
+];
+function familiaPorId(id) { return FAMILIAS.filter(function (f) { return f.id === id; })[0]; }
+
+/* Texto de un término sin signo: 1x se escribe x */
+function cuerpoTermino(coef, fam) {
+  const a = Math.abs(coef);
+  if (fam === 'k') { return String(a); }
+  return (a === 1 ? '' : String(a)) + fam;
+}
+function cuerpoTerminoSr(coef, fam) {
+  const a = Math.abs(coef);
+  if (fam === 'k') { return String(a); }
+  return (a === 1 ? '' : a + ' por ') + fam;
+}
+
+/* ═════════ Generación de la expresión ═════════ */
+function coeficientesFamilia(cantidad) {
+  let c;
+  do {
+    c = [];
+    for (let i = 0; i < cantidad; i++) {
+      c.push(ent(2, 9) * (Math.random() < 0.45 ? -1 : 1));
+    }
+  } while (c.reduce(function (s, v) { return s + v; }, 0) === 0);
+  return c;
+}
+
+function generarExpresion() {
+  const plan = [
+    { fam: 'x', n: 2 },
+    { fam: 'y', n: 2 },
+    { fam: 'k', n: Math.random() < 0.5 ? 2 : 1 }
+  ];
+  let terminos = [];
+  let intentos = 0;
+  /* Se repite hasta que exista al menos un término positivo, para que la
+     expresión no abra con un signo suelto. */
+  do {
+    terminos = [];
+    plan.forEach(function (p) {
+      coeficientesFamilia(p.n).forEach(function (c) {
+        terminos.push({ coef: c, fam: p.fam });
+      });
+    });
+    intentos++;
+  } while (!terminos.some(function (t) { return t.coef > 0; }) && intentos < 100);
+
+  terminos = mezclar(terminos);
+  const iPos = terminos.findIndex(function (t) { return t.coef > 0; });
+  if (iPos > 0) {
+    const tmp = terminos[0]; terminos[0] = terminos[iPos]; terminos[iPos] = tmp;
+  }
+  return terminos;
+}
+
+function sumaFamilia(terminos, fam) {
+  return terminos
+    .filter(function (t) { return t.fam === fam; })
+    .reduce(function (s, t) { return s + t.coef; }, 0);
+}
+
+function familiasPresentes(terminos) {
+  return FAMILIAS.filter(function (f) {
+    return terminos.some(function (t) { return t.fam === f.id; });
+  });
+}
+
+/* ═════════ Pintado ═════════ */
+function pintarExpresion(destino, destinoSr, terminos, resaltar) {
+  destino.innerHTML = '';
+  let sr = '';
+  terminos.forEach(function (t, i) {
+    if (i === 0) {
+      if (t.coef < 0) { destino.appendChild(el('span', 'signo', '-')); sr += 'menos '; }
+    } else {
+      destino.appendChild(el('span', 'signo', t.coef < 0 ? '-' : '+'));
+      sr += t.coef < 0 ? ' menos ' : ' más ';
+    }
+    let clase = 'termino ' + familiaPorId(t.fam).clase;
+    if (resaltar && resaltar !== t.fam) { clase = 'termino apagado'; }
+    destino.appendChild(el('span', clase, cuerpoTermino(t.coef, t.fam)));
+    sr += cuerpoTerminoSr(t.coef, t.fam);
+  });
+  destinoSr.textContent = 'Expresión: ' + sr + '.';
+}
+
+function textoResultado(terminos) {
+  const partes = [];
+  familiasPresentes(terminos).forEach(function (f) {
+    const s = sumaFamilia(terminos, f.id);
+    if (s === 0) { return; }
+    partes.push({ s: s, fam: f.id });
+  });
+  let txt = '';
+  partes.forEach(function (p, i) {
+    if (i === 0) { txt += (p.s < 0 ? '-' : '') + cuerpoTermino(p.s, p.fam); }
+    else { txt += (p.s < 0 ? ' - ' : ' + ') + cuerpoTermino(p.s, p.fam); }
+  });
+  return txt === '' ? '0' : txt;
+}
+
+/* ═════════ Demostración ═════════ */
+const demoExpr = document.getElementById('demo-expresion');
+const demoExprSr = document.getElementById('demo-expresion-sr');
+const demoPasos = document.getElementById('demo-pasos');
+const btnDemoSig = document.getElementById('demo-siguiente');
+
+let demoTerminos = [];
+let demoPaso = 0;
+let demoGuion = [];
+
+function construirGuion(terminos) {
+  const guion = [];
+  guion.push({
+    titulo: 'Identifica cada término con su signo',
+    texto: 'Un término incluye el signo que lo precede. Esta expresión tiene ' + terminos.length +
+           ' términos, y el color indica a qué familia pertenece cada uno.',
+    resaltar: null
+  });
+  familiasPresentes(terminos).forEach(function (f) {
+    const propios = terminos.filter(function (t) { return t.fam === f.id; });
+    const lista = propios.map(function (t) {
+      return (t.coef < 0 ? '-' : '') + cuerpoTermino(t.coef, t.fam);
+    }).join(', ');
+    const suma = sumaFamilia(terminos, f.id);
+    const operacion = propios.map(function (t, i) {
+      return (i === 0 ? (t.coef < 0 ? '-' : '') : (t.coef < 0 ? ' - ' : ' + ')) + Math.abs(t.coef);
+    }).join('');
+    guion.push({
+      titulo: 'Agrupa y combina: ' + f.rotulo.toLowerCase(),
+      texto: 'Términos de esta familia: ' + lista + '. Se suman los coeficientes y la parte literal se conserva.',
+      calculo: operacion + ' = ' + suma + '  →  ' + (suma < 0 ? '-' : '') + cuerpoTermino(suma, f.id),
+      resaltar: f.id
+    });
+  });
+  guion.push({
+    titulo: 'Escribe la expresión simplificada',
+    texto: 'Cada familia aporta un único término. No se puede seguir combinando porque ya no quedan términos semejantes.',
+    calculo: textoResultado(terminos),
+    resaltar: null
+  });
+  return guion;
+}
+
+function nuevoDemo() {
+  demoTerminos = generarExpresion();
+  demoGuion = construirGuion(demoTerminos);
+  demoPaso = 0;
+  demoPasos.innerHTML = '';
+  pintarExpresion(demoExpr, demoExprSr, demoTerminos, null);
+  btnDemoSig.disabled = false;
+  btnDemoSig.textContent = 'Siguiente paso';
+}
+
+function avanzarDemo() {
+  if (demoPaso >= demoGuion.length) { return; }
+  const p = demoGuion[demoPaso];
+  const li = el('li');
+  li.appendChild(el('span', 'titulo-paso', p.titulo));
+  li.appendChild(el('span', null, p.texto));
+  if (p.calculo) { li.appendChild(el('div', 'calculo', p.calculo)); }
+  demoPasos.appendChild(li);
+  pintarExpresion(demoExpr, demoExprSr, demoTerminos, p.resaltar);
+  demoPaso++;
+  if (demoPaso >= demoGuion.length) {
+    btnDemoSig.disabled = true;
+    btnDemoSig.textContent = 'Demostración completa';
+  }
+}
+
+btnDemoSig.addEventListener('click', avanzarDemo);
+document.getElementById('demo-otro').addEventListener('click', function () {
+  nuevoDemo();
+  document.getElementById('tit-demo').focus();
+});
+
+/* ═════════ Práctica ═════════ */
+const prExpr = document.getElementById('pr-expresion');
+const prExprSr = document.getElementById('pr-expresion-sr');
+const cuerpoClasifica = document.getElementById('cuerpo-clasifica');
+const prRetro = document.getElementById('pr-retro');
+const fase2 = document.getElementById('fase2');
+const filasSuma = document.getElementById('filas-suma');
+const btnComprobar1 = document.getElementById('btn-comprobar-1');
+const btnComprobar2 = document.getElementById('btn-comprobar-2');
+
+let prTerminos = [];
+let elecciones = [];
+
+function nuevoEjercicio() {
+  prTerminos = generarExpresion();
+  elecciones = prTerminos.map(function () { return null; });
+  prRetro.innerHTML = '';
+  fase2.classList.add('oculto');
+  filasSuma.innerHTML = '';
+  btnComprobar1.disabled = false;
+  pintarExpresion(prExpr, prExprSr, prTerminos, null);
+
+  cuerpoClasifica.innerHTML = '';
+  prTerminos.forEach(function (t, i) {
+    const tr = el('tr');
+
+    const tdTerm = el('td', 'term', (t.coef < 0 ? '-' : '+') + cuerpoTermino(t.coef, t.fam));
+    tr.appendChild(tdTerm);
+
+    const tdFam = el('td');
+    const grupo = el('div', 'grupo-fam');
+    grupo.setAttribute('role', 'group');
+    grupo.setAttribute('aria-label', 'Familia del término ' +
+      (t.coef < 0 ? 'menos ' : 'más ') + cuerpoTerminoSr(t.coef, t.fam));
+    FAMILIAS.forEach(function (f) {
+      const b = el('button', 'btn-fam', f.rotulo);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function () {
+        elecciones[i] = f.id;
+        grupo.querySelectorAll('button').forEach(function (o) { o.setAttribute('aria-pressed', 'false'); });
+        b.setAttribute('aria-pressed', 'true');
+      });
+      grupo.appendChild(b);
+    });
+    tdFam.appendChild(grupo);
+    tr.appendChild(tdFam);
+
+    const tdRes = el('td', 'veredicto');
+    tdRes.id = 'veredicto-' + i;
+    tr.appendChild(tdRes);
+
+    cuerpoClasifica.appendChild(tr);
+  });
+}
+
+function mostrarRetro(tipo, titulo, parrafos) {
+  prRetro.innerHTML = '';
+  const caja = el('div', 'caja ' + tipo);
+  caja.appendChild(el('p', 'titulo', titulo));
+  parrafos.forEach(function (p) { caja.appendChild(el('p', null, p)); });
+  prRetro.appendChild(caja);
+}
+
+btnComprobar1.addEventListener('click', function () {
+  const faltan = elecciones.filter(function (e) { return e === null; }).length;
+  if (faltan > 0) {
+    mostrarRetro('mal', 'Falta clasificar',
+      ['Quedan ' + faltan + ' término(s) sin familia asignada. Clasifícalos todos antes de comprobar.']);
+    return;
+  }
+
+  let errores = 0;
+  prTerminos.forEach(function (t, i) {
+    const celda = document.getElementById('veredicto-' + i);
+    const bien = elecciones[i] === t.fam;
+    if (!bien) { errores++; }
+    celda.className = 'veredicto ' + (bien ? 'bien' : 'mal');
+    celda.innerHTML = '';
+    celda.appendChild(el('span', null, bien ? '✓ correcto' : '✗ revisa'));
+  });
+
+  if (errores > 0) {
+    mostrarRetro('mal', 'Hay ' + errores + ' término(s) mal clasificado(s)',
+      ['Recuerda: la familia la determina la parte literal, no el número. Un término con x pertenece a la familia de x aunque su coeficiente sea negativo, y un número solo, sin variable, es una constante.',
+       'Corrige los marcados y vuelve a comprobar.']);
+    return;
+  }
+
+  mostrarRetro('bien', 'Clasificación correcta',
+    ['Todos los términos están en su familia. Ahora combina los coeficientes de cada una.']);
+  btnComprobar1.disabled = true;
+  construirFase2();
+});
+
+function construirFase2() {
+  filasSuma.innerHTML = '';
+  const presentes = familiasPresentes(prTerminos);
+  document.getElementById('pista-fase2').textContent =
+    'Escribe el coeficiente resultante de cada familia, con su signo si es negativo. En las constantes escribe el número que queda.';
+
+  presentes.forEach(function (f) {
+    const fila = el('div', 'fila-suma');
+    const propios = prTerminos.filter(function (t) { return t.fam === f.id; });
+    const detalle = propios.map(function (t, i) {
+      return (i === 0 ? (t.coef < 0 ? '-' : '') : (t.coef < 0 ? ' - ' : ' + ')) + Math.abs(t.coef);
+    }).join('');
+
+    fila.appendChild(el('span', 'etq', f.rotulo + ':'));
+    fila.appendChild(el('span', null, detalle + ' ='));
+
+    const inp = el('input', 'coef');
+    inp.type = 'text';
+    inp.inputMode = 'numeric';
+    inp.setAttribute('aria-label', 'Coeficiente resultante de ' + f.rotulo.toLowerCase() + ', operación ' + detalle);
+    inp.setAttribute('data-fam', f.id);
+    fila.appendChild(inp);
+
+    if (f.id !== 'k') {
+      fila.appendChild(el('span', null, '(la parte literal es ' + f.id + ')'));
+    }
+    filasSuma.appendChild(fila);
+  });
+
+  fase2.classList.remove('oculto');
+  document.getElementById('tit-fase2').focus();
+}
+
+btnComprobar2.addEventListener('click', function () {
+  const entradas = filasSuma.querySelectorAll('input.coef');
+  let vacios = 0, errores = 0;
+
+  entradas.forEach(function (inp) {
+    const fam = inp.getAttribute('data-fam');
+    const esperado = sumaFamilia(prTerminos, fam);
+    const valor = inp.value.replace(/\s/g, '').replace('−', '-');
+    inp.classList.remove('bien', 'mal');
+    if (valor === '') { vacios++; return; }
+    if (Number(valor) === esperado) { inp.classList.add('bien'); }
+    else { inp.classList.add('mal'); errores++; }
+  });
+
+  if (vacios > 0) {
+    mostrarRetro('mal', 'Faltan coeficientes', ['Completa las ' + vacios + ' casilla(s) vacía(s) antes de comprobar.']);
+    return;
+  }
+  if (errores > 0) {
+    mostrarRetro('mal', 'Revisa ' + errores + ' coeficiente(s)',
+      ['Opera los coeficientes respetando su signo, de izquierda a derecha. Un término que va restando aporta un valor negativo a la suma.',
+       'Las casillas marcadas en rojo son las que hay que corregir.']);
+    return;
+  }
+
+  mostrarRetro('bien', 'Expresión simplificada correctamente',
+    ['El resultado es ' + textoResultado(prTerminos) + '.',
+     'Ya no quedan términos semejantes que combinar: cada familia aporta un único término.']);
+});
+
+document.getElementById('btn-otro-ejercicio').addEventListener('click', function () {
+  nuevoEjercicio();
+  document.getElementById('tit-practica').focus();
+});
+
+/* ═════════ Arranque ═════════ */
+nuevoDemo();
+nuevoEjercicio();
+</script>
+</body>
+</html>

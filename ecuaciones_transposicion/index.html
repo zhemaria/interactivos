@@ -1,1 +1,642 @@
+<!doctype html>
+<!--
+  Interactivo 4.2 · Resolver ecuaciones lineales por transposición
+  Spanish ASE Math · Nivel 3 · Tema 4 · Álgebra lineal
+  José M. Fernández, ABE/ASE Math Master Teacher
+  Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interactivo 4.2 · Resolver ecuaciones lineales por transposición</title>
+  <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23ffffff%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%2294%22%20height%3D%2294%22%20fill%3D%22none%22%20stroke%3D%22%23002060%22%20stroke-width%3D%226%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20fill%3D%22%23002060%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22700%22%20font-size%3D%2278%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%26%23209%3B%3C%2Ftext%3E%3C%2Fsvg%3E" />
+    
+<meta name="description" content="Práctica guiada de transposición de términos para resolver ecuaciones de uno y dos pasos y ecuaciones con variables en ambos lados." />
+<meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+<meta name="license" content="CC BY-NC-SA 4.0" />
+<link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+<style>
+  :root {
+    --tema:#bf360c; --tema-d:#8c2708; --tema-bg:#fbe9e7; --tema-bg2:#f7d9d3;
+    --acento:#1565c0; --acento-d:#0d47a1;
+    --txt:#222222; --txt-2:#555555; --bg:#f5f7fa;
+    --correcto:#1b5e20; --correcto-bg:#e8f5e9;
+    --error:#b71c1c; --error-bg:#ffebee;
+    --borde:#d0d7de;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:24px 16px 40px; background:var(--bg); color:var(--txt);
+    font-family:'Segoe UI', system-ui, Roboto, Helvetica, Arial, sans-serif;
+    font-size:16px; line-height:1.6;
+  }
+  .contenedor { max-width:800px; margin:0 auto; }
+  .sr-only {
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  header.principal {
+    background:var(--tema); color:#ffffff; padding:26px 28px;
+    border-radius:14px; margin-bottom:20px;
+  }
+  header.principal .ruta { font-size:13px; letter-spacing:.4px; text-transform:uppercase; }
+  header.principal h1 { margin:8px 0 6px; font-size:24px; font-weight:700; }
+  header.principal .meta { font-size:14px; }
 
+  .tarjeta {
+    background:#ffffff; border:1px solid var(--borde); border-radius:12px;
+    padding:22px 24px; margin-bottom:20px; box-shadow:0 2px 6px #dfe4ea;
+  }
+  .tarjeta h2 { color:var(--tema-d); font-size:20px; margin:0 0 6px; }
+  .tarjeta h3 { color:var(--tema-d); font-size:17px; margin:22px 0 8px; }
+  .tarjeta .intro { color:var(--txt-2); font-size:15px; margin:0 0 18px; }
+
+  .caja-objetivos {
+    background:var(--tema-bg); border-left:6px solid var(--tema);
+    border-radius:0 10px 10px 0; padding:16px 20px; margin-bottom:20px;
+  }
+  .caja-objetivos h2 { margin:0 0 8px; color:var(--tema-d); font-size:18px; }
+  .caja-objetivos p { margin:0 0 8px; }
+  .caja-objetivos p:last-child { margin-bottom:0; }
+
+  /* Tabla de reglas */
+  table.reglas { width:100%; border-collapse:collapse; margin-top:10px; background:#ffffff; }
+  table.reglas caption { text-align:left; font-size:14px; color:var(--txt-2); padding-bottom:8px; }
+  table.reglas th, table.reglas td {
+    border:1px solid var(--borde); padding:9px 12px; text-align:left; vertical-align:top;
+  }
+  table.reglas th { background:var(--tema); color:#ffffff; font-size:14px; text-transform:uppercase; letter-spacing:.3px; }
+  table.reglas td:first-child { font-weight:700; color:var(--tema-d); white-space:nowrap; }
+
+  /* Pestañas */
+  .tablist { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+  .tablist button {
+    flex:1; min-width:220px; padding:14px 16px; font:inherit; font-weight:600; font-size:16px;
+    background:#ffffff; color:var(--tema-d); border:2px solid var(--tema-d);
+    border-radius:10px; cursor:pointer; text-align:left;
+  }
+  .tablist button .sub { display:block; font-weight:400; font-size:14px; color:var(--txt-2); margin-top:2px; }
+  .tablist button[aria-selected="true"] { background:var(--tema); border-color:var(--tema); color:#ffffff; }
+  .tablist button[aria-selected="true"] .sub { color:#ffffff; }
+
+  /* Ecuación */
+  .ecuacion {
+    font-size:30px; font-weight:600; text-align:center;
+    padding:22px 12px; background:var(--tema-bg); border-radius:10px; margin:0 0 6px;
+  }
+  .ecuacion .igual { color:var(--tema-d); margin:0 14px; }
+  .ecuacion .fijo { padding:2px 6px; }
+  .term-btn {
+    font:inherit; font-size:30px; font-weight:600;
+    background:#ffffff; color:var(--tema-d);
+    border:2px dashed var(--tema); border-radius:8px;
+    padding:0 8px; margin:0 2px; cursor:pointer;
+  }
+  .term-btn:hover { background:var(--tema); color:#ffffff; border-style:solid; }
+  .term-btn[disabled] { border-style:solid; border-color:#757575; color:var(--txt); cursor:default; background:#ffffff; }
+  .ayuda-clic { text-align:center; color:var(--txt-2); font-size:14px; margin:0 0 16px; }
+
+  /* Pasos */
+  ol.pasos { list-style:none; margin:10px 0 0; padding:0; counter-reset:paso; }
+  ol.pasos li {
+    counter-increment:paso; position:relative;
+    background:var(--bg); border:1px solid var(--borde); border-left:6px solid var(--tema);
+    border-radius:0 10px 10px 0; padding:12px 16px 12px 52px; margin-bottom:10px;
+  }
+  ol.pasos li::before {
+    content:counter(paso); position:absolute; left:14px; top:12px;
+    width:26px; height:26px; line-height:26px; text-align:center;
+    background:var(--tema); color:#ffffff; border-radius:50%; font-weight:700; font-size:14px;
+  }
+  ol.pasos .titulo-paso { font-weight:700; color:var(--tema-d); display:block; }
+  ol.pasos .calculo { font-size:21px; font-weight:600; margin-top:4px; }
+  ol.pasos .propiedad { font-size:14px; color:var(--txt-2); display:block; margin-top:2px; }
+  .sin-pasos { color:var(--txt-2); font-size:15px; }
+
+  /* Retroalimentación */
+  .retro { margin-top:14px; }
+  .retro .caja { border-radius:10px; padding:14px 18px; border-left:6px solid var(--tema); background:var(--tema-bg); }
+  .retro .caja.bien { background:var(--correcto-bg); border-left-color:var(--correcto); }
+  .retro .caja.mal { background:var(--error-bg); border-left-color:var(--error); }
+  .retro .titulo { font-weight:700; margin:0 0 6px; }
+  .retro .caja.bien .titulo { color:var(--correcto); }
+  .retro .caja.mal .titulo { color:var(--error); }
+  .retro p { margin:0 0 6px; }
+  .retro p:last-child { margin-bottom:0; }
+
+  /* Verificación */
+  .verificacion { background:var(--correcto-bg); border-left:6px solid var(--correcto); border-radius:0 10px 10px 0; padding:14px 18px; margin-top:16px; }
+  .verificacion h3 { color:var(--correcto); margin:0 0 6px; font-size:17px; }
+  .verificacion .linea { font-size:19px; font-weight:600; margin:4px 0; }
+
+  .fila-nav { display:flex; flex-wrap:wrap; gap:12px; margin-top:18px; }
+  .btn-accion {
+    padding:12px 22px; background:var(--acento); color:#ffffff;
+    border:2px solid var(--acento); border-radius:8px; font:inherit; font-weight:600; cursor:pointer;
+  }
+  .btn-accion:hover { background:var(--acento-d); border-color:var(--acento-d); }
+  .btn-accion[disabled] { background:#757575; border-color:#757575; cursor:default; }
+  .btn-secundario {
+    padding:12px 22px; background:#ffffff; color:var(--tema-d);
+    border:2px solid var(--tema-d); border-radius:8px; font:inherit; font-weight:600; cursor:pointer;
+  }
+  .btn-secundario:hover { background:var(--tema-bg); }
+  .btn-secundario[disabled] { color:var(--txt-2); border-color:#757575; cursor:default; background:#ffffff; }
+
+  button:focus-visible { outline:3px solid var(--acento); outline-offset:3px; }
+  [role="tabpanel"]:focus { outline:3px solid var(--acento); outline-offset:4px; }
+  h2:focus, h3:focus { outline:3px solid var(--acento); outline-offset:4px; }
+
+  footer.licencia {
+    margin-top:24px; padding-top:16px; border-top:1px solid var(--borde);
+    font-size:13px; color:var(--txt-2); text-align:center;
+  }
+  footer.licencia a { color:var(--acento-d); }
+  .oculto { display:none; }
+
+  @media (max-width:560px) {
+    header.principal { padding:20px; }
+    header.principal h1 { font-size:21px; }
+    .tarjeta { padding:18px 16px; }
+    .ecuacion { font-size:23px; padding:18px 8px; }
+    .term-btn { font-size:23px; }
+    .btn-accion, .btn-secundario { width:100%; }
+    .tablist button { min-width:100%; }
+  }
+</style>
+</head>
+<body>
+<div class="contenedor">
+
+  <header class="principal">
+    <div class="ruta">Spanish ASE Math · Nivel 3 · Tema 4 · Lección 4.2</div>
+    <h1>Resolver ecuaciones lineales por transposición</h1>
+    <div class="meta">Práctica guiada · Ecuaciones de uno y dos pasos y con variables en ambos lados</div>
+  </header>
+
+  <div class="caja-objetivos">
+    <h2>Idea central</h2>
+    <p>Resolver una ecuación es <strong>aislar la variable</strong>: dejarla sola de un lado del signo igual. El método de <strong>transposición</strong> consiste en pasar cada término al otro lado aplicando la <strong>operación inversa</strong>.</p>
+    <p>Transponer no es un truco aparte: es la forma abreviada de las propiedades de igualdad. Pasar «+ 5» restando equivale a restar 5 en <strong>ambos</strong> lados; la balanza se mantiene en equilibrio.</p>
+  </div>
+
+  <section class="tarjeta" aria-labelledby="tit-reglas">
+    <h2 id="tit-reglas">Las cuatro reglas de transposición</h2>
+    <table class="reglas">
+      <caption>Cada término cambia a su operación inversa al cruzar el signo igual.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Si el término está</th>
+          <th scope="col">Pasa al otro lado</th>
+          <th scope="col">Propiedad de igualdad equivalente</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>sumando (+ 5)</td><td>restando (− 5)</td><td>Se resta 5 en ambos lados.</td></tr>
+        <tr><td>restando (− 5)</td><td>sumando (+ 5)</td><td>Se suma 5 en ambos lados.</td></tr>
+        <tr><td>multiplicando (3x)</td><td>dividiendo (÷ 3)</td><td>Se divide entre 3 en ambos lados.</td></tr>
+        <tr><td>dividiendo (x/3)</td><td>multiplicando (× 3)</td><td>Se multiplica por 3 en ambos lados.</td></tr>
+      </tbody>
+    </table>
+    <p class="intro" style="margin-top:14px">Orden recomendado: primero se reúnen las variables de un solo lado, después las constantes del otro, y el coeficiente se pasa dividiendo <strong>al final</strong>.</p>
+  </section>
+
+  <!-- ══════════ PESTAÑAS ══════════ -->
+  <div class="tablist" role="tablist" aria-label="Tipo de ecuación">
+    <button type="button" role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">
+      Sección 1 · Variable en un solo lado
+      <span class="sub">Ecuaciones de uno y dos pasos</span>
+    </button>
+    <button type="button" role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b" tabindex="-1">
+      Sección 2 · Variables en ambos lados
+      <span class="sub">Reunir primero las variables</span>
+    </button>
+  </div>
+
+  <!-- ══════════ PANEL A ══════════ -->
+  <section class="tarjeta" role="tabpanel" id="panel-a" aria-labelledby="tab-a" tabindex="0">
+    <h2 id="tit-a" tabindex="-1">Variable en un solo lado</h2>
+    <p class="intro">La variable aparece únicamente a la izquierda. Toca el término que quieras transponer; el coeficiente se pasa dividiendo con el botón de abajo.</p>
+
+    <div class="ecuacion" id="a-ecuacion" aria-hidden="true"></div>
+    <p class="sr-only" id="a-ecuacion-sr" role="status" aria-live="polite"></p>
+    <p class="ayuda-clic">Los términos con borde punteado se pueden transponer.</p>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion" id="a-dividir"></button>
+    </div>
+
+    <div class="retro" id="a-retro" role="status" aria-live="polite"></div>
+
+    <h3>Registro de pasos</h3>
+    <ol class="pasos" id="a-pasos"></ol>
+    <p class="sin-pasos" id="a-sin-pasos">Todavía no has transpuesto ningún término.</p>
+
+    <div id="a-verificacion"></div>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-secundario" id="a-mostrar">Muéstrame la solución</button>
+      <button type="button" class="btn-secundario" id="a-nuevo">Nueva ecuación</button>
+    </div>
+  </section>
+
+  <!-- ══════════ PANEL B ══════════ -->
+  <section class="tarjeta oculto" role="tabpanel" id="panel-b" aria-labelledby="tab-b" tabindex="0">
+    <h2 id="tit-b" tabindex="-1">Variables en ambos lados</h2>
+    <p class="intro">La variable aparece a los dos lados del igual. Conviene reunir primero las variables a la izquierda y después las constantes a la derecha.</p>
+
+    <div class="ecuacion" id="b-ecuacion" aria-hidden="true"></div>
+    <p class="sr-only" id="b-ecuacion-sr" role="status" aria-live="polite"></p>
+    <p class="ayuda-clic">Los términos con borde punteado se pueden transponer.</p>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-accion" id="b-dividir"></button>
+    </div>
+
+    <div class="retro" id="b-retro" role="status" aria-live="polite"></div>
+
+    <h3>Registro de pasos</h3>
+    <ol class="pasos" id="b-pasos"></ol>
+    <p class="sin-pasos" id="b-sin-pasos">Todavía no has transpuesto ningún término.</p>
+
+    <div id="b-verificacion"></div>
+
+    <div class="fila-nav">
+      <button type="button" class="btn-secundario" id="b-mostrar">Muéstrame la solución</button>
+      <button type="button" class="btn-secundario" id="b-nuevo">Nueva ecuación</button>
+    </div>
+  </section>
+
+  <footer class="licencia">
+    <p>José M. Fernández, ABE/ASE Math Master Teacher · Harry S. Truman College — City Colleges of Chicago</p>
+    <p>Esta obra está bajo una licencia
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" rel="license">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.</p>
+  </footer>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   Utilidades
+   ═══════════════════════════════════════════════════════════ */
+function ent(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function el(tag, clase, texto) {
+  const n = document.createElement(tag);
+  if (clase) { n.className = clase; }
+  if (texto !== undefined) { n.textContent = texto; }
+  return n;
+}
+/* 1x se escribe x */
+function termX(c) {
+  if (c === 1) { return 'x'; }
+  if (c === -1) { return '-x'; }
+  return c + 'x';
+}
+function termXSr(c) {
+  if (c === 1) { return 'x'; }
+  if (c === -1) { return 'menos x'; }
+  return c + ' x';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Estado de la ecuación:  A·x + B = C·x + D
+   ═══════════════════════════════════════════════════════════ */
+
+/* Sección 1: variable solo a la izquierda */
+function nuevaSimple() {
+  const x = ent(2, 12);
+  const molde = ent(0, 3);
+  let A, B;
+  if (molde === 0) { A = 1; B = ent(2, 15); }            /* x + b = c   */
+  else if (molde === 1) { A = 1; B = -ent(2, 15); }       /* x - b = c   */
+  else if (molde === 2) { A = ent(2, 9); B = 0; }         /* ax = c      */
+  else { A = ent(2, 9); B = (Math.random() < 0.5 ? 1 : -1) * ent(2, 12); }  /* ax ± b = c */
+  const D = A * x + B;
+  return { A: A, B: B, C: 0, D: D };
+}
+
+/* Sección 2: variables en ambos lados */
+function nuevaDoble() {
+  const x = ent(2, 10);
+  const C = ent(1, 5);
+  const A = C + ent(1, 5);
+  const B = (Math.random() < 0.5 ? 1 : -1) * ent(1, 9);
+  const D = (A - C) * x + B;
+  return { A: A, B: B, C: C, D: D };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Motor de un panel
+   ═══════════════════════════════════════════════════════════ */
+function crearPanel(prefijo, generador, titulo) {
+  const dEcu = document.getElementById(prefijo + '-ecuacion');
+  const dEcuSr = document.getElementById(prefijo + '-ecuacion-sr');
+  const dRetro = document.getElementById(prefijo + '-retro');
+  const dPasos = document.getElementById(prefijo + '-pasos');
+  const dSinPasos = document.getElementById(prefijo + '-sin-pasos');
+  const dVerif = document.getElementById(prefijo + '-verificacion');
+  const btnDividir = document.getElementById(prefijo + '-dividir');
+  const btnMostrar = document.getElementById(prefijo + '-mostrar');
+  const btnNuevo = document.getElementById(prefijo + '-nuevo');
+
+  let est = null;      /* estado actual  */
+  let ini = null;      /* ecuación original, para verificar */
+  let resuelto = false;
+
+  /* ── Texto de la ecuación ── */
+  function textoLado(coef, cons) {
+    if (coef === 0 && cons === 0) { return '0'; }
+    let t = '';
+    if (coef !== 0) { t += termX(coef); }
+    if (cons !== 0) {
+      if (t === '') { t += String(cons); }
+      else { t += (cons < 0 ? ' - ' : ' + ') + Math.abs(cons); }
+    }
+    return t;
+  }
+  function textoEcuacion(e) {
+    return textoLado(e.A, e.B) + ' = ' + textoLado(e.C, e.D);
+  }
+  function srLado(coef, cons) {
+    if (coef === 0 && cons === 0) { return 'cero'; }
+    let t = '';
+    if (coef !== 0) { t += termXSr(coef); }
+    if (cons !== 0) {
+      if (t === '') { t += String(cons); }
+      else { t += (cons < 0 ? ' menos ' : ' más ') + Math.abs(cons); }
+    }
+    return t;
+  }
+
+  function mostrarRetro(tipo, tit, parrafos) {
+    dRetro.innerHTML = '';
+    const caja = el('div', 'caja ' + tipo);
+    caja.appendChild(el('p', 'titulo', tit));
+    parrafos.forEach(function (p) { caja.appendChild(el('p', null, p)); });
+    dRetro.appendChild(caja);
+  }
+
+  function anotarPaso(tit, propiedad, calculo) {
+    dSinPasos.classList.add('oculto');
+    const li = el('li');
+    li.appendChild(el('span', 'titulo-paso', tit));
+    li.appendChild(el('span', 'propiedad', propiedad));
+    li.appendChild(el('div', 'calculo', calculo));
+    dPasos.appendChild(li);
+  }
+
+  /* ── Pintado ── */
+  function pintar() {
+    dEcu.innerHTML = '';
+
+    /* Lado izquierdo */
+    if (est.A !== 0) {
+      dEcu.appendChild(el('span', 'fijo', termX(est.A)));
+    }
+    if (est.B !== 0) {
+      dEcu.appendChild(el('span', 'fijo', est.B < 0 ? ' - ' : ' + '));
+      const b = el('button', 'term-btn', String(Math.abs(est.B)));
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Transponer el término ' +
+        (est.B < 0 ? 'menos ' : 'más ') + Math.abs(est.B) + ' del lado izquierdo');
+      b.addEventListener('click', function () { moverConstIzq(); });
+      b.disabled = resuelto;
+      dEcu.appendChild(b);
+    }
+    if (est.A === 0 && est.B === 0) { dEcu.appendChild(el('span', 'fijo', '0')); }
+
+    dEcu.appendChild(el('span', 'igual', '='));
+
+    /* Lado derecho */
+    let algoDerecha = false;
+    if (est.C !== 0) {
+      const b = el('button', 'term-btn', termX(est.C));
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Transponer el término ' + termXSr(est.C) + ' del lado derecho');
+      b.addEventListener('click', function () { moverVarDer(); });
+      b.disabled = resuelto;
+      dEcu.appendChild(b);
+      algoDerecha = true;
+    }
+    if (est.D !== 0) {
+      if (algoDerecha) { dEcu.appendChild(el('span', 'fijo', est.D < 0 ? ' - ' : ' + ')); }
+      else if (est.D < 0) { dEcu.appendChild(el('span', 'fijo', '-')); }
+      const b = el('button', 'term-btn', String(Math.abs(est.D)));
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Transponer el término ' +
+        (est.D < 0 ? 'menos ' : 'más ') + Math.abs(est.D) + ' del lado derecho');
+      b.addEventListener('click', function () { moverConstDer(); });
+      b.disabled = resuelto;
+      dEcu.appendChild(b);
+      algoDerecha = true;
+    }
+    if (!algoDerecha) { dEcu.appendChild(el('span', 'fijo', '0')); }
+
+    dEcuSr.textContent = 'Ecuación actual: ' + srLado(est.A, est.B) + ' igual a ' + srLado(est.C, est.D) + '.';
+
+    /* Botón de división */
+    if (est.A !== 1 && est.A !== 0) {
+      btnDividir.textContent = 'Pasar el coeficiente ' + est.A + ' dividiendo';
+      btnDividir.setAttribute('aria-label', 'Pasar el coeficiente ' + est.A + ' dividiendo al lado derecho');
+      btnDividir.disabled = false;
+    } else {
+      btnDividir.textContent = 'El coeficiente de x ya es 1';
+      btnDividir.disabled = true;
+    }
+    if (resuelto) { btnDividir.disabled = true; }
+  }
+
+  /* ── Movimientos ── */
+  function comprobarResuelto() {
+    if (est.A === 1 && est.B === 0 && est.C === 0) {
+      resuelto = true;
+      mostrarRetro('bien', 'Variable aislada',
+        ['La solución es x = ' + est.D + '.',
+         'Falta el último paso de la estrategia: verificar sustituyendo en la ecuación original.']);
+      pintarVerificacion();
+      pintar();
+      return true;
+    }
+    return false;
+  }
+
+  function moverVarDer() {
+    if (resuelto) { return; }
+    const c = est.C;
+    const antes = textoEcuacion(est);
+    est.A = est.A - c;
+    est.C = 0;
+    anotarPaso('Se transpone ' + termX(c) + ' al lado izquierdo',
+      'Propiedad de igualdad: se resta ' + termX(c) + ' en ambos lados.',
+      antes + '  →  ' + textoEcuacion(est));
+    mostrarRetro('bien', 'Bien hecho',
+      ['El término ' + termX(c) + ' estaba sumando a la derecha, así que pasa restando a la izquierda. Ahora todas las variables están reunidas.']);
+    pintar();
+    comprobarResuelto();
+  }
+
+  function moverConstIzq() {
+    if (resuelto) { return; }
+    const b = est.B;
+    const antes = textoEcuacion(est);
+    est.D = est.D - b;
+    est.B = 0;
+    anotarPaso('Se transpone ' + (b < 0 ? '- ' : '+ ') + Math.abs(b) + ' al lado derecho',
+      'Propiedad de igualdad: se ' + (b < 0 ? 'suma ' : 'resta ') + Math.abs(b) + ' en ambos lados.',
+      antes + '  →  ' + textoEcuacion(est));
+    mostrarRetro('bien', 'Bien hecho',
+      ['El término estaba ' + (b < 0 ? 'restando' : 'sumando') + ' a la izquierda, así que pasa ' +
+       (b < 0 ? 'sumando' : 'restando') + ' a la derecha.']);
+    pintar();
+    comprobarResuelto();
+  }
+
+  function moverConstDer() {
+    if (resuelto) { return; }
+    mostrarRetro('mal', 'Es legal, pero te aleja de la solución',
+      ['Ese término es una constante y ya está del lado correcto: el lado donde debe quedar el resultado.',
+       'Si lo pasas a la izquierda, quedaría junto a la variable y tendrías que devolverlo después. Mueve primero los términos que acompañan a la x.']);
+  }
+
+  function dividir() {
+    if (resuelto) { return; }
+    if (est.C !== 0) {
+      mostrarRetro('mal', 'Todavía no',
+        ['Aún hay un término con x del lado derecho. Si divides ahora, ese término también habría que dividirlo y la ecuación se complica.',
+         'Reúne primero las variables en un solo lado.']);
+      return;
+    }
+    if (est.B !== 0) {
+      mostrarRetro('mal', 'Todavía no',
+        ['La x aún está acompañada por una constante del mismo lado. El coeficiente se pasa dividiendo al final, cuando la x haya quedado sola con su coeficiente.',
+         'Transpón primero esa constante al otro lado.']);
+      return;
+    }
+    const a = est.A;
+    const antes = textoEcuacion(est);
+    est.D = est.D / a;
+    est.A = 1;
+    anotarPaso('Se pasa el coeficiente ' + a + ' dividiendo',
+      'Propiedad de igualdad: se divide entre ' + a + ' en ambos lados.',
+      antes + '  →  ' + textoEcuacion(est));
+    pintar();
+    comprobarResuelto();
+  }
+
+  /* ── Verificación ── */
+  function pintarVerificacion() {
+    dVerif.innerHTML = '';
+    const caja = el('div', 'verificacion');
+    caja.appendChild(el('h3', null, 'Paso final · Verifica la solución'));
+    caja.appendChild(el('p', null,
+      'Sustituye x = ' + est.D + ' en la ecuación original y comprueba que los dos lados dan el mismo valor.'));
+
+    const btn = el('button', 'btn-accion', 'Verificar la solución');
+    btn.type = 'button';
+    btn.addEventListener('click', function () {
+      const v = est.D;
+      const izq = ini.A * v + ini.B;
+      const der = ini.C * v + ini.D;
+      btn.disabled = true;
+      caja.appendChild(el('p', 'linea', 'Lado izquierdo: ' + sustituir(ini.A, ini.B, v) + ' = ' + izq));
+      caja.appendChild(el('p', 'linea', 'Lado derecho: ' + sustituir(ini.C, ini.D, v) + ' = ' + der));
+      caja.appendChild(el('p', null, izq === der
+        ? 'Los dos lados dan ' + izq + '. La solución x = ' + v + ' es correcta.'
+        : 'Los lados no coinciden; revisa el procedimiento.'));
+    });
+    caja.appendChild(btn);
+    dVerif.appendChild(caja);
+  }
+
+  function sustituir(coef, cons, v) {
+    if (coef === 0 && cons === 0) { return '0'; }
+    let t = '';
+    if (coef !== 0) { t += (coef === 1 ? '' : coef) + '(' + v + ')'; }
+    if (cons !== 0) {
+      if (t === '') { t += String(cons); }
+      else { t += (cons < 0 ? ' - ' : ' + ') + Math.abs(cons); }
+    }
+    return t;
+  }
+
+  /* ── Solución automática ── */
+  function mostrarSolucion() {
+    let guardia = 0;
+    while (!resuelto && guardia < 10) {
+      if (est.C !== 0) { moverVarDer(); }
+      else if (est.B !== 0) { moverConstIzq(); }
+      else if (est.A !== 1) { dividir(); }
+      else { break; }
+      guardia++;
+    }
+    dRetro.innerHTML = '';
+    mostrarRetro('bien', 'Solución completa',
+      ['El registro de pasos muestra el orden recomendado: primero las variables, después las constantes y el coeficiente al final.',
+       'La solución es x = ' + est.D + '.']);
+  }
+
+  /* ── Reinicio ── */
+  function nuevo() {
+    est = generador();
+    ini = { A: est.A, B: est.B, C: est.C, D: est.D };
+    resuelto = false;
+    dPasos.innerHTML = '';
+    dSinPasos.classList.remove('oculto');
+    dRetro.innerHTML = '';
+    dVerif.innerHTML = '';
+    pintar();
+  }
+
+  btnDividir.addEventListener('click', dividir);
+  btnMostrar.addEventListener('click', mostrarSolucion);
+  btnNuevo.addEventListener('click', function () {
+    nuevo();
+    document.getElementById(titulo).focus();
+  });
+
+  nuevo();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Pestañas
+   ═══════════════════════════════════════════════════════════ */
+const tabs = [document.getElementById('tab-a'), document.getElementById('tab-b')];
+const paneles = [document.getElementById('panel-a'), document.getElementById('panel-b')];
+
+function activarTab(i, moverFoco) {
+  tabs.forEach(function (t, j) {
+    t.setAttribute('aria-selected', j === i ? 'true' : 'false');
+    t.tabIndex = j === i ? 0 : -1;
+    paneles[j].classList.toggle('oculto', j !== i);
+  });
+  if (moverFoco) { tabs[i].focus(); }
+}
+
+tabs.forEach(function (t, i) {
+  t.addEventListener('click', function () { activarTab(i, false); });
+  t.addEventListener('keydown', function (ev) {
+    if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') {
+      ev.preventDefault(); activarTab((i + 1) % tabs.length, true);
+    } else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp') {
+      ev.preventDefault(); activarTab((i + tabs.length - 1) % tabs.length, true);
+    } else if (ev.key === 'Home') {
+      ev.preventDefault(); activarTab(0, true);
+    } else if (ev.key === 'End') {
+      ev.preventDefault(); activarTab(tabs.length - 1, true);
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════
+   Arranque
+   ═══════════════════════════════════════════════════════════ */
+crearPanel('a', nuevaSimple, 'tit-a');
+crearPanel('b', nuevaDoble, 'tit-b');
+</script>
+</body>
+</html>

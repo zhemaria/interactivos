@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<!--
+  Comprobación del tema 1 · Las cinco reglas de los exponentes
+  Autor: Jose M. Fernandez, ABE/ASE Math Master Teacher,
+  Harry S. Truman College - City Colleges of Chicago.
+  Licencia: Creative Commons Atribucion-NoComercial-CompartirIgual 4.0 Internacional
+  (CC BY-NC-SA 4.0) - https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comprobación del tema 1 · Las cinco reglas de los exponentes</title>
+    <meta name="author" content="Jose M. Fernandez, Harry S. Truman College - City Colleges of Chicago" />
+    <meta name="license" content="CC BY-NC-SA 4.0" />
+    <link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+    <style>
+      :root {
+        --tema: #880e4f;
+        --tema-d: #5d0935;
+        --tema-bg: #fce4ec;
+        --tema-bg2: #f9d6e2;
+        --acento: #00695c;
+        --txt: #222222;
+        --sec: #555555;
+        --bg: #f5f7fa;
+        --ok: #1b5e20;
+        --ok-bg: #e8f5e9;
+        --ok-bd: #2e7d32;
+        --no: #b71c1c;
+        --no-bg: #ffebee;
+        --no-bd: #c62828;
+      }
+      * { box-sizing: border-box; }
+      body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--txt);
+        line-height: 1.6;
+        font-size: 16px;
+      }
+      .contenedor { max-width: 880px; margin: 0 auto; padding: 24px; }
+
+      .sr-only {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+      }
+
+      header.principal {
+        background: var(--tema); color: #ffffff; padding: 28px 30px;
+        border-radius: 14px; margin-bottom: 22px; border: 1px solid var(--tema-d);
+      }
+      header.principal .ruta {
+        font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; color: #fce4ec;
+      }
+      header.principal h1 { margin: 8px 0 6px; font-size: 24px; font-weight: 700; }
+      header.principal .meta { font-size: 14px; color: #fce4ec; }
+
+      h2.seccion {
+        color: var(--tema-d); font-size: 20px; margin: 30px 0 12px;
+        padding-bottom: 6px; border-bottom: 3px solid var(--tema-bg);
+      }
+
+      .caja-objetivos {
+        background: var(--tema-bg); border-left: 6px solid var(--tema);
+        padding: 18px 22px; border-radius: 0 10px 10px 0; margin-bottom: 18px;
+      }
+      .caja-objetivos h2 { margin: 0 0 10px; color: var(--tema-d); font-size: 19px; }
+      .caja-objetivos ul { margin: 0; padding-left: 22px; }
+      .caja-objetivos li { margin: 5px 0; }
+
+      .caja-tip {
+        background: #e8f5e9; border-left: 5px solid #2e7d32; padding: 12px 16px;
+        border-radius: 0 8px 8px 0; margin: 14px 0; color: #1b5e20; font-size: 15px;
+      }
+
+      .tarjeta {
+        background: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px;
+        padding: 22px 24px 26px; margin-bottom: 18px;
+      }
+
+      .contador {
+        font-size: 14px; color: var(--sec); font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.4px; margin: 0 0 4px;
+      }
+      .etiqueta-regla {
+        display: inline-block; background: var(--tema-bg); color: var(--tema-d);
+        font-size: 13px; font-weight: 700; padding: 3px 12px; border-radius: 12px;
+        margin-bottom: 10px;
+      }
+      .enunciado { font-size: 17px; font-weight: 600; margin: 6px 0 4px; color: var(--tema-d); }
+
+      .expresion {
+        text-align: center; font-size: 30px; font-weight: 700; color: var(--txt);
+        background: #fafafa; border: 2px dashed var(--tema-bg2);
+        border-radius: 10px; padding: 22px 14px; margin: 14px 0 18px;
+      }
+      .expresion sup { font-size: 0.62em; }
+
+      .frac { display: inline-block; vertical-align: middle; text-align: center; margin: 0 4px; }
+      .frac-n { display: block; padding: 0 8px 2px; }
+      .frac-d { display: block; padding: 2px 8px 0; border-top: 3px solid var(--txt); }
+
+      .opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 560px) { .opciones { grid-template-columns: 1fr; } }
+      .opcion {
+        background: #ffffff; border: 2px solid #d8d8d8; border-radius: 9px;
+        padding: 14px 12px; font-size: 21px; font-weight: 600; color: var(--txt);
+        cursor: pointer; font-family: inherit; text-align: center; min-height: 62px;
+      }
+      .opcion sup { font-size: 0.62em; }
+      .opcion:hover:enabled { border-color: var(--tema); background: var(--tema-bg); }
+      .opcion:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+      .opcion:disabled { cursor: default; }
+      .opcion.correcta { border-color: var(--ok-bd); background: var(--ok-bg); color: var(--ok); }
+      .opcion.incorrecta { border-color: var(--no-bd); background: var(--no-bg); color: var(--no); }
+      .opcion.elegida { border-color: var(--tema); background: var(--tema-bg); }
+
+      .retro { margin-top: 16px; font-size: 15px; border-radius: 9px; padding: 0; }
+      .retro.activa { padding: 14px 16px; }
+      .retro.ok { background: var(--ok-bg); border-left: 5px solid var(--ok-bd); color: var(--ok); }
+      .retro.no { background: var(--no-bg); border-left: 5px solid var(--no-bd); color: var(--no); }
+      .retro strong { font-weight: 700; }
+      .retro .titulo-retro { display: block; font-weight: 700; margin-bottom: 4px; font-size: 16px; }
+
+      .acciones { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+      .btn {
+        background: var(--tema); color: #ffffff; border: none; padding: 11px 22px;
+        border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer;
+        font-family: inherit;
+      }
+      .btn:hover { background: var(--tema-d); }
+      .btn:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+      .btn.sec { background: #455a64; }
+      .btn.sec:hover { background: #263238; }
+      .btn[hidden] { display: none; }
+
+      table.tabla {
+        width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 15px;
+        background: #ffffff;
+      }
+      table.tabla caption { text-align: left; font-size: 14px; color: var(--sec); padding-bottom: 6px; }
+      table.tabla th, table.tabla td { border: 1px solid #d8d8d8; padding: 9px 12px; text-align: left; }
+      table.tabla thead th { background: var(--tema-bg); color: var(--tema-d); }
+      table.tabla td.num { text-align: center; font-variant-numeric: tabular-nums; }
+
+      details.reglas {
+        background: #ffffff; border: 1px solid #e0e0e0; border-radius: 10px;
+        padding: 4px 18px; margin-bottom: 18px;
+      }
+      details.reglas summary {
+        cursor: pointer; font-weight: 700; color: var(--tema-d); padding: 12px 0; font-size: 16px;
+      }
+      details.reglas summary:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+      footer {
+        margin-top: 26px; padding-top: 16px; border-top: 2px solid var(--tema-bg);
+        font-size: 13px; color: var(--sec); text-align: center;
+      }
+      footer a { color: var(--tema-d); }
+
+      .pregunta {
+        background: #ffffff; border: 1px solid #e0e0e0; border-left: 5px solid var(--tema);
+        border-radius: 10px; padding: 16px 20px 20px; margin-bottom: 16px;
+      }
+      .enc-preg { font-size: 16px; color: var(--tema-d); margin: 0 0 6px; font-weight: 700; }
+      .num-preg {
+        display: inline-block; background: var(--tema); color: #ffffff; width: 26px; height: 26px;
+        border-radius: 50%; text-align: center; line-height: 26px; font-size: 14px; margin-right: 6px;
+      }
+      .pregunta .expresion { font-size: 26px; padding: 16px 12px; margin: 10px 0 14px; }
+
+      .datos {
+        background: #ffffff; border: 1px solid #e0e0e0; border-radius: 10px;
+        padding: 16px 20px; margin-bottom: 18px;
+      }
+      .datos p.campo { margin: 6px 0; font-weight: 600; color: var(--tema-d); }
+      .datos input {
+        font-family: inherit; font-size: 16px; padding: 8px 10px; width: 100%; max-width: 420px;
+        border: 2px solid #d8d8d8; border-radius: 8px; color: var(--txt);
+      }
+      .datos input:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+      .resultado { margin: 16px 0; font-size: 17px; border-radius: 9px; padding: 0; }
+      .resultado.aprob, .resultado.repro { padding: 14px 18px; }
+      .resultado.aprob { background: var(--ok-bg); border-left: 6px solid var(--ok-bd); color: var(--ok); }
+      .resultado.repro { background: #fff8e1; border-left: 6px solid #5c3900; color: #5c3900; }
+
+      @media print {
+        .btn, .caja-tip, details.reglas { display: none !important; }
+        .pregunta, .tarjeta, .datos { break-inside: avoid; border-color: #999999; }
+        header.principal { background: #ffffff; color: #000000; border: 2px solid #000000; }
+        header.principal .ruta, header.principal .meta { color: #000000; }
+        body { background: #ffffff; font-size: 12px; }
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="contenedor">
+      <header class="principal">
+        <div class="ruta">Spanish ASE Math &middot; Nivel 3 &middot; Tema 1 &middot; Reglas de los exponentes</div>
+        <h1>Comprobación del tema 1 · Las cinco reglas de los exponentes</h1>
+        <div class="meta">12 preguntas generadas al azar · Repaso integrador de las lecciones 1.1, 1.2 y 1.3 · Brightspace D2L</div>
+      </header>
+
+      <div class="caja-objetivos">
+        <h2>Qué se practica en este interactivo</h2>
+        <ul>
+          <li>Las tres reglas de la multiplicación de la lección 1.1.</li>
+          <li>La regla del cociente, el exponente cero y los exponentes negativos de la lección 1.2.</li>
+          <li>Las expresiones que exigen combinar varias reglas de la lección 1.3.</li>
+          <li>La presentación del resultado final con exponentes positivos.</li>
+        </ul>
+      </div>
+
+      <div class="caja-tip"><strong>Cómo se usa.</strong> Son doce preguntas generadas al azar: cuatro de cada lección. Se responden todas y después se pulsa <strong>Comprobar las respuestas</strong>. Al corregir aparecen la explicación de cada ejercicio y un informe por bloque que señala qué lección conviene repasar. Se aprueba con 9 aciertos de 12.</div>
+
+
+      <div class="datos">
+        <p class="campo" id="lbl-nombre">Nombre del estudiante</p>
+        <input type="text" id="nombre" aria-labelledby="lbl-nombre" autocomplete="name" />
+        <p style="margin:10px 0 0;color:#555555;font-size:14px;">
+          Fecha de la comprobación: <span id="fecha"></span>
+        </p>
+      </div>
+
+      <main>
+        <div id="cuerpo-preguntas"></div>
+
+        <div class="acciones">
+          <button type="button" class="btn" id="btn-comprobar">Comprobar las respuestas</button>
+          <button type="button" class="btn" id="btn-nueva" hidden>Generar otra comprobación</button>
+          <button type="button" class="btn sec" id="btn-imprimir" hidden>Imprimir el informe</button>
+        </div>
+
+        <div class="resultado" id="resultado" role="status" aria-live="polite" tabindex="-1"></div>
+
+        <div id="informe" hidden>
+          <h2 class="seccion">Informe por bloque de contenido</h2>
+          <table class="tabla">
+            <caption>Desempeño en cada bloque del tema, con el número de aciertos, el porcentaje y el nivel alcanzado.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Bloque de contenido</th>
+                <th scope="col">Aciertos</th>
+                <th scope="col">Porcentaje</th>
+                <th scope="col">Nivel</th>
+              </tr>
+            </thead>
+            <tbody id="informe-cuerpo"></tbody>
+          </table>
+          <p style="font-size:14px;color:#555555;">
+            Un bloque se considera dominado a partir del 75 %. Los bloques marcados como
+            «Requiere repaso» indican la lección que conviene volver a estudiar antes de repetir la comprobación.
+          </p>
+        </div>
+      </main>
+
+      <details class="reglas">
+        <summary>Recordatorio de las cinco reglas de los exponentes</summary>
+        <table class="tabla">
+          <caption>Nombre de cada regla, su patrón general y un ejemplo numérico.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Regla</th>
+              <th scope="col">Patrón</th>
+              <th scope="col">Ejemplo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Producto</td><td>a<sup>m</sup> &middot; a<sup>n</sup> = a<sup>m+n</sup></td><td>x<sup>2</sup> &middot; x<sup>5</sup> = x<sup>7</sup></td></tr>
+            <tr><td>Potencia de una potencia</td><td>(a<sup>m</sup>)<sup>n</sup> = a<sup>mn</sup></td><td>(x<sup>3</sup>)<sup>4</sup> = x<sup>12</sup></td></tr>
+            <tr><td>Potencia de un producto</td><td>(ab)<sup>n</sup> = a<sup>n</sup>b<sup>n</sup></td><td>(2x)<sup>3</sup> = 8x<sup>3</sup></td></tr>
+            <tr><td>Cociente</td><td>a<sup>m</sup> &divide; a<sup>n</sup> = a<sup>m&minus;n</sup></td><td>x<sup>7</sup> &divide; x<sup>3</sup> = x<sup>4</sup></td></tr>
+            <tr><td>Exponente cero y negativo</td><td>a<sup>0</sup> = 1 &nbsp;&nbsp; a<sup>&minus;n</sup> = 1 &divide; a<sup>n</sup></td><td>5<sup>0</sup> = 1 &nbsp;&nbsp; x<sup>&minus;2</sup> = 1 &divide; x<sup>2</sup></td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:14px;color:#555555;">En todas las reglas la base debe ser distinta de cero cuando aparece en un denominador.</p>
+      </details>
+
+      <footer>
+        Spanish ASE Math &middot; Nivel 3 &middot; Tema 1 &middot; Reglas de los exponentes<br />
+        José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago<br />
+        Obra bajo licencia
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" rel="license">Creative Commons BY-NC-SA 4.0</a>.
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+
+      /* ---------- utilidades generales ---------- */
+      function ale(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+      function elige(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+      function mezclar(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+      }
+
+      /* ---------- construcción de expresiones ----------
+         Cada expresión es un objeto { h: HTML visual, s: texto para lector de pantalla } */
+      function expH(e) { return e < 0 ? '&minus;' + Math.abs(e) : String(e); }
+      function expS(e) { return e < 0 ? 'menos ' + Math.abs(e) : String(e); }
+
+      function pot(v, e) {
+        if (e === 1) { return { h: v, s: v }; }
+        return { h: v + '<sup>' + expH(e) + '</sup>', s: v + ' elevado a la ' + expS(e) };
+      }
+      function num(n) { return { h: String(n), s: String(n) }; }
+      function con(c, resto) {
+        if (c === 1) { return resto; }
+        return { h: String(c) + resto.h, s: String(c) + ' ' + resto.s };
+      }
+      function une() {
+        var partes = Array.prototype.slice.call(arguments);
+        return {
+          h: partes.map(function (p) { return p.h; }).join(''),
+          s: partes.map(function (p) { return p.s; }).join(' ')
+        };
+      }
+      function porr(a, b) {
+        return { h: a.h + ' <span aria-hidden="true">&middot;</span> ' + b.h, s: a.s + ' por ' + b.s };
+      }
+      function par(x, e) {
+        if (e === null) { return { h: '(' + x.h + ')', s: 'abre paréntesis ' + x.s + ' cierra paréntesis' }; }
+        return {
+          h: '(' + x.h + ')<sup>' + expH(e) + '</sup>',
+          s: 'abre paréntesis ' + x.s + ' cierra paréntesis elevado a la ' + expS(e)
+        };
+      }
+      function frac(n, d) {
+        return {
+          h: '<span class="frac"><span class="frac-n">' + n.h + '</span><span class="frac-d">' + d.h + '</span></span>',
+          s: n.s + ' sobre ' + d.s
+        };
+      }
+      function neg(x) { return { h: '&minus;' + x.h, s: 'menos ' + x.s }; }
+
+      /* ---------- armado de opciones sin repeticiones ---------- */
+      function armarOpciones(q) {
+        var lista = [q.ans];
+        var vistos = {};
+        vistos[q.ans.h] = true;
+        var candidatos = q.dis.slice();
+        var i;
+        for (i = 0; i < candidatos.length && lista.length < 4; i++) {
+          if (!vistos[candidatos[i].h]) { vistos[candidatos[i].h] = true; lista.push(candidatos[i]); }
+        }
+        /* relleno de seguridad: nunca deben quedar menos de cuatro opciones */
+        var reserva = [
+          { h: '2' + q.ans.h, s: '2 ' + q.ans.s },
+          { h: q.ans.h + '<sup>2</sup>', s: q.ans.s + ' al cuadrado' },
+          { h: 'Ninguna de las anteriores', s: 'Ninguna de las anteriores' },
+          { h: 'No se puede simplificar', s: 'No se puede simplificar' }
+        ];
+        for (i = 0; i < reserva.length && lista.length < 4; i++) {
+          if (!vistos[reserva[i].h]) { vistos[reserva[i].h] = true; lista.push(reserva[i]); }
+        }
+        return mezclar(lista);
+      }
+
+      /* ============ BANCO DE LA LECCIÓN 1.1 ============ */
+      var VARS11 = ['x', 'y', 'a', 'm', 'n', 'b'];
+
+      function g11Producto() {
+        var v = elige(VARS11), a = ale(2, 7), b = ale(2, 7);
+        var dif = Math.abs(a - b) === 0 ? a + b + 1 : Math.abs(a - b);
+        return {
+          regla: 'Regla del producto',
+          enunciado: 'Simplifica aplicando la regla del producto:',
+          expr: porr(pot(v, a), pot(v, b)),
+          ans: pot(v, a + b),
+          dis: [pot(v, a * b), pot(v, dif), con(2, pot(v, a + b))],
+          expl: 'Las bases son iguales, de modo que los exponentes se <strong>suman</strong>: ' +
+                a + ' + ' + b + ' = ' + (a + b) + '. Multiplicarlos es el error más frecuente en esta regla.'
+        };
+      }
+
+      function g11ProductoCoef() {
+        var v = elige(VARS11), a = ale(2, 5), b = ale(2, 5);
+        var c1 = ale(2, 6), c2 = ale(2, 6);
+        return {
+          regla: 'Regla del producto',
+          enunciado: 'Simplifica el producto de estos dos términos:',
+          expr: porr(con(c1, pot(v, a)), con(c2, pot(v, b))),
+          ans: con(c1 * c2, pot(v, a + b)),
+          dis: [con(c1 * c2, pot(v, a * b)), con(c1 + c2, pot(v, a + b)), con(c1 + c2, pot(v, a * b))],
+          expl: 'Los <strong>coeficientes se multiplican</strong> (' + c1 + ' &middot; ' + c2 + ' = ' + (c1 * c2) +
+                ') y los <strong>exponentes se suman</strong> (' + a + ' + ' + b + ' = ' + (a + b) +
+                '). Son dos operaciones distintas dentro del mismo paso.'
+        };
+      }
+
+      function g11PotDePot() {
+        var v = elige(VARS11), a = ale(2, 6), b = ale(2, 5);
+        return {
+          regla: 'Potencia de una potencia',
+          enunciado: 'Simplifica aplicando la regla de la potencia de una potencia:',
+          expr: par(pot(v, a), b),
+          ans: pot(v, a * b),
+          dis: [pot(v, a + b), con(b, pot(v, a)), pot(v, a)],
+          expl: 'Cuando una potencia se eleva a otra potencia los exponentes se <strong>multiplican</strong>: ' +
+                a + ' &middot; ' + b + ' = ' + (a * b) + '. Sumarlos corresponde a la regla del producto, no a esta.'
+        };
+      }
+
+      function g11PotDeProd() {
+        var v = elige(VARS11), c = ale(2, 5), a = ale(2, 3);
+        return {
+          regla: 'Potencia de un producto',
+          enunciado: 'Simplifica aplicando la regla de la potencia de un producto:',
+          expr: par(con(c, pot(v, 1)), a),
+          ans: con(Math.pow(c, a), pot(v, a)),
+          dis: [con(c, pot(v, a)), con(c * a, pot(v, a)), con(Math.pow(c, a), pot(v, 1))],
+          expl: 'El exponente exterior alcanza a <strong>todos</strong> los factores del paréntesis, también al coeficiente: ' +
+                c + '<sup>' + a + '</sup> = ' + Math.pow(c, a) + '. Dejar el ' + c + ' sin elevar es el descuido más común.'
+        };
+      }
+
+      function g11PotDeProdDosVar() {
+        var v = elige(['x', 'a', 'm']), w = elige(['y', 'b', 'n']);
+        var a = ale(2, 4), b = ale(2, 4), c = ale(2, 3);
+        return {
+          regla: 'Potencia de un producto',
+          enunciado: 'Distribuye el exponente exterior a los dos factores:',
+          expr: par(une(pot(v, a), pot(w, b)), c),
+          ans: une(pot(v, a * c), pot(w, b * c)),
+          dis: [
+            une(pot(v, a + c), pot(w, b + c)),
+            une(pot(v, a * c), pot(w, b)),
+            une(pot(v, a), pot(w, b))
+          ],
+          expl: 'Se distribuye el exponente exterior y en cada factor los exponentes se multiplican: ' +
+                a + ' &middot; ' + c + ' = ' + (a * c) + ' y ' + b + ' &middot; ' + c + ' = ' + (b * c) + '.'
+        };
+      }
+
+      var BANCO11 = [g11Producto, g11ProductoCoef, g11PotDePot, g11PotDeProd, g11PotDeProdDosVar];
+      var REGLAS11 = ['Regla del producto', 'Potencia de una potencia', 'Potencia de un producto'];
+
+      /* ============ BANCO DE LA LECCIÓN 1.2 ============ */
+      var VARS12 = ['m', 'n', 'p', 'z', 'x', 'y'];
+
+      function g12Cociente() {
+        var v = elige(VARS12), a = ale(6, 10), b = ale(1, 4);
+        return {
+          regla: 'Regla del cociente',
+          enunciado: 'Simplifica aplicando la regla del cociente:',
+          expr: frac(pot(v, a), pot(v, b)),
+          ans: pot(v, a - b),
+          dis: [pot(v, a + b), pot(v, a * b), frac(num(1), pot(v, a - b))],
+          expl: 'Al dividir potencias de la misma base los exponentes se <strong>restan</strong>: ' +
+                a + ' &minus; ' + b + ' = ' + (a - b) + '.'
+        };
+      }
+
+      function g12CocienteCoef() {
+        var v = elige(VARS12), a = ale(5, 9), b = ale(1, 4);
+        var c2 = ale(2, 5), k = ale(2, 5), c1 = c2 * k;
+        return {
+          regla: 'Regla del cociente',
+          enunciado: 'Simplifica el cociente completo, coeficiente y variable:',
+          expr: frac(con(c1, pot(v, a)), con(c2, pot(v, b))),
+          ans: con(k, pot(v, a - b)),
+          dis: [con(k, pot(v, a + b)), con(c1 - c2, pot(v, a - b)), con(c1 * c2, pot(v, a - b))],
+          expl: 'Los coeficientes se <strong>dividen</strong> (' + c1 + ' &divide; ' + c2 + ' = ' + k +
+                ') y los exponentes se <strong>restan</strong> (' + a + ' &minus; ' + b + ' = ' + (a - b) +
+                '). Restar los coeficientes es un error frecuente.'
+        };
+      }
+
+      function g12CeroPorCociente() {
+        var v = elige(VARS12), a = ale(3, 8);
+        return {
+          regla: 'Exponente cero',
+          enunciado: 'Aplica la regla del cociente y escribe el resultado final:',
+          expr: frac(pot(v, a), pot(v, a)),
+          ans: num(1),
+          dis: [num(0), pot(v, 1), pot(v, 2 * a)],
+          expl: 'Al restar los exponentes queda ' + a + ' &minus; ' + a + ' = 0, o sea ' + v +
+                '<sup>0</sup>. Y toda cantidad distinta de cero elevada a la cero vale <strong>1</strong>, ' +
+                'porque cualquier expresión dividida entre sí misma da 1.'
+        };
+      }
+
+      function g12CeroDirecto() {
+        var v = elige(['x', 'a', 'm']), w = elige(['y', 'b', 'n']);
+        var c = ale(2, 9), a = ale(2, 5), b = ale(2, 5);
+        var dentro = con(c, une(pot(v, a), pot(w, b)));
+        return {
+          regla: 'Exponente cero',
+          enunciado: 'Calcula el valor de esta expresión:',
+          expr: par(dentro, 0),
+          ans: num(1),
+          dis: [num(0), num(c), dentro],
+          expl: 'Todo el paréntesis, sin importar lo que contenga, está elevado a la cero. Si la base no es cero, ' +
+                'el resultado es <strong>1</strong>. El exponente cero no es lo mismo que multiplicar por cero.'
+        };
+      }
+
+      function g12NegativoAFraccion() {
+        var v = elige(VARS12), a = ale(2, 6);
+        return {
+          regla: 'Exponentes negativos',
+          enunciado: 'Reescribe con exponente positivo:',
+          expr: pot(v, -a),
+          ans: frac(num(1), pot(v, a)),
+          dis: [neg(pot(v, a)), frac(num(1), pot(v, -a)), neg(frac(num(1), pot(v, a)))],
+          expl: 'Un exponente negativo indica <strong>recíproco</strong>, no un número negativo: ' + v +
+                '<sup>&minus;' + a + '</sup> = 1 &divide; ' + v + '<sup>' + a + '</sup>. El signo del resultado no cambia.'
+        };
+      }
+
+      function g12FraccionANegativo() {
+        var v = elige(VARS12), a = ale(2, 6);
+        return {
+          regla: 'Exponentes negativos',
+          enunciado: 'Reescribe esta fracción usando un solo exponente negativo:',
+          expr: frac(num(1), pot(v, a)),
+          ans: pot(v, -a),
+          dis: [pot(v, a), neg(pot(v, a)), neg(pot(v, -a))],
+          expl: 'Pasar una potencia del denominador al numerador <strong>cambia el signo del exponente</strong>: ' +
+                '1 &divide; ' + v + '<sup>' + a + '</sup> = ' + v + '<sup>&minus;' + a + '</sup>.'
+        };
+      }
+
+      function g12CocienteNegativo() {
+        var v = elige(VARS12), a = ale(2, 4), b = ale(6, 9);
+        return {
+          regla: 'Exponentes negativos',
+          enunciado: 'Simplifica y expresa el resultado con exponente positivo:',
+          expr: frac(pot(v, a), pot(v, b)),
+          ans: frac(num(1), pot(v, b - a)),
+          dis: [pot(v, b - a), frac(num(1), pot(v, a + b)), neg(pot(v, b - a))],
+          expl: 'Al restar queda ' + a + ' &minus; ' + b + ' = &minus;' + (b - a) + ', es decir ' + v +
+                '<sup>&minus;' + (b - a) + '</sup>. Como se pide exponente positivo, se escribe 1 &divide; ' +
+                v + '<sup>' + (b - a) + '</sup>.'
+        };
+      }
+
+      var BANCO12 = [g12Cociente, g12CocienteCoef, g12CeroPorCociente, g12CeroDirecto,
+                   g12NegativoAFraccion, g12FraccionANegativo, g12CocienteNegativo];
+      var REGLAS12 = ['Regla del cociente', 'Exponente cero', 'Exponentes negativos'];
+
+      /* ============ BANCO DE LA LECCIÓN 1.3 ============ */
+      var VARS13 = ['x', 'y', 'a', 'm'];
+
+      function g13ProductoElevado() {
+        var v = elige(VARS13), a = ale(2, 5), b = ale(2, 5), c = ale(2, 4);
+        return {
+          regla: 'Producto dentro de un paréntesis',
+          enunciado: 'Simplifica respetando el orden: primero el paréntesis.',
+          expr: par(porr(pot(v, a), pot(v, b)), c),
+          ans: pot(v, (a + b) * c),
+          dis: [pot(v, a * b * c), pot(v, a + b + c), pot(v, a * b + c)],
+          expl: 'Dentro del paréntesis se <strong>suman</strong> (' + a + ' + ' + b + ' = ' + (a + b) +
+                ') y despues se <strong>multiplica</strong> por el exponente exterior (' + (a + b) +
+                ' &middot; ' + c + ' = ' + ((a + b) * c) + ').'
+        };
+      }
+
+      function g13PotenciaSobreCociente() {
+        var v = elige(VARS13), a = ale(2, 4), b = ale(2, 4);
+        var arriba = a * b;
+        var c = ale(1, arriba - 1);
+        return {
+          regla: 'Potencia y cociente combinados',
+          enunciado: 'Simplifica la expresión completa:',
+          expr: frac(par(pot(v, a), b), pot(v, c)),
+          ans: pot(v, arriba - c),
+          dis: [pot(v, a + b - c), pot(v, arriba + c), frac(num(1), pot(v, arriba - c))],
+          expl: 'Primero la potencia de una potencia: ' + a + ' &middot; ' + b + ' = ' + arriba +
+                '. Después el cociente: ' + arriba + ' &minus; ' + c + ' = ' + (arriba - c) + '.'
+        };
+      }
+
+      function g13CoefElevadoPorTermino() {
+        var v = elige(VARS13), c = ale(2, 4), a = ale(2, 3), n = ale(2, 3), b = ale(2, 5);
+        var cn = Math.pow(c, n);
+        return {
+          regla: 'Parentesis con coeficiente',
+          enunciado: 'Simplifica: eleva el paréntesis y luego multiplica.',
+          expr: porr(par(con(c, pot(v, a)), n), pot(v, b)),
+          ans: con(cn, pot(v, a * n + b)),
+          dis: [con(c * n, pot(v, a * n + b)), con(cn, pot(v, a * n * b)), con(cn, pot(v, a + n + b))],
+          expl: 'El exponente exterior eleva también al coeficiente (' + c + '<sup>' + n + '</sup> = ' + cn +
+                ') y multiplica el exponente de la variable (' + a + ' &middot; ' + n + ' = ' + (a * n) +
+                '). Por último, la regla del producto suma los exponentes: ' + (a * n) + ' + ' + b + ' = ' + (a * n + b) + '.'
+        };
+      }
+
+      function g13DosVariables() {
+        var v = elige(['x', 'a']), w = elige(['y', 'b']);
+        var a = ale(2, 4), b = ale(2, 4), c = ale(2, 3);
+        var d = ale(1, a * c - 1), e = ale(1, b * c - 1);
+        return {
+          regla: 'Dos variables con varias reglas',
+          enunciado: 'Simplifica la expresión con las dos variables:',
+          expr: frac(par(une(pot(v, a), pot(w, b)), c), une(pot(v, d), pot(w, e))),
+          ans: une(pot(v, a * c - d), pot(w, b * c - e)),
+          dis: [
+            une(pot(v, a + c - d), pot(w, b + c - e)),
+            une(pot(v, a * c + d), pot(w, b * c + e)),
+            une(pot(v, a * c - d), pot(w, b * c + e))
+          ],
+          expl: 'Se distribuye el exponente exterior (' + a + ' &middot; ' + c + ' = ' + (a * c) + ' y ' +
+                b + ' &middot; ' + c + ' = ' + (b * c) + ') y luego se resta el denominador variable por variable: ' +
+                (a * c) + ' &minus; ' + d + ' = ' + (a * c - d) + ' y ' + (b * c) + ' &minus; ' + e + ' = ' + (b * c - e) + '.'
+        };
+      }
+
+      function g13ResultadoNegativo() {
+        var v = elige(VARS13), a = ale(2, 3), b = ale(2, 3);
+        var arriba = a * b;
+        var c = arriba + ale(1, 4);
+        return {
+          regla: 'Resultado con exponente positivo',
+          enunciado: 'Simplifica y expresa el resultado con exponentes positivos:',
+          expr: frac(par(pot(v, a), b), pot(v, c)),
+          ans: frac(num(1), pot(v, c - arriba)),
+          dis: [pot(v, c - arriba), frac(num(1), pot(v, arriba + c)), frac(num(1), pot(v, arriba * c))],
+          expl: 'Arriba queda ' + a + ' &middot; ' + b + ' = ' + arriba + '. Al restar: ' + arriba +
+                ' &minus; ' + c + ' = &minus;' + (c - arriba) + '. Un exponente negativo se reescribe como ' +
+                'fracción: 1 &divide; ' + v + '<sup>' + (c - arriba) + '</sup>.'
+        };
+      }
+
+      function g13CeroCombinado() {
+        var v = elige(VARS13), a = ale(2, 5), b = ale(2, 5), c = ale(2, 4);
+        return {
+          regla: 'Parentesis con coeficiente',
+          enunciado: 'Simplifica la expresión completa:',
+          expr: porr(par(con(c, pot(v, a)), 0), pot(v, b)),
+          ans: pot(v, b),
+          dis: [con(c, pot(v, a + b)), num(0), con(c, pot(v, b))],
+          expl: 'El primer factor está elevado a la cero, así que vale <strong>1</strong>. Multiplicar por 1 ' +
+                'no cambia nada, de modo que solo queda ' + v + '<sup>' + b + '</sup>.'
+        };
+      }
+
+      var BANCO13 = [g13ProductoElevado, g13PotenciaSobreCociente, g13CoefElevadoPorTermino,
+                   g13DosVariables, g13ResultadoNegativo, g13CeroCombinado];
+      var REGLAS13 = ['Producto dentro de un paréntesis', 'Potencia y cociente combinados',
+                    'Parentesis con coeficiente', 'Dos variables con varias reglas',
+                    'Resultado con exponente positivo'];
+
+      var BLOQUES = [
+        { nombre: 'Reglas de la multiplicación (lección 1.1)', gens: BANCO11 },
+        { nombre: 'Cociente, exponente cero y negativos (lección 1.2)', gens: BANCO12 },
+        { nombre: 'Varias reglas combinadas (lección 1.3)', gens: BANCO13 }
+      ];
+      var POR_BLOQUE = 4;
+
+      /* ============ MOTOR DE COMPROBACIÓN ============ */
+      var elCuerpo = document.getElementById('cuerpo-preguntas');
+      var elResultado = document.getElementById('resultado');
+      var elInforme = document.getElementById('informe');
+      var elInformeCuerpo = document.getElementById('informe-cuerpo');
+      var btnComprobar = document.getElementById('btn-comprobar');
+      var btnNueva = document.getElementById('btn-nueva');
+      var btnImprimir = document.getElementById('btn-imprimir');
+      var elFecha = document.getElementById('fecha');
+
+      var ronda = [];
+      var corregida = false;
+
+      function fechaHoy() {
+        var d = new Date();
+        var meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+                     'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        return d.getDate() + ' de ' + meses[d.getMonth()] + ' de ' + d.getFullYear();
+      }
+
+      function generarRonda() {
+        ronda = [];
+        BLOQUES.forEach(function (bl) {
+          var gens = mezclar(bl.gens);
+          for (var i = 0; i < POR_BLOQUE; i++) {
+            var g = gens[i % gens.length];
+            var q = g();
+            q.bloque = bl.nombre;
+            q.opciones = armarOpciones(q);
+            q.elegida = null;
+            ronda.push(q);
+          }
+        });
+        ronda = mezclar(ronda);
+      }
+
+      function pintarRonda() {
+        elCuerpo.innerHTML = '';
+        ronda.forEach(function (q, idx) {
+          var div = document.createElement('div');
+          div.className = 'pregunta';
+
+          var enc = document.createElement('h3');
+          enc.className = 'enc-preg';
+          enc.innerHTML = '<span class="num-preg" aria-hidden="true">' + (idx + 1) + '</span> ' +
+                          'Pregunta ' + (idx + 1) + ' de ' + ronda.length + ': ' + q.enunciado;
+          div.appendChild(enc);
+
+          var ex = document.createElement('div');
+          ex.className = 'expresion';
+          ex.innerHTML = '<span aria-hidden="true">' + q.expr.h + '</span>' +
+                         '<span class="sr-only">' + q.expr.s + '</span>';
+          div.appendChild(ex);
+
+          var cont = document.createElement('div');
+          cont.className = 'opciones';
+          q.opciones.forEach(function (op, j) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'opcion';
+            b.setAttribute('aria-label', 'Pregunta ' + (idx + 1) + ', opción ' + (j + 1) + ': ' + op.s);
+            b.setAttribute('aria-pressed', 'false');
+            b.innerHTML = '<span aria-hidden="true">' + op.h + '</span>';
+            b.addEventListener('click', function () {
+              if (corregida) { return; }
+              q.elegida = j;
+              cont.querySelectorAll('.opcion').forEach(function (o) {
+                o.classList.remove('elegida');
+                o.setAttribute('aria-pressed', 'false');
+              });
+              b.classList.add('elegida');
+              b.setAttribute('aria-pressed', 'true');
+            });
+            cont.appendChild(b);
+          });
+          div.appendChild(cont);
+
+          var fb = document.createElement('div');
+          fb.className = 'retro';
+          div.appendChild(fb);
+
+          elCuerpo.appendChild(div);
+        });
+      }
+
+      function comprobar() {
+        corregida = true;
+        var aciertos = 0;
+        var porBloque = {};
+        BLOQUES.forEach(function (bl) { porBloque[bl.nombre] = { c: 0, t: 0 }; });
+
+        var divs = elCuerpo.querySelectorAll('.pregunta');
+        ronda.forEach(function (q, idx) {
+          var div = divs[idx];
+          var botones = div.querySelectorAll('.opcion');
+          var fb = div.querySelector('.retro');
+          porBloque[q.bloque].t += 1;
+
+          botones.forEach(function (b) { b.disabled = true; });
+
+          var bien = (q.elegida !== null && q.opciones[q.elegida].h === q.ans.h);
+          if (bien) { aciertos += 1; porBloque[q.bloque].c += 1; }
+
+          q.opciones.forEach(function (op, j) {
+            if (op.h === q.ans.h) { botones[j].classList.add('correcta'); }
+          });
+          if (q.elegida !== null && !bien) { botones[q.elegida].classList.add('incorrecta'); }
+
+          var cabeza;
+          if (bien) {
+            cabeza = 'Correcto.';
+          } else if (q.elegida === null) {
+            cabeza = 'Sin responder. La respuesta correcta es ' + q.ans.h + '.';
+          } else {
+            cabeza = 'Incorrecto. La respuesta correcta es ' + q.ans.h + '.';
+          }
+          fb.className = 'retro activa ' + (bien ? 'ok' : 'no');
+          fb.innerHTML = '<span class="titulo-retro">' + cabeza + '</span>' + q.expl;
+        });
+
+        var pct = Math.round((aciertos / ronda.length) * 100);
+        elResultado.className = 'resultado ' + (aciertos >= 9 ? 'aprob' : 'repro');
+        elResultado.innerHTML = 'Resultado: <strong>' + aciertos + ' de ' + ronda.length +
+          '</strong> respuestas correctas (' + pct + ' %). ' +
+          (aciertos >= 9
+            ? 'Dominio demostrado del Tema 1. Se puede continuar al Tema 2.'
+            : 'Se requieren 9 aciertos. Conviene repasar las lecciones señaladas abajo e intentarlo de nuevo.');
+
+        var filas = '';
+        BLOQUES.forEach(function (bl) {
+          var m = porBloque[bl.nombre];
+          var p = Math.round((m.c / m.t) * 100);
+          var juicio = p >= 75 ? 'Dominado' : (p >= 50 ? 'En desarrollo' : 'Requiere repaso');
+          filas += '<tr><th scope="row">' + bl.nombre + '</th><td class="num">' + m.c + ' de ' + m.t +
+                   '</td><td class="num">' + p + ' %</td><td>' + juicio + '</td></tr>';
+        });
+        elInformeCuerpo.innerHTML = filas;
+        elInforme.hidden = false;
+
+        btnComprobar.hidden = true;
+        btnNueva.hidden = false;
+        btnImprimir.hidden = false;
+        elResultado.focus();
+      }
+
+      function nuevaRonda() {
+        corregida = false;
+        elResultado.className = 'resultado';
+        elResultado.textContent = '';
+        elInforme.hidden = true;
+        btnComprobar.hidden = false;
+        btnNueva.hidden = true;
+        btnImprimir.hidden = true;
+        generarRonda();
+        pintarRonda();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      btnComprobar.addEventListener('click', comprobar);
+      btnNueva.addEventListener('click', nuevaRonda);
+      btnImprimir.addEventListener('click', function () { window.print(); });
+
+      elFecha.textContent = fechaHoy();
+      generarRonda();
+      pintarRonda();
+
+      })();
+    </script>
+  </body>
+</html>

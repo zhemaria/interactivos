@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<!--
+  Interactivo 1.2 · Práctica del cociente, el exponente cero y los negativos
+  Autor: Jose M. Fernandez, ABE/ASE Math Master Teacher,
+  Harry S. Truman College - City Colleges of Chicago.
+  Licencia: Creative Commons Atribucion-NoComercial-CompartirIgual 4.0 Internacional
+  (CC BY-NC-SA 4.0) - https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactivo 1.2 · Regla del cociente, exponente cero y exponentes negativos</title>
+    <meta name="author" content="Jose M. Fernandez, Harry S. Truman College - City Colleges of Chicago" />
+    <meta name="license" content="CC BY-NC-SA 4.0" />
+    <link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+    <style>
+      :root {
+        --tema: #880e4f;
+        --tema-d: #5d0935;
+        --tema-bg: #fce4ec;
+        --tema-bg2: #f9d6e2;
+        --acento: #00695c;
+        --txt: #222222;
+        --sec: #555555;
+        --bg: #f5f7fa;
+        --ok: #1b5e20;
+        --ok-bg: #e8f5e9;
+        --ok-bd: #2e7d32;
+        --no: #b71c1c;
+        --no-bg: #ffebee;
+        --no-bd: #c62828;
+      }
+      * { box-sizing: border-box; }
+      body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--txt);
+        line-height: 1.6;
+        font-size: 16px;
+      }
+      .contenedor { max-width: 880px; margin: 0 auto; padding: 24px; }
+
+      .sr-only {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+      }
+
+      header.principal {
+        background: var(--tema); color: #ffffff; padding: 28px 30px;
+        border-radius: 14px; margin-bottom: 22px; border: 1px solid var(--tema-d);
+      }
+      header.principal .ruta {
+        font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; color: #fce4ec;
+      }
+      header.principal h1 { margin: 8px 0 6px; font-size: 24px; font-weight: 700; }
+      header.principal .meta { font-size: 14px; color: #fce4ec; }
+
+      h2.seccion {
+        color: var(--tema-d); font-size: 20px; margin: 30px 0 12px;
+        padding-bottom: 6px; border-bottom: 3px solid var(--tema-bg);
+      }
+
+      .caja-objetivos {
+        background: var(--tema-bg); border-left: 6px solid var(--tema);
+        padding: 18px 22px; border-radius: 0 10px 10px 0; margin-bottom: 18px;
+      }
+      .caja-objetivos h2 { margin: 0 0 10px; color: var(--tema-d); font-size: 19px; }
+      .caja-objetivos ul { margin: 0; padding-left: 22px; }
+      .caja-objetivos li { margin: 5px 0; }
+
+      .caja-tip {
+        background: #e8f5e9; border-left: 5px solid #2e7d32; padding: 12px 16px;
+        border-radius: 0 8px 8px 0; margin: 14px 0; color: #1b5e20; font-size: 15px;
+      }
+
+      .tarjeta {
+        background: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px;
+        padding: 22px 24px 26px; margin-bottom: 18px;
+      }
+
+      .contador {
+        font-size: 14px; color: var(--sec); font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.4px; margin: 0 0 4px;
+      }
+      .etiqueta-regla {
+        display: inline-block; background: var(--tema-bg); color: var(--tema-d);
+        font-size: 13px; font-weight: 700; padding: 3px 12px; border-radius: 12px;
+        margin-bottom: 10px;
+      }
+      .enunciado { font-size: 17px; font-weight: 600; margin: 6px 0 4px; color: var(--tema-d); }
+
+      .expresion {
+        text-align: center; font-size: 30px; font-weight: 700; color: var(--txt);
+        background: #fafafa; border: 2px dashed var(--tema-bg2);
+        border-radius: 10px; padding: 22px 14px; margin: 14px 0 18px;
+      }
+      .expresion sup { font-size: 0.62em; }
+
+      .frac { display: inline-block; vertical-align: middle; text-align: center; margin: 0 4px; }
+      .frac-n { display: block; padding: 0 8px 2px; }
+      .frac-d { display: block; padding: 2px 8px 0; border-top: 3px solid var(--txt); }
+
+      .opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 560px) { .opciones { grid-template-columns: 1fr; } }
+      .opcion {
+        background: #ffffff; border: 2px solid #d8d8d8; border-radius: 9px;
+        padding: 14px 12px; font-size: 21px; font-weight: 600; color: var(--txt);
+        cursor: pointer; font-family: inherit; text-align: center; min-height: 62px;
+      }
+      .opcion sup { font-size: 0.62em; }
+      .opcion:hover:enabled { border-color: var(--tema); background: var(--tema-bg); }
+      .opcion:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+      .opcion:disabled { cursor: default; }
+      .opcion.correcta { border-color: var(--ok-bd); background: var(--ok-bg); color: var(--ok); }
+      .opcion.incorrecta { border-color: var(--no-bd); background: var(--no-bg); color: var(--no); }
+      .opcion.elegida { border-color: var(--tema); background: var(--tema-bg); }
+
+      .retro { margin-top: 16px; font-size: 15px; border-radius: 9px; padding: 0; }
+      .retro.activa { padding: 14px 16px; }
+      .retro.ok { background: var(--ok-bg); border-left: 5px solid var(--ok-bd); color: var(--ok); }
+      .retro.no { background: var(--no-bg); border-left: 5px solid var(--no-bd); color: var(--no); }
+      .retro strong { font-weight: 700; }
+      .retro .titulo-retro { display: block; font-weight: 700; margin-bottom: 4px; font-size: 16px; }
+
+      .acciones { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+      .btn {
+        background: var(--tema); color: #ffffff; border: none; padding: 11px 22px;
+        border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer;
+        font-family: inherit;
+      }
+      .btn:hover { background: var(--tema-d); }
+      .btn:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+      .btn.sec { background: #455a64; }
+      .btn.sec:hover { background: #263238; }
+      .btn[hidden] { display: none; }
+
+      table.tabla {
+        width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 15px;
+        background: #ffffff;
+      }
+      table.tabla caption { text-align: left; font-size: 14px; color: var(--sec); padding-bottom: 6px; }
+      table.tabla th, table.tabla td { border: 1px solid #d8d8d8; padding: 9px 12px; text-align: left; }
+      table.tabla thead th { background: var(--tema-bg); color: var(--tema-d); }
+      table.tabla td.num { text-align: center; font-variant-numeric: tabular-nums; }
+
+      details.reglas {
+        background: #ffffff; border: 1px solid #e0e0e0; border-radius: 10px;
+        padding: 4px 18px; margin-bottom: 18px;
+      }
+      details.reglas summary {
+        cursor: pointer; font-weight: 700; color: var(--tema-d); padding: 12px 0; font-size: 16px;
+      }
+      details.reglas summary:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+      footer {
+        margin-top: 26px; padding-top: 16px; border-top: 2px solid var(--tema-bg);
+        font-size: 13px; color: var(--sec); text-align: center;
+      }
+      footer a { color: var(--tema-d); }
+
+    </style>
+  </head>
+  <body>
+    <div class="contenedor">
+      <header class="principal">
+        <div class="ruta">Spanish ASE Math &middot; Nivel 3 &middot; Tema 1 &middot; Reglas de los exponentes</div>
+        <h1>Interactivo 1.2 · Práctica del cociente, el exponente cero y los negativos</h1>
+        <div class="meta">Práctica generativa e ilimitada · Complemento de la lección 1.2 · Brightspace D2L</div>
+      </header>
+
+      <div class="caja-objetivos">
+        <h2>Qué se practica en este interactivo</h2>
+        <ul>
+          <li>La regla del cociente: a<sup>m</sup> &divide; a<sup>n</sup> = a<sup>m&minus;n</sup>, con y sin coeficientes.</li>
+          <li>El exponente cero: a<sup>0</sup> = 1, deducido desde la propia regla del cociente.</li>
+          <li>Los exponentes negativos como recíprocos: a<sup>&minus;n</sup> = 1 &divide; a<sup>n</sup>.</li>
+          <li>Pasar de exponente negativo a fracción y de fracción a exponente negativo.</li>
+        </ul>
+      </div>
+
+      <div class="caja-tip"><strong>Cómo se usa.</strong> Los ejercicios se generan al azar y no se repiten. Conviene fijarse en el enunciado: unos piden simplificar y otros piden reescribir con <strong>exponente positivo</strong>, que es la forma final exigida en el examen GED.</div>
+
+
+      <main class="tarjeta">
+        <p class="contador" id="contador">Ejercicio 1</p>
+        <p class="etiqueta-regla" id="etiqueta-regla">Regla</p>
+        <h2 class="enunciado" id="enunciado">Cargando el ejercicio…</h2>
+        <div class="expresion" id="expresion"></div>
+        <div class="opciones" id="opciones"></div>
+        <div class="retro" id="retro" role="status" aria-live="polite"></div>
+        <div class="acciones">
+          <button type="button" class="btn" id="btn-siguiente" hidden>Siguiente ejercicio</button>
+          <button type="button" class="btn sec" id="btn-reiniciar">Reiniciar el marcador</button>
+        </div>
+      </main>
+
+      <h2 class="seccion">Marcador por regla</h2>
+      <table class="tabla">
+        <caption>Aciertos, ejercicios intentados y porcentaje de acierto en cada regla de esta sesión.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Regla</th>
+            <th scope="col">Aciertos</th>
+            <th scope="col">Intentos</th>
+            <th scope="col">Porcentaje</th>
+          </tr>
+        </thead>
+        <tbody id="marcador-cuerpo"></tbody>
+      </table>
+      <p id="resumen-global" role="status" aria-live="polite" style="font-weight:700;color:#5d0935;"></p>
+
+      <details class="reglas">
+        <summary>Recordatorio de las cinco reglas de los exponentes</summary>
+        <table class="tabla">
+          <caption>Nombre de cada regla, su patrón general y un ejemplo numérico.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Regla</th>
+              <th scope="col">Patrón</th>
+              <th scope="col">Ejemplo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Producto</td><td>a<sup>m</sup> &middot; a<sup>n</sup> = a<sup>m+n</sup></td><td>x<sup>2</sup> &middot; x<sup>5</sup> = x<sup>7</sup></td></tr>
+            <tr><td>Potencia de una potencia</td><td>(a<sup>m</sup>)<sup>n</sup> = a<sup>mn</sup></td><td>(x<sup>3</sup>)<sup>4</sup> = x<sup>12</sup></td></tr>
+            <tr><td>Potencia de un producto</td><td>(ab)<sup>n</sup> = a<sup>n</sup>b<sup>n</sup></td><td>(2x)<sup>3</sup> = 8x<sup>3</sup></td></tr>
+            <tr><td>Cociente</td><td>a<sup>m</sup> &divide; a<sup>n</sup> = a<sup>m&minus;n</sup></td><td>x<sup>7</sup> &divide; x<sup>3</sup> = x<sup>4</sup></td></tr>
+            <tr><td>Exponente cero y negativo</td><td>a<sup>0</sup> = 1 &nbsp;&nbsp; a<sup>&minus;n</sup> = 1 &divide; a<sup>n</sup></td><td>5<sup>0</sup> = 1 &nbsp;&nbsp; x<sup>&minus;2</sup> = 1 &divide; x<sup>2</sup></td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:14px;color:#555555;">En todas las reglas la base debe ser distinta de cero cuando aparece en un denominador.</p>
+      </details>
+
+      <footer>
+        Spanish ASE Math &middot; Nivel 3 &middot; Tema 1 &middot; Reglas de los exponentes<br />
+        José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago<br />
+        Obra bajo licencia
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" rel="license">Creative Commons BY-NC-SA 4.0</a>.
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+
+      /* ---------- utilidades generales ---------- */
+      function ale(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+      function elige(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+      function mezclar(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+      }
+
+      /* ---------- construcción de expresiones ----------
+         Cada expresión es un objeto { h: HTML visual, s: texto para lector de pantalla } */
+      function expH(e) { return e < 0 ? '&minus;' + Math.abs(e) : String(e); }
+      function expS(e) { return e < 0 ? 'menos ' + Math.abs(e) : String(e); }
+
+      function pot(v, e) {
+        if (e === 1) { return { h: v, s: v }; }
+        return { h: v + '<sup>' + expH(e) + '</sup>', s: v + ' elevado a la ' + expS(e) };
+      }
+      function num(n) { return { h: String(n), s: String(n) }; }
+      function con(c, resto) {
+        if (c === 1) { return resto; }
+        return { h: String(c) + resto.h, s: String(c) + ' ' + resto.s };
+      }
+      function une() {
+        var partes = Array.prototype.slice.call(arguments);
+        return {
+          h: partes.map(function (p) { return p.h; }).join(''),
+          s: partes.map(function (p) { return p.s; }).join(' ')
+        };
+      }
+      function porr(a, b) {
+        return { h: a.h + ' <span aria-hidden="true">&middot;</span> ' + b.h, s: a.s + ' por ' + b.s };
+      }
+      function par(x, e) {
+        if (e === null) { return { h: '(' + x.h + ')', s: 'abre paréntesis ' + x.s + ' cierra paréntesis' }; }
+        return {
+          h: '(' + x.h + ')<sup>' + expH(e) + '</sup>',
+          s: 'abre paréntesis ' + x.s + ' cierra paréntesis elevado a la ' + expS(e)
+        };
+      }
+      function frac(n, d) {
+        return {
+          h: '<span class="frac"><span class="frac-n">' + n.h + '</span><span class="frac-d">' + d.h + '</span></span>',
+          s: n.s + ' sobre ' + d.s
+        };
+      }
+      function neg(x) { return { h: '&minus;' + x.h, s: 'menos ' + x.s }; }
+
+      /* ---------- armado de opciones sin repeticiones ---------- */
+      function armarOpciones(q) {
+        var lista = [q.ans];
+        var vistos = {};
+        vistos[q.ans.h] = true;
+        var candidatos = q.dis.slice();
+        var i;
+        for (i = 0; i < candidatos.length && lista.length < 4; i++) {
+          if (!vistos[candidatos[i].h]) { vistos[candidatos[i].h] = true; lista.push(candidatos[i]); }
+        }
+        /* relleno de seguridad: nunca deben quedar menos de cuatro opciones */
+        var reserva = [
+          { h: '2' + q.ans.h, s: '2 ' + q.ans.s },
+          { h: q.ans.h + '<sup>2</sup>', s: q.ans.s + ' al cuadrado' },
+          { h: 'Ninguna de las anteriores', s: 'Ninguna de las anteriores' },
+          { h: 'No se puede simplificar', s: 'No se puede simplificar' }
+        ];
+        for (i = 0; i < reserva.length && lista.length < 4; i++) {
+          if (!vistos[reserva[i].h]) { vistos[reserva[i].h] = true; lista.push(reserva[i]); }
+        }
+        return mezclar(lista);
+      }
+
+      /* ============ BANCO DE LA LECCIÓN 1.2 ============ */
+      var VARS = ['m', 'n', 'p', 'z', 'x', 'y'];
+
+      function g12Cociente() {
+        var v = elige(VARS), a = ale(6, 10), b = ale(1, 4);
+        return {
+          regla: 'Regla del cociente',
+          enunciado: 'Simplifica aplicando la regla del cociente:',
+          expr: frac(pot(v, a), pot(v, b)),
+          ans: pot(v, a - b),
+          dis: [pot(v, a + b), pot(v, a * b), frac(num(1), pot(v, a - b))],
+          expl: 'Al dividir potencias de la misma base los exponentes se <strong>restan</strong>: ' +
+                a + ' &minus; ' + b + ' = ' + (a - b) + '.'
+        };
+      }
+
+      function g12CocienteCoef() {
+        var v = elige(VARS), a = ale(5, 9), b = ale(1, 4);
+        var c2 = ale(2, 5), k = ale(2, 5), c1 = c2 * k;
+        return {
+          regla: 'Regla del cociente',
+          enunciado: 'Simplifica el cociente completo, coeficiente y variable:',
+          expr: frac(con(c1, pot(v, a)), con(c2, pot(v, b))),
+          ans: con(k, pot(v, a - b)),
+          dis: [con(k, pot(v, a + b)), con(c1 - c2, pot(v, a - b)), con(c1 * c2, pot(v, a - b))],
+          expl: 'Los coeficientes se <strong>dividen</strong> (' + c1 + ' &divide; ' + c2 + ' = ' + k +
+                ') y los exponentes se <strong>restan</strong> (' + a + ' &minus; ' + b + ' = ' + (a - b) +
+                '). Restar los coeficientes es un error frecuente.'
+        };
+      }
+
+      function g12CeroPorCociente() {
+        var v = elige(VARS), a = ale(3, 8);
+        return {
+          regla: 'Exponente cero',
+          enunciado: 'Aplica la regla del cociente y escribe el resultado final:',
+          expr: frac(pot(v, a), pot(v, a)),
+          ans: num(1),
+          dis: [num(0), pot(v, 1), pot(v, 2 * a)],
+          expl: 'Al restar los exponentes queda ' + a + ' &minus; ' + a + ' = 0, o sea ' + v +
+                '<sup>0</sup>. Y toda cantidad distinta de cero elevada a la cero vale <strong>1</strong>, ' +
+                'porque cualquier expresión dividida entre sí misma da 1.'
+        };
+      }
+
+      function g12CeroDirecto() {
+        var v = elige(['x', 'a', 'm']), w = elige(['y', 'b', 'n']);
+        var c = ale(2, 9), a = ale(2, 5), b = ale(2, 5);
+        var dentro = con(c, une(pot(v, a), pot(w, b)));
+        return {
+          regla: 'Exponente cero',
+          enunciado: 'Calcula el valor de esta expresión:',
+          expr: par(dentro, 0),
+          ans: num(1),
+          dis: [num(0), num(c), dentro],
+          expl: 'Todo el paréntesis, sin importar lo que contenga, está elevado a la cero. Si la base no es cero, ' +
+                'el resultado es <strong>1</strong>. El exponente cero no es lo mismo que multiplicar por cero.'
+        };
+      }
+
+      function g12NegativoAFraccion() {
+        var v = elige(VARS), a = ale(2, 6);
+        return {
+          regla: 'Exponentes negativos',
+          enunciado: 'Reescribe con exponente positivo:',
+          expr: pot(v, -a),
+          ans: frac(num(1), pot(v, a)),
+          dis: [neg(pot(v, a)), frac(num(1), pot(v, -a)), neg(frac(num(1), pot(v, a)))],
+          expl: 'Un exponente negativo indica <strong>recíproco</strong>, no un número negativo: ' + v +
+                '<sup>&minus;' + a + '</sup> = 1 &divide; ' + v + '<sup>' + a + '</sup>. El signo del resultado no cambia.'
+        };
+      }
+
+      function g12FraccionANegativo() {
+        var v = elige(VARS), a = ale(2, 6);
+        return {
+          regla: 'Exponentes negativos',
+          enunciado: 'Reescribe esta fracción usando un solo exponente negativo:',
+          expr: frac(num(1), pot(v, a)),
+          ans: pot(v, -a),
+          dis: [pot(v, a), neg(pot(v, a)), neg(pot(v, -a))],
+          expl: 'Pasar una potencia del denominador al numerador <strong>cambia el signo del exponente</strong>: ' +
+                '1 &divide; ' + v + '<sup>' + a + '</sup> = ' + v + '<sup>&minus;' + a + '</sup>.'
+        };
+      }
+
+      function g12CocienteNegativo() {
+        var v = elige(VARS), a = ale(2, 4), b = ale(6, 9);
+        return {
+          regla: 'Exponentes negativos',
+          enunciado: 'Simplifica y expresa el resultado con exponente positivo:',
+          expr: frac(pot(v, a), pot(v, b)),
+          ans: frac(num(1), pot(v, b - a)),
+          dis: [pot(v, b - a), frac(num(1), pot(v, a + b)), neg(pot(v, b - a))],
+          expl: 'Al restar queda ' + a + ' &minus; ' + b + ' = &minus;' + (b - a) + ', es decir ' + v +
+                '<sup>&minus;' + (b - a) + '</sup>. Como se pide exponente positivo, se escribe 1 &divide; ' +
+                v + '<sup>' + (b - a) + '</sup>.'
+        };
+      }
+
+      var BANCO = [g12Cociente, g12CocienteCoef, g12CeroPorCociente, g12CeroDirecto,
+                   g12NegativoAFraccion, g12FraccionANegativo, g12CocienteNegativo];
+      var REGLAS = ['Regla del cociente', 'Exponente cero', 'Exponentes negativos'];
+
+      /* ============ MOTOR DE PRÁCTICA ============ */
+      var elEnunciado = document.getElementById('enunciado');
+      var elExpr = document.getElementById('expresion');
+      var elOpciones = document.getElementById('opciones');
+      var elRetro = document.getElementById('retro');
+      var elEtiqueta = document.getElementById('etiqueta-regla');
+      var elContador = document.getElementById('contador');
+      var btnSiguiente = document.getElementById('btn-siguiente');
+      var btnReiniciar = document.getElementById('btn-reiniciar');
+      var elMarcador = document.getElementById('marcador-cuerpo');
+      var elResumen = document.getElementById('resumen-global');
+
+      var actual = null;
+      var respondida = false;
+      var marcas = {};
+
+      function reiniciarMarcas() {
+        marcas = {};
+        REGLAS.forEach(function (r) { marcas[r] = { c: 0, t: 0 }; });
+      }
+
+      function pintarMarcador() {
+        var filas = '';
+        var totC = 0, totT = 0;
+        REGLAS.forEach(function (r) {
+          var m = marcas[r];
+          totC += m.c; totT += m.t;
+          var pct = m.t === 0 ? '&mdash;' : Math.round((m.c / m.t) * 100) + ' %';
+          filas += '<tr><th scope="row">' + r + '</th><td class="num">' + m.c +
+                   '</td><td class="num">' + m.t + '</td><td class="num">' + pct + '</td></tr>';
+        });
+        elMarcador.innerHTML = filas;
+        var pctG = totT === 0 ? 0 : Math.round((totC / totT) * 100);
+        elResumen.textContent = 'Total: ' + totC + ' aciertos de ' + totT + ' ejercicios (' + pctG + ' %).';
+        elContador.textContent = 'Ejercicio ' + (totT + 1);
+      }
+
+      function nuevoEjercicio() {
+        respondida = false;
+        actual = elige(BANCO)();
+        actual.opciones = armarOpciones(actual);
+
+        elEtiqueta.textContent = actual.regla;
+        elEnunciado.textContent = actual.enunciado;
+        elExpr.innerHTML = '<span aria-hidden="true">' + actual.expr.h + '</span>' +
+                           '<span class="sr-only">' + actual.expr.s + '</span>';
+
+        elOpciones.innerHTML = '';
+        actual.opciones.forEach(function (op, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'opcion';
+          b.setAttribute('aria-label', 'Opción ' + (i + 1) + ': ' + op.s);
+          b.innerHTML = '<span aria-hidden="true">' + op.h + '</span>';
+          b.addEventListener('click', function () { responder(b, op); });
+          elOpciones.appendChild(b);
+        });
+
+        elRetro.className = 'retro';
+        elRetro.innerHTML = '';
+        btnSiguiente.hidden = true;
+        pintarMarcador();
+      }
+
+      function responder(boton, op) {
+        if (respondida) { return; }
+        respondida = true;
+        var correcta = (op.h === actual.ans.h);
+        marcas[actual.regla].t += 1;
+        if (correcta) { marcas[actual.regla].c += 1; }
+
+        var botones = elOpciones.querySelectorAll('.opcion');
+        botones.forEach(function (b) { b.disabled = true; });
+        boton.classList.add(correcta ? 'correcta' : 'incorrecta');
+        if (!correcta) {
+          actual.opciones.forEach(function (o, i) {
+            if (o.h === actual.ans.h) { botones[i].classList.add('correcta'); }
+          });
+        }
+
+        elRetro.className = 'retro activa ' + (correcta ? 'ok' : 'no');
+        elRetro.innerHTML =
+          '<span class="titulo-retro">' +
+          (correcta ? 'Correcto.' : 'Todavía no. La respuesta correcta es ' + actual.ans.h + '.') +
+          '</span>' + actual.expl;
+
+        btnSiguiente.hidden = false;
+        pintarMarcador();
+        btnSiguiente.focus();
+      }
+
+      btnSiguiente.addEventListener('click', function () {
+        nuevoEjercicio();
+        var primera = elOpciones.querySelector('.opcion');
+        if (primera) { primera.focus(); }
+      });
+
+      btnReiniciar.addEventListener('click', function () {
+        reiniciarMarcas();
+        nuevoEjercicio();
+        var primera = elOpciones.querySelector('.opcion');
+        if (primera) { primera.focus(); }
+      });
+
+      reiniciarMarcas();
+      nuevoEjercicio();
+
+      })();
+    </script>
+  </body>
+</html>

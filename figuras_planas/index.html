@@ -1,1 +1,1329 @@
+<!DOCTYPE html>
+<!--
+  Figuras planas: lados, vértices, ángulos y clasificación — Lección 7.1
+  Autor: José M. Fernández, ABE/ASE Math Master Teacher,
+         Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interactivo · Lección 7.1: clasificación de figuras 2D</title>
+<meta name="author" content="José M. Fernández, Harry S. Truman College — City Colleges of Chicago">
+<meta name="description" content="Interactivo de geometría plana para la Lección 7.1: lados, vértices, ángulos, polígonos, triángulos y cuadriláteros.">
+<meta name="license" content="CC BY-NC-SA 4.0">
+<link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es">
+<style>
+  :root{
+    --tinta:#1b2733;
+    --tinta-suave:#4a5560;
+    --fondo:#f6f4ee;
+    --papel:#ffffff;
+    --azul:#37474f;
+    --azul-claro:#eceff1;
+    --turquesa:#006064;
+    --turquesa-claro:#e0f2f1;
+    --verde:#2e7d4f;
+    --verde-claro:#e7f4ec;
+    --ambar:#5C3900;
+    --ambar-claro:#fdf3df;
+    --vino:#8a2432;
+    --vino-claro:#fdecea;
+    --borde:#c3ced9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    padding:16px;
+    font-family:"Segoe UI",Arial,Helvetica,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    color:var(--tinta);
+    background:var(--fondo);
+  }
+  .envoltura{max-width:900px;margin:0 auto;}
+  header.principal{
+    background:linear-gradient(135deg,#263238 0%,#37474f 55%,#455a64 100%);
+    color:#ffffff;
+    padding:20px;
+    border-radius:10px 10px 0 0;
+  }
+  header.principal h1{margin:0 0 6px;font-size:1.5rem;line-height:1.3;}
+  header.principal p{margin:0;font-size:1rem;color:#ffffff;}
+  main{
+    background:var(--papel);
+    border:1px solid var(--borde);
+    border-top:none;
+    border-radius:0 0 10px 10px;
+    padding:0 20px 24px;
+  }
+  h2{font-size:1.2rem;margin:0 0 10px;color:var(--turquesa);}
+  h3{font-size:1.02rem;margin:18px 0 8px;color:var(--tinta);}
+  p{margin:0 0 12px;}
 
+  /* ---------- Pestañas ---------- */
+  .pestanas{
+    display:flex;flex-wrap:wrap;gap:6px;
+    padding:14px 0;position:sticky;top:0;background:var(--papel);z-index:5;
+    border-bottom:2px solid var(--borde);
+  }
+  .pestanas button{
+    font:inherit;font-size:.92rem;font-weight:600;
+    padding:9px 14px;border:2px solid var(--azul);border-radius:8px;
+    background:var(--papel);color:var(--azul);cursor:pointer;
+  }
+  .pestanas button[aria-selected="true"]{background:var(--turquesa);border-color:var(--turquesa);color:#ffffff;}
+  .pestanas button:hover{background:var(--azul-claro);color:var(--azul);}
+  .pestanas button[aria-selected="true"]:hover{background:var(--turquesa);color:#ffffff;}
+  [role="tabpanel"]{padding-top:18px;}
+  [role="tabpanel"][hidden]{display:none;}
+
+  /* ---------- Controles ---------- */
+  .controles{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
+  .boton{
+    font:inherit;font-size:.92rem;
+    padding:8px 13px;border:2px solid var(--azul);border-radius:8px;
+    background:var(--papel);color:var(--azul);cursor:pointer;
+  }
+  .boton:hover{background:var(--azul-claro);}
+  .boton[aria-pressed="true"],.boton.activo{background:var(--turquesa);border-color:var(--turquesa);color:#ffffff;}
+  .boton[aria-pressed="true"]:hover,.boton.activo:hover{background:#004d51;color:#ffffff;}
+  .boton.secundario{border-color:var(--ambar);color:var(--ambar);}
+  .boton.secundario:hover{background:var(--ambar-claro);}
+  button:focus-visible,[role="tab"]:focus-visible{
+    outline:3px solid var(--ambar);outline-offset:2px;
+  }
+
+  /* ---------- Lienzo ---------- */
+  .lienzo{
+    background:var(--papel);border:2px solid var(--borde);border-radius:8px;
+    padding:10px;margin-bottom:14px;
+  }
+  .lienzo svg{display:block;width:100%;height:auto;}
+  .doble{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:720px){.doble{grid-template-columns:1.1fr .9fr;}}
+
+  /* ---------- Cajas informativas ---------- */
+  .caja{border-left:6px solid var(--azul);background:var(--azul-claro);
+        padding:12px 14px;border-radius:0 8px 8px 0;margin:0 0 14px;}
+  .caja.verde{border-color:var(--verde);background:var(--verde-claro);}
+  .caja.ambar{border-color:var(--ambar);background:var(--ambar-claro);}
+  .caja h3{margin-top:0;}
+  .caja p:last-child,.caja ul:last-child{margin-bottom:0;}
+  ul{margin:0 0 12px;padding-left:22px;}
+  li{margin-bottom:5px;}
+  .dato{font-weight:700;color:var(--turquesa);}
+
+  table{border-collapse:collapse;width:100%;margin:0 0 14px;font-size:.94rem;}
+  caption{text-align:left;font-weight:700;padding:6px 0;color:var(--tinta);}
+  th,td{border:1px solid var(--borde);padding:7px 9px;text-align:left;vertical-align:top;}
+  thead th{background:var(--azul-claro);color:var(--tinta);}
+
+  .leyenda{font-size:.9rem;color:#4a5560;margin:0 0 12px;}
+  .leyenda strong{color:var(--tinta);}
+
+  /* ---------- Cuestionario ---------- */
+  .pregunta{border:1px solid var(--borde);border-radius:8px;padding:14px;margin-bottom:14px;}
+  .pregunta .enunciado{font-weight:600;margin-bottom:10px;}
+  .opciones{display:flex;flex-direction:column;gap:7px;}
+  .opcion{
+    font:inherit;text-align:left;padding:9px 12px;border:2px solid var(--borde);
+    border-radius:8px;background:var(--papel);color:var(--tinta);cursor:pointer;
+  }
+  .opcion:hover{background:var(--azul-claro);}
+  .opcion[aria-pressed="true"]{border-color:var(--azul);background:var(--azul-claro);font-weight:600;}
+  .opcion.correcta{border-color:var(--verde);background:var(--verde-claro);font-weight:600;}
+  .opcion.incorrecta{border-color:var(--vino);background:var(--vino-claro);}
+  .retro{margin:10px 0 0;font-size:.94rem;padding:9px 11px;border-radius:6px;}
+  .retro.bien{background:var(--verde-claro);color:#123f28;border-left:5px solid var(--verde);}
+  .retro.mal{background:var(--vino-claro);color:#5e1723;border-left:5px solid var(--vino);}
+  .marcador{font-weight:700;font-size:1.05rem;padding:12px 14px;border-radius:8px;
+            background:var(--azul-claro);border-left:6px solid var(--azul);margin-bottom:14px;}
+
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+           overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+  footer.licencia{
+    max-width:900px;margin:18px auto 0;font-size:.85rem;color:#4a5560;
+    border-top:1px solid var(--borde);padding-top:12px;
+  }
+  footer.licencia a{color:var(--turquesa);}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="envoltura">
+
+  <header class="principal">
+    <h1>Interactivo · Clasificación de figuras 2D: atributos y vocabulario</h1>
+    <p>Matemáticas · Nivel 1 · Tema 7 — Geometría · Lección 7.1</p>
+  </header>
+
+  <main>
+    <div class="pestanas" role="tablist" aria-label="Secciones del interactivo">
+      <button type="button" role="tab" id="tab-partes"  aria-controls="panel-partes"  aria-selected="true">1. Partes de una figura</button>
+      <button type="button" role="tab" id="tab-angulos" aria-controls="panel-angulos" aria-selected="false" tabindex="-1">2. Tipos de ángulo</button>
+      <button type="button" role="tab" id="tab-poligonos" aria-controls="panel-poligonos" aria-selected="false" tabindex="-1">3. Polígonos</button>
+      <button type="button" role="tab" id="tab-triangulos" aria-controls="panel-triangulos" aria-selected="false" tabindex="-1">4. Triángulos</button>
+      <button type="button" role="tab" id="tab-cuadrilateros" aria-controls="panel-cuadrilateros" aria-selected="false" tabindex="-1">5. Cuadriláteros</button>
+      <button type="button" role="tab" id="tab-reto" aria-controls="panel-reto" aria-selected="false" tabindex="-1">6. Reto: identifica la figura</button>
+      <button type="button" role="tab" id="tab-arbol" aria-controls="panel-arbol" aria-selected="false" tabindex="-1">7. Árbol de decisión</button>
+      <button type="button" role="tab" id="tab-practica" aria-controls="panel-practica" aria-selected="false" tabindex="-1">8. Práctica</button>
+    </div>
+
+    <!-- ============ 1. PARTES ============ -->
+    <section role="tabpanel" id="panel-partes" aria-labelledby="tab-partes" tabindex="0">
+      <h2>Lados, vértices y ángulos</h2>
+      <p>Toda figura plana cerrada por segmentos de recta se describe con tres elementos. Active cada botón para verlos resaltados sobre el pentágono.</p>
+
+      <div class="controles">
+        <button type="button" class="boton" id="ver-lados" aria-pressed="true">Mostrar lados</button>
+        <button type="button" class="boton" id="ver-vertices" aria-pressed="false">Mostrar vértices</button>
+        <button type="button" class="boton" id="ver-angulos" aria-pressed="false">Mostrar ángulos</button>
+      </div>
+
+      <div class="doble">
+        <div class="lienzo" id="lienzo-partes"></div>
+        <div>
+          <div class="caja" id="texto-partes" aria-live="polite">
+            <h3>Descripción</h3>
+            <p id="parrafo-partes">Seleccione un elemento para leer su descripción.</p>
+          </div>
+          <div class="caja verde">
+            <h3>Definiciones</h3>
+            <ul>
+              <li><strong>Lado:</strong> cada segmento recto que forma la figura.</li>
+              <li><strong>Vértice:</strong> la esquina donde se juntan dos lados.</li>
+              <li><strong>Ángulo:</strong> la abertura que se forma en cada vértice. Se mide en grados (°).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="caja ambar">
+        <h3>Regla que conviene recordar</h3>
+        <p>En cualquier polígono, el número de lados, el número de vértices y el número de ángulos interiores es siempre el mismo.</p>
+      </div>
+    </section>
+
+    <!-- ============ 2. ÁNGULOS ============ -->
+    <section role="tabpanel" id="panel-angulos" aria-labelledby="tab-angulos" tabindex="0" hidden>
+      <h2>Ángulo recto, agudo y obtuso</h2>
+
+      <table>
+        <caption>Clasificación de los ángulos según su medida</caption>
+        <thead>
+          <tr><th scope="col">Tipo</th><th scope="col">Medida</th><th scope="col">Cómo reconocerlo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Agudo</td><td>Mayor que 0° y menor que 90°</td><td>La abertura es más cerrada que la esquina de una hoja de papel.</td></tr>
+          <tr><td>Recto</td><td>Exactamente 90°</td><td>Coincide con la esquina de una hoja. Se marca con un cuadrito.</td></tr>
+          <tr><td>Obtuso</td><td>Mayor que 90° y menor que 180°</td><td>La abertura es más amplia que la esquina de una hoja.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="lienzo" id="lienzo-tres-angulos"></div>
+
+      <h3>Práctica rápida: clasifique el ángulo</h3>
+      <div class="doble">
+        <div class="lienzo" id="lienzo-reto"></div>
+        <div>
+          <div class="controles">
+            <button type="button" class="boton" data-reto="agudo">Es agudo</button>
+            <button type="button" class="boton" data-reto="recto">Es recto</button>
+            <button type="button" class="boton" data-reto="obtuso">Es obtuso</button>
+          </div>
+          <p class="retro" id="retro-reto" aria-live="polite">Observe la abertura y elija una opción.</p>
+          <button type="button" class="boton secundario" id="otro-reto">Generar otro ángulo</button>
+          <p class="leyenda" id="contador-reto">Aciertos: 0 de 0 intentos.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. POLÍGONOS ============ -->
+    <section role="tabpanel" id="panel-poligonos" aria-labelledby="tab-poligonos" tabindex="0" hidden>
+      <h2>Clasificación de polígonos por su número de lados</h2>
+      <p>Un <strong>polígono</strong> es una figura plana cerrada formada por lados rectos. Elija un polígono para ver sus datos. En esta lección se evalúan sobre todo los de <strong>3 a 6 lados</strong>; los demás se incluyen para explorar el patrón de los nombres.</p>
+
+      <div class="controles" id="botones-poligonos"></div>
+
+      <div class="doble">
+        <div class="lienzo" id="lienzo-poligono"></div>
+        <div>
+          <div class="caja" aria-live="polite">
+            <h3 id="titulo-poligono">Pentágono</h3>
+            <ul id="datos-poligono"></ul>
+          </div>
+          <div class="caja ambar">
+            <h3>Suma de los ángulos interiores</h3>
+            <p>Para un polígono de <em>n</em> lados: suma = (<em>n</em> − 2) × 180°.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="caja verde">
+        <h3>El círculo no es un polígono</h3>
+        <p>El círculo está formado por una línea curva cerrada; no tiene lados rectos, ni vértices, ni ángulos interiores. Por eso queda fuera de esta clasificación.</p>
+      </div>
+    </section>
+
+    <!-- ============ 4. TRIÁNGULOS ============ -->
+    <section role="tabpanel" id="panel-triangulos" aria-labelledby="tab-triangulos" tabindex="0" hidden>
+      <h2>Clasificación de triángulos según sus lados</h2>
+      <p class="leyenda"><strong>Cómo leer las marcas:</strong> los lados que llevan el mismo número de rayitas (|) tienen la misma longitud; un número distinto de rayitas indica una longitud distinta.</p>
+
+      <div class="controles" id="botones-triangulos"></div>
+
+      <div class="doble">
+        <div class="lienzo" id="lienzo-triangulo"></div>
+        <div class="caja" aria-live="polite">
+          <h3 id="titulo-triangulo">Triángulo equilátero</h3>
+          <p id="parrafo-triangulo"></p>
+          <ul id="datos-triangulo"></ul>
+        </div>
+      </div>
+
+      <table>
+        <caption>Resumen de los tres tipos de triángulo</caption>
+        <thead>
+          <tr><th scope="col">Tipo</th><th scope="col">Lados</th><th scope="col">Ángulos</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Equilátero</td><td>Los tres lados iguales</td><td>Los tres ángulos miden 60°</td></tr>
+          <tr><td>Isósceles</td><td>Dos lados iguales y uno distinto</td><td>Los dos ángulos de la base son iguales</td></tr>
+          <tr><td>Escaleno</td><td>Los tres lados distintos</td><td>Los tres ángulos son distintos</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============ 5. CUADRILÁTEROS ============ -->
+    <section role="tabpanel" id="panel-cuadrilateros" aria-labelledby="tab-cuadrilateros" tabindex="0" hidden>
+      <h2>Clasificación de cuadriláteros</h2>
+      <p class="leyenda"><strong>Cómo leer las marcas:</strong> las rayitas (|) iguales señalan lados de la misma longitud; las puntas de flecha (›) iguales señalan lados paralelos; el cuadrito en un vértice señala un ángulo recto.</p>
+
+      <div class="controles" id="botones-cuadrilateros"></div>
+
+      <div class="doble">
+        <div class="lienzo" id="lienzo-cuadrilatero"></div>
+        <div class="caja" aria-live="polite">
+          <h3 id="titulo-cuadrilatero">Cuadrado</h3>
+          <p id="parrafo-cuadrilatero"></p>
+          <ul id="datos-cuadrilatero"></ul>
+        </div>
+      </div>
+
+      <table>
+        <caption>Propiedades comparadas de los cuadriláteros</caption>
+        <thead>
+          <tr>
+            <th scope="col">Figura</th>
+            <th scope="col">Pares de lados paralelos</th>
+            <th scope="col">Lados iguales</th>
+            <th scope="col">Ángulos rectos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Cuadrado</td><td>2</td><td>Los cuatro</td><td>4</td></tr>
+          <tr><td>Rectángulo</td><td>2</td><td>Iguales dos a dos</td><td>4</td></tr>
+          <tr><td>Rombo</td><td>2</td><td>Los cuatro</td><td>Ninguno (en general)</td></tr>
+          <tr><td>Paralelogramo</td><td>2</td><td>Iguales dos a dos</td><td>Ninguno (en general)</td></tr>
+          <tr><td>Trapecio</td><td>1</td><td>No necesariamente</td><td>Ninguno (en general)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="caja ambar">
+        <h3>Dato curioso</h3>
+        <p>Un <strong>cuadrado</strong> es un caso especial de rectángulo (tiene 4 ángulos rectos) y también de rombo (tiene 4 lados iguales). El cuadrado cumple las dos condiciones a la vez.</p>
+      </div>
+    </section>
+
+    <!-- ============ 6. RETO: IDENTIFICA LA FIGURA ============ -->
+    <section role="tabpanel" id="panel-reto" aria-labelledby="tab-reto" tabindex="0" hidden>
+      <h2>Reto: identifica la figura</h2>
+      <p>Aquí no se le dice nada de antemano. Aparece una figura y usted responde todas las preguntas sobre ella: cuántos lados tiene, cómo se llama, de qué tipo es y qué clase de ángulo está marcado. Cada figura aparece girada al azar, así que hay que fijarse en las <strong>marcas</strong>, no en la posición.</p>
+
+      <div class="doble">
+        <div class="lienzo" id="lienzo-figura"></div>
+        <div>
+          <div class="caja" aria-live="polite">
+            <h3 id="titulo-reto-fig">Pregunta 1</h3>
+            <p id="pregunta-reto-fig">Cargando la figura&hellip;</p>
+            <div class="opciones" id="opciones-reto-fig"></div>
+            <p class="retro" id="retro-reto-fig" hidden></p>
+          </div>
+          <div class="controles">
+            <button type="button" class="boton" id="siguiente-fig" hidden>Siguiente pregunta</button>
+            <button type="button" class="boton secundario" id="otra-fig">Otra figura</button>
+          </div>
+          <p class="marcador" id="marcador-fig" role="status">Aciertos: 0 de 0 preguntas respondidas.</p>
+        </div>
+      </div>
+
+      <div class="caja verde">
+        <h3>Cómo leer la figura</h3>
+        <ul>
+          <li>Las <strong>rayitas</strong> (|) marcan lados de la misma longitud: mismo número de rayitas, misma medida.</li>
+          <li>Las <strong>puntas de flecha</strong> (&rsaquo;) marcan lados paralelos.</li>
+          <li>El <strong>cuadrito</strong> en una esquina indica un ángulo recto.</li>
+          <li>La letra <strong>V</strong> señala el vértice cuyo ángulo hay que clasificar.</li>
+        </ul>
+      </div>
+
+      <div class="caja ambar">
+        <h3>Girar no cambia la figura</h3>
+        <p>Un cuadrado sigue siendo un cuadrado aunque se apoye sobre una punta, y un triángulo isósceles lo sigue siendo aunque esté de cabeza. Lo que define a la figura son sus lados y sus ángulos, no cómo está colocada en la hoja.</p>
+      </div>
+    </section>
+
+    <!-- ============ 7. ÁRBOL DE DECISIÓN ============ -->
+    <section role="tabpanel" id="panel-arbol" aria-labelledby="tab-arbol" tabindex="0" hidden>
+      <h2>Árbol de decisión: ¿qué cuadrilátero es?</h2>
+      <p>Responda las preguntas en orden. Es el mismo árbol de tres pasos de la Actividad B de la práctica guiada, ahora para recorrerlo por su cuenta.</p>
+
+      <div class="doble">
+        <div>
+          <div class="caja" aria-live="polite">
+            <h3 id="titulo-arbol">Paso 1</h3>
+            <p id="pregunta-arbol">¿Tiene 4 ángulos rectos?</p>
+            <div class="controles" id="botones-arbol"></div>
+            <button type="button" class="boton secundario" id="reiniciar-arbol" hidden>Empezar de nuevo</button>
+          </div>
+          <div class="caja verde">
+            <h3>Camino recorrido</h3>
+            <ol id="camino-arbol"><li>Se parte de un polígono de cuatro lados: un cuadrilátero.</li></ol>
+          </div>
+        </div>
+        <div class="lienzo" id="lienzo-arbol"></div>
+      </div>
+
+      <div class="caja ambar">
+        <h3>Los tres pasos del árbol</h3>
+        <ol>
+          <li>¿Tiene 4 ángulos rectos? Si <strong>sí</strong> → es cuadrado o rectángulo. Si <strong>no</strong> → es rombo, paralelogramo o trapecio.</li>
+          <li>Con 4 ángulos rectos: ¿los 4 lados son iguales? Si <strong>sí</strong> → cuadrado; si <strong>no</strong> → rectángulo.</li>
+          <li>Sin ángulos rectos: ¿cuántos pares de lados paralelos? <strong>Dos pares</strong> → rombo o paralelogramo; <strong>un solo par</strong> → trapecio.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ 8. PRÁCTICA ============ -->
+    <section role="tabpanel" id="panel-practica" aria-labelledby="tab-practica" tabindex="0" hidden>
+      <h2>Práctica: compruebe lo aprendido</h2>
+      <p>Seleccione una respuesta en cada pregunta y pulse <strong>Comprobar respuestas</strong>. Puede corregir las preguntas falladas y volver a comprobar.</p>
+
+      <p class="marcador" id="marcador" role="status">Resultado: sin comprobar todavía.</p>
+      <div id="cuestionario"></div>
+
+      <div class="controles">
+        <button type="button" class="boton" id="comprobar">Comprobar respuestas</button>
+        <button type="button" class="boton secundario" id="reiniciar">Reiniciar la práctica</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="licencia">
+    <p>José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago.</p>
+    <p>Esta obra está bajo una licencia
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" rel="license">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================
+     Utilidades geométricas
+     ========================================================= */
+  var COL = {
+    trazo:"#1b2733", relleno:"#dceaf6", azul:"#00696e",
+    verde:"#2e7d4f", ambar:"#5C3900", vino:"#8a2432", gris:"#4a5560", turquesa:"#006064"
+  };
+
+  function unit(p,q){
+    var dx=q[0]-p[0], dy=q[1]-p[1], l=Math.hypot(dx,dy);
+    return [dx/l, dy/l];
+  }
+  function centroide(pts){
+    var sx=0, sy=0, i;
+    for(i=0;i<pts.length;i++){ sx+=pts[i][0]; sy+=pts[i][1]; }
+    return [sx/pts.length, sy/pts.length];
+  }
+  function poligonoRegular(n,cx,cy,r){
+    var pts=[], i, a;
+    for(i=0;i<n;i++){
+      a = -Math.PI/2 + (i*2*Math.PI)/n;
+      pts.push([cx + r*Math.cos(a), cy + r*Math.sin(a)]);
+    }
+    return pts;
+  }
+  function atributoPuntos(pts){
+    return pts.map(function(p){ return p[0].toFixed(1)+","+p[1].toFixed(1); }).join(" ");
+  }
+  /* Rayitas perpendiculares en el punto medio de un lado */
+  function rayitas(p1,p2,cantidad){
+    var mx=(p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2;
+    var u=unit(p1,p2), n=[-u[1],u[0]], d="", i, t, bx, by;
+    var largo=7, sep=6, offset=(cantidad-1)*sep/2;
+    for(i=0;i<cantidad;i++){
+      t = -offset + i*sep;
+      bx = mx + u[0]*t; by = my + u[1]*t;
+      d += "M "+(bx-n[0]*largo)+" "+(by-n[1]*largo)+" L "+(bx+n[0]*largo)+" "+(by+n[1]*largo)+" ";
+    }
+    return d;
+  }
+  /* Puntas de flecha (paralelismo) en el punto medio de un lado */
+  function flechas(p1,p2,cantidad){
+    var mx=(p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2;
+    var u=unit(p1,p2), n=[-u[1],u[0]], d="", i, t, bx, by, punta, a1, a2;
+    var sep=9, offset=(cantidad-1)*sep/2;
+    for(i=0;i<cantidad;i++){
+      t = -offset + i*sep;
+      bx = mx + u[0]*t; by = my + u[1]*t;
+      punta=[bx+u[0]*5, by+u[1]*5];
+      a1=[bx-u[0]*4+n[0]*6, by-u[1]*4+n[1]*6];
+      a2=[bx-u[0]*4-n[0]*6, by-u[1]*4-n[1]*6];
+      d += "M "+a1[0]+" "+a1[1]+" L "+punta[0]+" "+punta[1]+" L "+a2[0]+" "+a2[1]+" ";
+    }
+    return d;
+  }
+  /* Cuadrito de ángulo recto en el vértice v, entre los puntos a y b */
+  function cuadritoRecto(v,a,b,tam){
+    tam = tam || 15;
+    var u1=unit(v,a), u2=unit(v,b);
+    var p1=[v[0]+u1[0]*tam, v[1]+u1[1]*tam];
+    var p2=[v[0]+u2[0]*tam, v[1]+u2[1]*tam];
+    var p3=[p1[0]+u2[0]*tam, p1[1]+u2[1]*tam];
+    return "M "+p1[0]+" "+p1[1]+" L "+p3[0]+" "+p3[1]+" L "+p2[0]+" "+p2[1];
+  }
+  /* Arco de ángulo en el vértice v, entre los puntos a y b */
+  function arcoAngulo(v,a,b,r){
+    var u1=unit(v,a), u2=unit(v,b);
+    var p1=[v[0]+u1[0]*r, v[1]+u1[1]*r];
+    var p2=[v[0]+u2[0]*r, v[1]+u2[1]*r];
+    var cruz = u1[0]*u2[1]-u1[1]*u2[0];
+    var barrido = cruz>0 ? 1 : 0;
+    return "M "+p1[0]+" "+p1[1]+" A "+r+" "+r+" 0 0 "+barrido+" "+p2[0]+" "+p2[1];
+  }
+  function medidaAngulo(v,a,b){
+    var u1=unit(v,a), u2=unit(v,b);
+    var c = u1[0]*u2[0] + u1[1]*u2[1];
+    c = Math.max(-1, Math.min(1, c));
+    return Math.acos(c)*180/Math.PI;
+  }
+  function tipoAngulo(g){
+    if(Math.abs(g-90) < 0.5) return "recto";
+    return g < 90 ? "agudo" : "obtuso";
+  }
+  function bisectriz(v,a,b,r){
+    var u1=unit(v,a), u2=unit(v,b);
+    var bx=u1[0]+u2[0], by=u1[1]+u2[1], l=Math.hypot(bx,by);
+    if(l===0){ return [v[0], v[1]-r]; }
+    return [v[0]+(bx/l)*r, v[1]+(by/l)*r];
+  }
+  function esc(t){
+    return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  /* =========================================================
+     Pestañas accesibles
+     ========================================================= */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function activarTab(tab, mover){
+    tabs.forEach(function(t){
+      var panel = document.getElementById(t.getAttribute("aria-controls"));
+      var sel = (t === tab);
+      t.setAttribute("aria-selected", sel ? "true" : "false");
+      t.tabIndex = sel ? 0 : -1;
+      if(panel){ panel.hidden = !sel; }
+    });
+    if(mover){ tab.focus(); }
+  }
+  tabs.forEach(function(tab, i){
+    tab.addEventListener("click", function(){ activarTab(tab, false); });
+    tab.addEventListener("keydown", function(e){
+      var j = null;
+      if(e.key==="ArrowRight"){ j=(i+1)%tabs.length; }
+      else if(e.key==="ArrowLeft"){ j=(i-1+tabs.length)%tabs.length; }
+      else if(e.key==="Home"){ j=0; }
+      else if(e.key==="End"){ j=tabs.length-1; }
+      if(j!==null){ e.preventDefault(); activarTab(tabs[j], true); }
+    });
+  });
+
+  /* =========================================================
+     1. Partes de una figura
+     ========================================================= */
+  var PENT = [[55,255],[55,130],[165,50],[300,110],[335,255]];
+  var LETRAS = ["A","B","C","D","E"];
+  var estado = { lados:true, vertices:false, angulos:false };
+
+  function dibujarPartes(){
+    var pts = PENT, n = pts.length, c = centroide(pts), i, s = "";
+    s += '<svg viewBox="0 0 400 310" role="img" aria-label="Pentágono con sus lados, vértices y ángulos.">';
+    s += '<polygon points="'+atributoPuntos(pts)+'" fill="'+COL.relleno+'" stroke="'+COL.trazo+'" stroke-width="2.5"/>';
+
+    if(estado.angulos){
+      for(i=0;i<n;i++){
+        var v=pts[i], a=pts[(i-1+n)%n], b=pts[(i+1)%n];
+        var g=medidaAngulo(v,a,b), t=tipoAngulo(g);
+        var color = t==="recto" ? COL.azul : (t==="agudo" ? COL.verde : COL.vino);
+        if(t==="recto"){
+          s += '<path d="'+cuadritoRecto(v,a,b,16)+'" fill="none" stroke="'+color+'" stroke-width="3"/>';
+        }else{
+          s += '<path d="'+arcoAngulo(v,a,b,30)+'" fill="none" stroke="'+color+'" stroke-width="3"/>';
+        }
+        var pos = bisectriz(v,a,b,52);
+        s += '<text x="'+pos[0]+'" y="'+pos[1]+'" fill="'+color+'" font-size="13" font-weight="bold" text-anchor="middle">'+Math.round(g)+'\u00B0</text>';
+        s += '<text x="'+pos[0]+'" y="'+(pos[1]+15)+'" fill="'+color+'" font-size="12" text-anchor="middle">'+t+'</text>';
+      }
+    }
+
+    if(estado.lados){
+      for(i=0;i<n;i++){
+        var p1=pts[i], p2=pts[(i+1)%n];
+        s += '<line x1="'+p1[0]+'" y1="'+p1[1]+'" x2="'+p2[0]+'" y2="'+p2[1]+'" stroke="'+COL.ambar+'" stroke-width="6" stroke-linecap="round"/>';
+        var mx=(p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2;
+        var d=unit(c,[mx,my]);
+        s += '<text x="'+(mx+d[0]*20)+'" y="'+(my+d[1]*20+5)+'" fill="'+COL.ambar+'" font-size="14" font-weight="bold" text-anchor="middle">L'+(i+1)+'</text>';
+      }
+    }
+
+    if(estado.vertices){
+      for(i=0;i<n;i++){
+        var v2=pts[i], d2=unit(c,v2);
+        s += '<circle cx="'+v2[0]+'" cy="'+v2[1]+'" r="7" fill="'+COL.verde+'" stroke="#ffffff" stroke-width="2"/>';
+        s += '<text x="'+(v2[0]+d2[0]*24)+'" y="'+(v2[1]+d2[1]*24+5)+'" fill="'+COL.verde+'" font-size="15" font-weight="bold" text-anchor="middle">'+LETRAS[i]+'</text>';
+      }
+    }
+    s += '</svg>';
+    document.getElementById("lienzo-partes").innerHTML = s;
+    textoPartes();
+  }
+
+  function textoPartes(){
+    var partes = [];
+    if(estado.lados){ partes.push("Los <strong>5 lados</strong> están resaltados y numerados de L1 a L5. Cada uno es un segmento de recta."); }
+    if(estado.vertices){ partes.push("Los <strong>5 vértices</strong> aparecen como puntos y se nombran con las letras A, B, C, D y E. Cada vértice es la unión de dos lados."); }
+    if(estado.angulos){ partes.push("Los <strong>5 ángulos interiores</strong> muestran su medida y su tipo: uno recto (90°), uno agudo (menor que 90°) y tres obtusos (mayores que 90°). Su suma es 540°."); }
+    if(partes.length === 0){ partes.push("Active al menos un botón para resaltar los elementos de la figura."); }
+    document.getElementById("parrafo-partes").innerHTML = partes.join(" ");
+  }
+
+  [["ver-lados","lados"],["ver-vertices","vertices"],["ver-angulos","angulos"]].forEach(function(par){
+    var btn = document.getElementById(par[0]);
+    btn.addEventListener("click", function(){
+      estado[par[1]] = !estado[par[1]];
+      btn.setAttribute("aria-pressed", estado[par[1]] ? "true" : "false");
+      dibujarPartes();
+    });
+  });
+  dibujarPartes();
+
+  /* =========================================================
+     2. Tipos de ángulo
+     ========================================================= */
+  function svgAngulo(grados, cx, cy, largo, color, etiqueta, mostrarMedida){
+    var rad = grados*Math.PI/180;
+    var a = [cx+largo, cy];
+    var b = [cx+largo*Math.cos(rad), cy-largo*Math.sin(rad)];
+    var v = [cx,cy], s = "";
+    if(Math.abs(grados-90) < 0.5){
+      s += '<path d="'+cuadritoRecto(v,a,b,16)+'" fill="none" stroke="'+color+'" stroke-width="3"/>';
+    }else{
+      s += '<path d="'+arcoAngulo(v,a,b,34)+'" fill="none" stroke="'+color+'" stroke-width="3"/>';
+    }
+    s += '<line x1="'+v[0]+'" y1="'+v[1]+'" x2="'+a[0]+'" y2="'+a[1]+'" stroke="'+COL.trazo+'" stroke-width="3" stroke-linecap="round"/>';
+    s += '<line x1="'+v[0]+'" y1="'+v[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="'+COL.trazo+'" stroke-width="3" stroke-linecap="round"/>';
+    s += '<circle cx="'+v[0]+'" cy="'+v[1]+'" r="5" fill="'+COL.trazo+'"/>';
+    if(mostrarMedida){
+      var pos = bisectriz(v,a,b,62);
+      s += '<text x="'+pos[0]+'" y="'+pos[1]+'" fill="'+color+'" font-size="15" font-weight="bold" text-anchor="middle">'+grados+'\u00B0</text>';
+    }
+    if(etiqueta){
+      s += '<text x="'+cx+'" y="'+(cy+34)+'" fill="'+color+'" font-size="15" font-weight="bold" text-anchor="middle">'+etiqueta+'</text>';
+    }
+    return s;
+  }
+
+  (function tresAngulos(){
+    var s = '<svg viewBox="0 0 620 200" role="img" aria-label="Tres ángulos de ejemplo: uno agudo de 45 grados, uno recto de 90 grados y uno obtuso de 135 grados.">';
+    s += svgAngulo(45, 40, 150, 110, COL.verde, "Agudo (45\u00B0)", false);
+    s += svgAngulo(90, 250, 150, 110, COL.azul, "Recto (90\u00B0)", false);
+    s += svgAngulo(135, 470, 150, 110, COL.vino, "Obtuso (135\u00B0)", false);
+    s += '</svg>';
+    document.getElementById("lienzo-tres-angulos").innerHTML = s;
+  })();
+
+  var MEDIDAS = [20,30,35,40,50,55,65,75,90,100,110,120,135,145,155,165];
+  var retoActual = 90, retoIntentos = 0, retoAciertos = 0, retoResuelto = false;
+
+  function pintarReto(revelar){
+    var color = revelar ? (tipoAngulo(retoActual)==="agudo" ? COL.verde : (tipoAngulo(retoActual)==="recto" ? COL.azul : COL.vino)) : COL.gris;
+    var s = '<svg viewBox="0 0 320 210" role="img" aria-label="Ángulo para clasificar.">';
+    s += svgAngulo(retoActual, 45, 165, 135, color, "", revelar);
+    s += '</svg>';
+    document.getElementById("lienzo-reto").innerHTML = s;
+  }
+  function nuevoReto(){
+    var previo = retoActual;
+    do{ retoActual = MEDIDAS[Math.floor(Math.random()*MEDIDAS.length)]; }while(retoActual === previo);
+    retoResuelto = false;
+    pintarReto(false);
+    var r = document.getElementById("retro-reto");
+    r.className = "retro";
+    r.textContent = "Observe la abertura y elija una opción.";
+  }
+  document.querySelectorAll("[data-reto]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      if(retoResuelto){ return; }
+      var elegido = btn.getAttribute("data-reto");
+      var correcto = tipoAngulo(retoActual);
+      var r = document.getElementById("retro-reto");
+      retoIntentos++;
+      if(elegido === correcto){
+        retoAciertos++;
+        retoResuelto = true;
+        r.className = "retro bien";
+        r.textContent = "Correcto. El ángulo mide " + retoActual + "\u00B0, por lo tanto es " + correcto + ".";
+        pintarReto(true);
+      }else{
+        r.className = "retro mal";
+        r.textContent = "Todavía no. Compare la abertura con la esquina de una hoja de papel (90°) e inténtelo de nuevo.";
+      }
+      document.getElementById("contador-reto").textContent =
+        "Aciertos: " + retoAciertos + " de " + retoIntentos + " intentos.";
+    });
+  });
+  document.getElementById("otro-reto").addEventListener("click", nuevoReto);
+  pintarReto(false);
+
+  /* =========================================================
+     3. Polígonos
+     ========================================================= */
+  var POLIGONOS = [
+    {n:3,  nombre:"Triángulo"},
+    {n:4,  nombre:"Cuadrilátero"},
+    {n:5,  nombre:"Pentágono"},
+    {n:6,  nombre:"Hexágono"},
+    {n:7,  nombre:"Heptágono"},
+    {n:8,  nombre:"Octágono"},
+    {n:9,  nombre:"Eneágono (nonágono)"},
+    {n:10, nombre:"Decágono"},
+    {n:12, nombre:"Dodecágono"}
+  ];
+
+  function dibujarPoligono(item){
+    var pts = poligonoRegular(item.n, 190, 160, 120);
+    var i, s = '<svg viewBox="0 0 380 320" role="img" aria-label="'+esc(item.nombre)+' regular de '+item.n+' lados con sus vértices marcados.">';
+    s += '<polygon points="'+atributoPuntos(pts)+'" fill="'+COL.relleno+'" stroke="'+COL.trazo+'" stroke-width="2.5"/>';
+    for(i=0;i<pts.length;i++){
+      s += '<circle cx="'+pts[i][0]+'" cy="'+pts[i][1]+'" r="5.5" fill="'+COL.verde+'" stroke="#ffffff" stroke-width="1.5"/>';
+    }
+    s += '<text x="190" y="168" fill="'+COL.azul+'" font-size="17" font-weight="bold" text-anchor="middle">'+item.n+' lados</text>';
+    s += '</svg>';
+    document.getElementById("lienzo-poligono").innerHTML = s;
+
+    var suma = (item.n-2)*180;
+    var cada = (suma/item.n);
+    document.getElementById("titulo-poligono").textContent = item.nombre;
+    document.getElementById("datos-poligono").innerHTML =
+      '<li>Lados: <span class="dato">'+item.n+'</span></li>' +
+      '<li>Vértices: <span class="dato">'+item.n+'</span></li>' +
+      '<li>Ángulos interiores: <span class="dato">'+item.n+'</span></li>' +
+      '<li>Suma de los ángulos interiores: <span class="dato">('+item.n+' − 2) × 180° = '+suma+'°</span></li>' +
+      '<li>Si es regular, cada ángulo mide: <span class="dato">'+ (Math.round(cada*10)/10) +'°</span></li>';
+  }
+
+  (function construirPoligonos(){
+    var cont = document.getElementById("botones-poligonos");
+    POLIGONOS.forEach(function(item, i){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "boton";
+      b.textContent = item.nombre;
+      b.setAttribute("aria-pressed", i===2 ? "true" : "false");
+      b.addEventListener("click", function(){
+        cont.querySelectorAll("button").forEach(function(o){ o.setAttribute("aria-pressed","false"); });
+        b.setAttribute("aria-pressed","true");
+        dibujarPoligono(item);
+      });
+      cont.appendChild(b);
+    });
+    dibujarPoligono(POLIGONOS[2]);
+  })();
+
+  /* =========================================================
+     4. Triángulos
+     ========================================================= */
+  var TRIANGULOS = [
+    {
+      clave:"equilatero", nombre:"Triángulo equilátero",
+      pts:[[85,225],[285,225],[185,51.8]],
+      marcas:[1,1,1],
+      texto:"Sus tres lados miden exactamente lo mismo.",
+      datos:["Los tres lados son iguales.","Los tres ángulos miden 60°.","Es el único triángulo que también es un polígono regular."]
+    },
+    {
+      clave:"isosceles", nombre:"Triángulo isósceles",
+      pts:[[80,225],[290,225],[185,55]],
+      marcas:[2,1,1],
+      texto:"Tiene dos lados iguales y un tercer lado distinto, llamado base.",
+      datos:["Dos lados iguales (una rayita cada uno) y uno distinto (dos rayitas).","Los dos ángulos que se apoyan en la base son iguales.","El tercer ángulo puede ser agudo, recto u obtuso."]
+    },
+    {
+      clave:"escaleno", nombre:"Triángulo escaleno",
+      pts:[[60,225],[270,225],[75,55]],
+      marcas:[1,2,3],
+      texto:"Sus tres lados tienen longitudes diferentes.",
+      datos:["Los tres lados son distintos (una, dos y tres rayitas).","Los tres ángulos también son distintos entre sí.","No tiene ejes de simetría."]
+    }
+  ];
+
+  function dibujarTriangulo(t){
+    var pts=t.pts, i, s = '<svg viewBox="0 0 360 270" role="img" aria-label="'+esc(t.nombre)+'. '+esc(t.texto)+'">';
+    s += '<polygon points="'+atributoPuntos(pts)+'" fill="'+COL.relleno+'" stroke="'+COL.trazo+'" stroke-width="2.5"/>';
+    for(i=0;i<3;i++){
+      s += '<path d="'+rayitas(pts[i], pts[(i+1)%3], t.marcas[i])+'" stroke="'+COL.vino+'" stroke-width="2.5" fill="none"/>';
+    }
+    for(i=0;i<3;i++){
+      s += '<circle cx="'+pts[i][0]+'" cy="'+pts[i][1]+'" r="5" fill="'+COL.verde+'" stroke="#ffffff" stroke-width="1.5"/>';
+    }
+    s += '</svg>';
+    document.getElementById("lienzo-triangulo").innerHTML = s;
+    document.getElementById("titulo-triangulo").textContent = t.nombre;
+    document.getElementById("parrafo-triangulo").textContent = t.texto;
+    document.getElementById("datos-triangulo").innerHTML =
+      t.datos.map(function(d){ return "<li>"+d+"</li>"; }).join("");
+  }
+
+  (function construirTriangulos(){
+    var cont = document.getElementById("botones-triangulos");
+    TRIANGULOS.forEach(function(t, i){
+      var b = document.createElement("button");
+      b.type="button"; b.className="boton"; b.textContent=t.nombre;
+      b.setAttribute("aria-pressed", i===0 ? "true" : "false");
+      b.addEventListener("click", function(){
+        cont.querySelectorAll("button").forEach(function(o){ o.setAttribute("aria-pressed","false"); });
+        b.setAttribute("aria-pressed","true");
+        dibujarTriangulo(t);
+      });
+      cont.appendChild(b);
+    });
+    dibujarTriangulo(TRIANGULOS[0]);
+  })();
+
+  /* =========================================================
+     5. Cuadriláteros
+     ========================================================= */
+  var CUADRILATEROS = [
+    {
+      clave:"cuadrado", nombre:"Cuadrado",
+      pts:[[110,50],[270,50],[270,210],[110,210]],
+      rayitas:[1,1,1,1], flechas:[1,2,1,2], rectos:[0,1,2,3],
+      texto:"Tiene los cuatro lados iguales y los cuatro ángulos rectos.",
+      datos:["Cuatro lados de igual longitud.","Cuatro ángulos rectos (90°).","Dos pares de lados paralelos.","Es un caso especial de rectángulo y también de rombo."]
+    },
+    {
+      clave:"rectangulo", nombre:"Rectángulo",
+      pts:[[65,75],[305,75],[305,195],[65,195]],
+      rayitas:[1,2,1,2], flechas:[1,2,1,2], rectos:[0,1,2,3],
+      texto:"Tiene los lados opuestos iguales y los cuatro ángulos rectos.",
+      datos:["Los lados opuestos son iguales dos a dos.","Cuatro ángulos rectos (90°).","Dos pares de lados paralelos.","Si sus cuatro lados fueran iguales, sería un cuadrado."]
+    },
+    {
+      clave:"rombo", nombre:"Rombo",
+      pts:[[185,40],[305,130],[185,220],[65,130]],
+      rayitas:[1,1,1,1], flechas:[1,2,1,2], rectos:[],
+      texto:"Tiene los cuatro lados iguales, pero sus ángulos no son rectos.",
+      datos:["Cuatro lados de igual longitud.","Los ángulos opuestos son iguales entre sí.","Dos pares de lados paralelos.","Es un paralelogramo con todos los lados iguales."]
+    },
+    {
+      clave:"paralelogramo", nombre:"Paralelogramo",
+      pts:[[110,60],[310,60],[260,200],[60,200]],
+      rayitas:[1,2,1,2], flechas:[1,2,1,2], rectos:[],
+      texto:"Tiene dos pares de lados paralelos e iguales, sin ángulos rectos.",
+      datos:["Los lados opuestos son paralelos e iguales.","Los ángulos opuestos son iguales entre sí.","Dos ángulos son agudos y dos obtusos.","El cuadrado, el rectángulo y el rombo son casos particulares."]
+    },
+    {
+      clave:"trapecio", nombre:"Trapecio",
+      pts:[[135,60],[250,60],[315,200],[45,200]],
+      rayitas:[0,0,0,0], flechas:[1,0,1,0], rectos:[],
+      texto:"Tiene un solo par de lados paralelos, de distinta longitud.",
+      datos:["Un único par de lados paralelos: las bases.","Los otros dos lados no son paralelos.","Las bases tienen longitudes diferentes.","No es un paralelogramo."]
+    }
+  ];
+
+  function dibujarCuadrilatero(c){
+    var pts=c.pts, i, s = '<svg viewBox="0 0 370 260" role="img" aria-label="'+esc(c.nombre)+'. '+esc(c.texto)+'">';
+    s += '<polygon points="'+atributoPuntos(pts)+'" fill="'+COL.relleno+'" stroke="'+COL.trazo+'" stroke-width="2.5"/>';
+    for(i=0;i<4;i++){
+      if(c.rayitas[i] > 0){
+        s += '<path d="'+rayitas(pts[i], pts[(i+1)%4], c.rayitas[i])+'" stroke="'+COL.vino+'" stroke-width="2.5" fill="none"/>';
+      }
+      if(c.flechas[i] > 0){
+        s += '<path d="'+flechas(pts[i], pts[(i+1)%4], c.flechas[i])+'" stroke="'+COL.ambar+'" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+      }
+    }
+    c.rectos.forEach(function(k){
+      s += '<path d="'+cuadritoRecto(pts[k], pts[(k+3)%4], pts[(k+1)%4], 16)+'" fill="none" stroke="'+COL.azul+'" stroke-width="2.5"/>';
+    });
+    for(i=0;i<4;i++){
+      s += '<circle cx="'+pts[i][0]+'" cy="'+pts[i][1]+'" r="5" fill="'+COL.verde+'" stroke="#ffffff" stroke-width="1.5"/>';
+    }
+    s += '</svg>';
+    document.getElementById("lienzo-cuadrilatero").innerHTML = s;
+    document.getElementById("titulo-cuadrilatero").textContent = c.nombre;
+    document.getElementById("parrafo-cuadrilatero").textContent = c.texto;
+    document.getElementById("datos-cuadrilatero").innerHTML =
+      c.datos.map(function(d){ return "<li>"+d+"</li>"; }).join("");
+  }
+
+  (function construirCuadrilateros(){
+    var cont = document.getElementById("botones-cuadrilateros");
+    CUADRILATEROS.forEach(function(c, i){
+      var b = document.createElement("button");
+      b.type="button"; b.className="boton"; b.textContent=c.nombre;
+      b.setAttribute("aria-pressed", i===0 ? "true" : "false");
+      b.addEventListener("click", function(){
+        cont.querySelectorAll("button").forEach(function(o){ o.setAttribute("aria-pressed","false"); });
+        b.setAttribute("aria-pressed","true");
+        dibujarCuadrilatero(c);
+      });
+      cont.appendChild(b);
+    });
+    dibujarCuadrilatero(CUADRILATEROS[0]);
+  })();
+
+  /* =========================================================
+     6. Reto: identifica la figura
+     ========================================================= */
+  var NOMBRES_POR_LADOS = {3:"Triángulo",4:"Cuadrilátero",5:"Pentágono",6:"Hexágono",
+                           7:"Heptágono",8:"Octágono",9:"Eneágono",10:"Decágono"};
+
+  var BANCO = [];
+  TRIANGULOS.forEach(function(t){
+    BANCO.push({ clase:"triangulo", nombre:t.nombre,
+      sub:t.nombre.replace("Triángulo ",""), lados:3, pts:t.pts,
+      rayitas:t.marcas, flechas:[0,0,0], rectos:[], giro:20 });
+  });
+  CUADRILATEROS.forEach(function(c){
+    BANCO.push({ clase:"cuadrilatero", nombre:c.nombre, sub:c.nombre, lados:4, pts:c.pts,
+      rayitas:c.rayitas, flechas:c.flechas, rectos:c.rectos, giro:12 });
+  });
+  [5,6,7,8].forEach(function(n){
+    var pts = poligonoRegular(n, 185, 130, 95);
+    BANCO.push({ clase:"regular", nombre:NOMBRES_POR_LADOS[n], sub:null, lados:n, pts:pts,
+      rayitas:pts.map(function(){ return 1; }),
+      flechas:pts.map(function(){ return 0; }), rectos:[], giro:180 });
+  });
+
+  function girar(pts, grados){
+    var c = centroide(pts), a = grados*Math.PI/180;
+    return pts.map(function(p){
+      var dx=p[0]-c[0], dy=p[1]-c[1];
+      return [c[0]+dx*Math.cos(a)-dy*Math.sin(a), c[1]+dx*Math.sin(a)+dy*Math.cos(a)];
+    });
+  }
+  function encuadrar(pts, W, H, m){
+    var minx=Infinity, miny=Infinity, maxx=-Infinity, maxy=-Infinity, i;
+    for(i=0;i<pts.length;i++){
+      if(pts[i][0]<minx){minx=pts[i][0];} if(pts[i][0]>maxx){maxx=pts[i][0];}
+      if(pts[i][1]<miny){miny=pts[i][1];} if(pts[i][1]>maxy){maxy=pts[i][1];}
+    }
+    var w=maxx-minx, h=maxy-miny;
+    var e=Math.min((W-2*m)/w, (H-2*m)/h);
+    return pts.map(function(p){
+      return [ (p[0]-minx)*e + (W-w*e)/2, (p[1]-miny)*e + (H-h*e)/2 ];
+    });
+  }
+
+  var retoFig = null, retoPreg = [], retoIdx = 0;
+  var figAciertos = 0, figRespondidas = 0;
+
+  function dibujarFiguraReto(){
+    var f = retoFig, pts = f.vista, n = pts.length, i;
+    var s = '<svg viewBox="0 0 380 300" role="img" aria-label="Figura de '+n+' lados para clasificar, con sus marcas de lados iguales, lados paralelos y el vértice V señalado.">';
+    s += '<polygon points="'+atributoPuntos(pts)+'" fill="'+COL.relleno+'" stroke="'+COL.trazo+'" stroke-width="2.5"/>';
+    for(i=0;i<n;i++){
+      if(f.rayitas[i] > 0){
+        s += '<path d="'+rayitas(pts[i], pts[(i+1)%n], f.rayitas[i])+'" stroke="'+COL.vino+'" stroke-width="2.5" fill="none"/>';
+      }
+      if(f.flechas[i] > 0){
+        s += '<path d="'+flechas(pts[i], pts[(i+1)%n], f.flechas[i])+'" stroke="'+COL.ambar+'" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+      }
+    }
+    f.rectos.forEach(function(k){
+      s += '<path d="'+cuadritoRecto(pts[k], pts[(k+n-1)%n], pts[(k+1)%n], 15)+'" fill="none" stroke="'+COL.azul+'" stroke-width="2.5"/>';
+    });
+    var v = pts[f.vertice], a = pts[(f.vertice+n-1)%n], b = pts[(f.vertice+1)%n];
+    if(f.rectos.indexOf(f.vertice) === -1){
+      s += '<path d="'+arcoAngulo(v,a,b,27)+'" fill="none" stroke="'+COL.turquesa+'" stroke-width="3.5"/>';
+    }
+    s += '<circle cx="'+v[0]+'" cy="'+v[1]+'" r="6" fill="'+COL.turquesa+'" stroke="#ffffff" stroke-width="2"/>';
+    var fuera = unit(centroide(pts), v);
+    s += '<text x="'+(v[0]+fuera[0]*24)+'" y="'+(v[1]+fuera[1]*24+6)+'" fill="'+COL.turquesa+'" font-size="17" font-weight="bold" text-anchor="middle">V</text>';
+    s += '</svg>';
+    document.getElementById("lienzo-figura").innerHTML = s;
+  }
+
+  function opcionesLados(correcto){
+    var set = [correcto], extra = [correcto-1, correcto+1, correcto+2, correcto-2], i;
+    for(i=0;i<extra.length && set.length<4;i++){
+      if(extra[i] >= 3 && set.indexOf(extra[i]) === -1){ set.push(extra[i]); }
+    }
+    return mezclar(set.map(function(v){ return {txt:String(v), ok:(v===correcto)}; }));
+  }
+  function opcionesNombre(correcto){
+    var todos = [3,4,5,6,7,8].map(function(k){ return NOMBRES_POR_LADOS[k]; });
+    var otros = mezclar(todos.filter(function(t){ return t !== correcto; })).slice(0,3);
+    return mezclar([correcto].concat(otros).map(function(t){ return {txt:t, ok:(t===correcto)}; }));
+  }
+  function opcionesLista(lista, correcto){
+    return mezclar(lista.map(function(t){ return {txt:t, ok:(t===correcto)}; }));
+  }
+
+  function armarPreguntas(f){
+    var qs = [], n = f.lados;
+    qs.push({ p:"¿Cuántos lados tiene esta figura?", o:opcionesLados(n),
+      e:"Cuente los segmentos rectos del contorno: son "+n+"." });
+    qs.push({ p:"¿Cuántos vértices tiene?", o:opcionesLados(n),
+      e:"En todo polígono el número de vértices es igual al de lados: "+n+"." });
+    qs.push({ p:"Según su número de lados, ¿cómo se llama este polígono?", o:opcionesNombre(f.nombreFamilia),
+      e:"Un polígono de "+n+" lados es un "+f.nombreFamilia.toLowerCase()+"." });
+    if(f.clase === "triangulo"){
+      qs.push({ p:"Fíjese en las rayitas. Según sus lados, este triángulo es:",
+        o:opcionesLista(["Equilátero","Isósceles","Escaleno"], f.sub),
+        e:f.sub==="Equilátero" ? "Las tres rayitas iguales indican tres lados iguales: equilátero."
+          : (f.sub==="Isósceles" ? "Dos lados llevan la misma marca y el tercero una distinta: isósceles."
+          : "Cada lado lleva un número distinto de rayitas: los tres son diferentes, escaleno.") });
+    }
+    if(f.clase === "cuadrilatero"){
+      qs.push({ p:"Fíjese en las marcas. ¿Qué cuadrilátero es?",
+        o:opcionesLista(["Cuadrado","Rectángulo","Rombo","Paralelogramo","Trapecio"], f.sub),
+        e:f.explica });
+    }
+    qs.push({ p:"El ángulo marcado con la letra V es un ángulo:",
+      o:opcionesLista(["Agudo","Recto","Obtuso"], f.tipoAngulo),
+      e:"Ese ángulo mide "+f.gradoAngulo+"°, por lo tanto es "+f.tipoAngulo.toLowerCase()+"." });
+    return qs;
+  }
+
+  var EXPLICA = {
+    "Cuadrado":"Cuatro rayitas iguales (lados iguales) y cuadritos en las esquinas (ángulos rectos): cuadrado.",
+    "Rectángulo":"Hay cuadritos en las esquinas, pero los lados son iguales solo dos a dos: rectángulo.",
+    "Rombo":"Los cuatro lados llevan la misma rayita, pero no hay ningún ángulo recto: rombo.",
+    "Paralelogramo":"Dos pares de lados paralelos e iguales dos a dos, sin ángulos rectos: paralelogramo.",
+    "Trapecio":"Solo un par de lados lleva las puntas de flecha: un solo par de lados paralelos, trapecio."
+  };
+
+  function nuevaFigura(){
+    var f = Object.assign({}, BANCO[Math.floor(Math.random()*BANCO.length)]);
+    var grados = (Math.random()*2-1)*f.giro;
+    f.vista = encuadrar(girar(f.pts, grados), 380, 300, 42);
+    f.vertice = Math.floor(Math.random()*f.lados);
+    f.nombreFamilia = NOMBRES_POR_LADOS[f.lados];
+    f.explica = EXPLICA[f.sub] || "";
+    var n=f.lados, v=f.vista[f.vertice], a=f.vista[(f.vertice+n-1)%n], b=f.vista[(f.vertice+1)%n];
+    f.gradoAngulo = Math.round(medidaAngulo(v,a,b));
+    f.tipoAngulo = f.gradoAngulo<89 ? "Agudo" : (f.gradoAngulo>91 ? "Obtuso" : "Recto");
+    retoFig = f;
+    retoPreg = armarPreguntas(f);
+    retoIdx = 0;
+    dibujarFiguraReto();
+    pintarPreguntaFig();
+  }
+
+  function pintarPreguntaFig(){
+    var q = retoPreg[retoIdx];
+    var cont = document.getElementById("opciones-reto-fig");
+    document.getElementById("titulo-reto-fig").textContent =
+      "Pregunta " + (retoIdx+1) + " de " + retoPreg.length;
+    document.getElementById("pregunta-reto-fig").textContent = q.p;
+    var r = document.getElementById("retro-reto-fig");
+    r.hidden = true; r.className = "retro";
+    document.getElementById("siguiente-fig").hidden = true;
+    cont.innerHTML = "";
+    q.o.forEach(function(op){
+      var b = document.createElement("button");
+      b.type="button"; b.className="opcion"; b.textContent=op.txt;
+      b.addEventListener("click", function(){ responderFig(b, op, q); });
+      cont.appendChild(b);
+    });
+  }
+
+  function responderFig(btn, op, q){
+    var cont = document.getElementById("opciones-reto-fig");
+    if(cont.getAttribute("data-bloqueado") === "si"){ return; }
+    var r = document.getElementById("retro-reto-fig");
+    figRespondidas++;
+    if(op.ok){
+      figAciertos++;
+      cont.setAttribute("data-bloqueado","si");
+      cont.querySelectorAll(".opcion").forEach(function(o){ o.disabled = true; });
+      btn.classList.add("correcta");
+      r.hidden = false; r.className = "retro bien";
+      r.textContent = "Correcto. " + q.e;
+      var ultima = (retoIdx === retoPreg.length-1);
+      var sig = document.getElementById("siguiente-fig");
+      sig.hidden = false;
+      sig.textContent = ultima ? "Terminar y ver otra figura" : "Siguiente pregunta";
+    }else{
+      btn.classList.add("incorrecta");
+      btn.disabled = true;
+      r.hidden = false; r.className = "retro mal";
+      r.textContent = "Todavía no. Vuelva a mirar la figura y sus marcas antes de elegir otra opción.";
+    }
+    document.getElementById("marcador-fig").textContent =
+      "Aciertos: " + figAciertos + " de " + figRespondidas + " preguntas respondidas.";
+  }
+
+  document.getElementById("siguiente-fig").addEventListener("click", function(){
+    document.getElementById("opciones-reto-fig").removeAttribute("data-bloqueado");
+    if(retoIdx === retoPreg.length-1){ nuevaFigura(); }
+    else { retoIdx++; pintarPreguntaFig(); }
+  });
+  document.getElementById("otra-fig").addEventListener("click", function(){
+    document.getElementById("opciones-reto-fig").removeAttribute("data-bloqueado");
+    nuevaFigura();
+  });
+  nuevaFigura();
+
+  /* =========================================================
+     7. Árbol de decisión de cuadriláteros
+     ========================================================= */
+  var ARBOL = {
+    inicio: { paso:1, p:"¿Tiene 4 ángulos rectos?", opciones:[
+      {t:"Sí", ir:"ladosA", eco:"Tiene 4 ángulos rectos: es cuadrado o rectángulo."},
+      {t:"No", ir:"paralelas", eco:"No tiene 4 ángulos rectos: es rombo, paralelogramo o trapecio."}
+    ]},
+    ladosA: { paso:2, p:"Con 4 ángulos rectos: ¿los 4 lados son iguales?", opciones:[
+      {t:"Sí", fin:"cuadrado", eco:"Sus 4 lados son iguales."},
+      {t:"No", fin:"rectangulo", eco:"Solo los lados opuestos son iguales."}
+    ]},
+    paralelas: { paso:3, p:"Sin ángulos rectos: ¿cuántos pares de lados paralelos tiene?", opciones:[
+      {t:"Dos pares", ir:"ladosB", eco:"Tiene dos pares de lados paralelos: es rombo o paralelogramo."},
+      {t:"Un solo par", fin:"trapecio", eco:"Tiene un solo par de lados paralelos."}
+    ]},
+    ladosB: { paso:3, p:"Con dos pares de lados paralelos: ¿los 4 lados son iguales?", opciones:[
+      {t:"Sí", fin:"rombo", eco:"Sus 4 lados son iguales."},
+      {t:"No", fin:"paralelogramo", eco:"Solo los lados opuestos son iguales."}
+    ]}
+  };
+  var nodoActual = "inicio";
+
+  function figuraPorClave(clave){
+    var i;
+    for(i=0;i<CUADRILATEROS.length;i++){
+      if(CUADRILATEROS[i].clave === clave){ return CUADRILATEROS[i]; }
+    }
+    return null;
+  }
+  function dibujarEnArbol(c){
+    var pts=c.pts, i, s = '<svg viewBox="0 0 370 260" role="img" aria-label="'+esc(c.nombre)+'. '+esc(c.texto)+'">';
+    s += '<polygon points="'+atributoPuntos(pts)+'" fill="'+COL.relleno+'" stroke="'+COL.trazo+'" stroke-width="2.5"/>';
+    for(i=0;i<4;i++){
+      if(c.rayitas[i] > 0){
+        s += '<path d="'+rayitas(pts[i], pts[(i+1)%4], c.rayitas[i])+'" stroke="'+COL.vino+'" stroke-width="2.5" fill="none"/>';
+      }
+      if(c.flechas[i] > 0){
+        s += '<path d="'+flechas(pts[i], pts[(i+1)%4], c.flechas[i])+'" stroke="'+COL.ambar+'" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+      }
+    }
+    c.rectos.forEach(function(k){
+      s += '<path d="'+cuadritoRecto(pts[k], pts[(k+3)%4], pts[(k+1)%4], 16)+'" fill="none" stroke="'+COL.azul+'" stroke-width="2.5"/>';
+    });
+    s += '</svg>';
+    document.getElementById("lienzo-arbol").innerHTML = s;
+  }
+  function pintarPregunta(){
+    var nodo = ARBOL[nodoActual];
+    var cont = document.getElementById("botones-arbol");
+    document.getElementById("titulo-arbol").textContent = "Paso " + nodo.paso;
+    document.getElementById("pregunta-arbol").textContent = nodo.p;
+    cont.innerHTML = "";
+    cont.hidden = false;
+    nodo.opciones.forEach(function(op, k){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "boton"; b.textContent = op.t;
+      b.addEventListener("click", function(){ avanzarArbol(op); });
+      cont.appendChild(b);
+    });
+    document.getElementById("reiniciar-arbol").hidden = true;
+  }
+  function avanzarArbol(op){
+    var li = document.createElement("li");
+    li.textContent = op.eco;
+    document.getElementById("camino-arbol").appendChild(li);
+    if(op.fin){
+      var c = figuraPorClave(op.fin);
+      document.getElementById("titulo-arbol").textContent = "Resultado: " + c.nombre;
+      document.getElementById("pregunta-arbol").textContent = c.texto;
+      document.getElementById("botones-arbol").hidden = true;
+      document.getElementById("reiniciar-arbol").hidden = false;
+      dibujarEnArbol(c);
+    }else{
+      nodoActual = op.ir;
+      pintarPregunta();
+    }
+  }
+  function reiniciarArbol(){
+    nodoActual = "inicio";
+    document.getElementById("camino-arbol").innerHTML =
+      "<li>Se parte de un polígono de cuatro lados: un cuadrilátero.</li>";
+    document.getElementById("lienzo-arbol").innerHTML =
+      '<svg viewBox="0 0 370 260" role="img" aria-label="Cuadrilátero genérico, todavía sin clasificar.">' +
+      '<polygon points="110,60 310,60 260,200 60,200" fill="#eceff1" stroke="'+COL.gris+'" stroke-width="2.5" stroke-dasharray="8 6"/>' +
+      '<text x="185" y="135" fill="'+COL.gris+'" font-size="16" font-weight="bold" text-anchor="middle">¿Cuál será?</text></svg>';
+    pintarPregunta();
+  }
+  document.getElementById("reiniciar-arbol").addEventListener("click", reiniciarArbol);
+  reiniciarArbol();
+
+  /* =========================================================
+     8. Práctica
+     ========================================================= */
+  var PREGUNTAS = [
+    { p:"¿Cómo se llama el punto donde se unen dos lados consecutivos de un polígono?",
+      o:["Vértice","Lado","Ángulo","Base"], c:0,
+      e:"El vértice es el punto de unión de dos lados; el ángulo es la abertura que se forma allí." },
+    { p:"Un ángulo que mide exactamente 90° se llama:",
+      o:["Ángulo recto","Ángulo agudo","Ángulo obtuso","Ángulo llano"], c:0,
+      e:"El ángulo recto mide 90° y se marca con un cuadrito en el vértice." },
+    { p:"Un ángulo que mide 130° se clasifica como:",
+      o:["Obtuso","Agudo","Recto","Llano"], c:0,
+      e:"Es mayor que 90° y menor que 180°, por lo tanto es obtuso." },
+    { p:"¿Cómo se llama el polígono de 8 lados?",
+      o:["Octágono","Heptágono","Hexágono","Decágono"], c:0,
+      e:"Ocho lados corresponden al octágono; siete al heptágono y seis al hexágono." },
+    { p:"¿Cuántos vértices tiene un heptágono?",
+      o:["7","6","8","14"], c:0,
+      e:"En todo polígono el número de vértices es igual al número de lados: 7." },
+    { p:"¿Cuánto suman los ángulos interiores de un pentágono?",
+      o:["540°","360°","450°","720°"], c:0,
+      e:"Se aplica (n − 2) × 180°: (5 − 2) × 180° = 540°." },
+    { p:"El triángulo que tiene sus tres lados iguales se llama:",
+      o:["Equilátero","Isósceles","Escaleno","Rectángulo"], c:0,
+      e:"Equilátero significa lados iguales; sus tres ángulos miden 60°." },
+    { p:"Un triángulo con dos lados iguales y uno distinto es:",
+      o:["Isósceles","Equilátero","Escaleno","Regular"], c:0,
+      e:"El isósceles tiene dos lados iguales y los ángulos de la base también son iguales." },
+    { p:"Un triángulo cuyos tres lados miden 5 cm, 8 cm y 11 cm es:",
+      o:["Escaleno","Isósceles","Equilátero","Regular"], c:0,
+      e:"Los tres lados son distintos, por lo tanto es escaleno." },
+    { p:"El cuadrilátero con cuatro lados iguales y cuatro ángulos rectos es:",
+      o:["El cuadrado","El rombo","El trapecio","El paralelogramo"], c:0,
+      e:"El rombo también tiene cuatro lados iguales, pero no ángulos rectos." },
+    { p:"El cuadrilátero que tiene un solo par de lados paralelos es:",
+      o:["El trapecio","El rombo","El rectángulo","El paralelogramo"], c:0,
+      e:"El trapecio tiene una sola pareja de lados paralelos, llamados bases." },
+    { p:"¿Por qué el círculo no se clasifica como polígono?",
+      o:["Porque no está formado por segmentos de recta","Porque es muy grande","Porque no se puede medir","Porque tiene infinitos lados iguales"], c:0,
+      e:"Un polígono debe estar formado por lados rectos; el círculo es una línea curva cerrada." }
+  ];
+
+  var barajado = [];
+
+  function mezclar(arr){
+    var a = arr.slice(), i, j, t;
+    for(i=a.length-1;i>0;i--){
+      j = Math.floor(Math.random()*(i+1));
+      t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  function construirCuestionario(){
+    var cont = document.getElementById("cuestionario");
+    cont.innerHTML = "";
+    barajado = PREGUNTAS.map(function(q, i){
+      var pares = q.o.map(function(txt, k){ return {txt:txt, ok:(k===q.c)}; });
+      return { idx:i, enunciado:q.p, expl:q.e, opciones:mezclar(pares), elegida:null, resuelta:false };
+    });
+
+    barajado.forEach(function(q, i){
+      var div = document.createElement("div");
+      div.className = "pregunta";
+      div.setAttribute("role","group");
+      div.setAttribute("aria-labelledby","enunciado-"+i);
+      var html = '<p class="enunciado" id="enunciado-'+i+'">'+(i+1)+'. '+esc(q.enunciado)+'</p><div class="opciones">';
+      q.opciones.forEach(function(op, k){
+        html += '<button type="button" class="opcion" data-p="'+i+'" data-o="'+k+'" aria-pressed="false">'+esc(op.txt)+'</button>';
+      });
+      html += '</div><p class="retro" id="retro-'+i+'" hidden></p>';
+      div.innerHTML = html;
+      cont.appendChild(div);
+    });
+
+    cont.querySelectorAll(".opcion").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var pi = parseInt(btn.getAttribute("data-p"), 10);
+        var oi = parseInt(btn.getAttribute("data-o"), 10);
+        if(barajado[pi].resuelta){ return; }
+        barajado[pi].elegida = oi;
+        var grupo = btn.parentNode.querySelectorAll(".opcion");
+        grupo.forEach(function(o){
+          o.setAttribute("aria-pressed","false");
+          o.classList.remove("correcta","incorrecta");
+        });
+        btn.setAttribute("aria-pressed","true");
+        var r = document.getElementById("retro-"+pi);
+        r.hidden = true; r.className = "retro";
+      });
+    });
+
+    document.getElementById("marcador").textContent = "Resultado: sin comprobar todavía.";
+  }
+
+  function comprobar(){
+    var aciertos = 0, sinResponder = 0;
+    barajado.forEach(function(q, i){
+      var r = document.getElementById("retro-"+i);
+      var botones = document.querySelectorAll('.opcion[data-p="'+i+'"]');
+      if(q.elegida === null){
+        sinResponder++;
+        r.hidden = false;
+        r.className = "retro mal";
+        r.textContent = "Falta seleccionar una respuesta en esta pregunta.";
+        return;
+      }
+      var correcta = q.opciones[q.elegida].ok;
+      botones.forEach(function(b){
+        b.classList.remove("correcta","incorrecta");
+      });
+      if(correcta){
+        aciertos++;
+        q.resuelta = true;
+        botones[q.elegida].classList.add("correcta");
+        botones.forEach(function(b){ b.disabled = true; });
+        r.hidden = false;
+        r.className = "retro bien";
+        r.textContent = "Correcto. " + q.expl;
+      }else{
+        botones[q.elegida].classList.add("incorrecta");
+        r.hidden = false;
+        r.className = "retro mal";
+        r.textContent = "Revise su respuesta e inténtelo de nuevo. Pista: " + q.expl.split(";")[0].replace(/\.\s*$/, "") + ".";
+      }
+    });
+    var total = barajado.length;
+    var msg = "Resultado: " + aciertos + " de " + total + " correctas.";
+    if(sinResponder > 0){ msg += " Quedan " + sinResponder + " preguntas sin responder."; }
+    else if(aciertos === total){ msg += " ¡Excelente trabajo! Ha dominado los objetivos de la lección."; }
+    else { msg += " Corrija las preguntas señaladas y vuelva a comprobar."; }
+    document.getElementById("marcador").textContent = msg;
+  }
+
+  document.getElementById("comprobar").addEventListener("click", comprobar);
+  document.getElementById("reiniciar").addEventListener("click", function(){
+    construirCuestionario();
+    document.getElementById("marcador").textContent = "La práctica se reinició. Responda de nuevo las 12 preguntas.";
+  });
+  construirCuestionario();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!doctype html>
+<!--
+  Rectas paralelas y perpendiculares — GEDparaHispanos
+  José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rectas paralelas y perpendiculares · Comparación lado a lado</title>
+    <meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+    <meta name="description" content="Interactivo con dos planos lado a lado para comparar una recta con su paralela (misma pendiente) y con su perpendicular (recíproca negativa)." />
+    <meta name="license" content="CC BY-NC-SA 4.0" />
+    <link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+    <style>
+      :root {
+        --tema: #1a237e;
+        --tema-d: #10174f;
+        --tema-bg: #e8eaf6;
+        --tema-bg2: #c5cae9;
+        --paralela: #00695c;
+        --perpendicular: #ad1457;
+        --txt: #222;
+        --muted: #555;
+        --bg: #f5f7fa;
+        --ok-txt: #1b5e20;
+        --ok-bg: #e8f5e9;
+        --no-txt: #a4160f;
+        --no-bg: #fdecea;
+      }
+      * { box-sizing: border-box; }
+      body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: var(--txt); line-height: 1.6; font-size: 16px; }
+      .contenedor { max-width: 1100px; margin: 0 auto; padding: 24px 20px 40px; }
+      header.principal {
+        background: linear-gradient(135deg, #10174f 0%, #1a237e 55%, #283593 100%);
+        color: #fff; padding: 28px 30px; border-radius: 14px; margin-bottom: 20px;
+        box-shadow: 0 4px 14px rgba(16, 23, 79, 0.28);
+      }
+      header.principal .ruta { font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; }
+      header.principal h1 { margin: 8px 0 6px; font-size: 25px; font-weight: 700; }
+      header.principal p { margin: 0; font-size: 15px; }
+
+      h2.seccion { color: var(--tema-d); font-size: 21px; margin: 30px 0 12px; padding-bottom: 6px; border-bottom: 3px solid var(--tema-bg); }
+      h3 { color: var(--tema-d); font-size: 17px; margin: 0 0 8px; }
+
+      .caja-instrucciones { background: var(--tema-bg); border-left: 6px solid var(--tema); border-radius: 0 10px 10px 0; margin-bottom: 20px; }
+      .caja-instrucciones > summary { list-style: none; cursor: pointer; padding: 12px 22px; color: var(--tema-d); font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+      .caja-instrucciones > summary::-webkit-details-marker { display: none; }
+      .caja-instrucciones > summary:hover { background: var(--tema-bg2); border-radius: 0 10px 0 0; }
+      .caja-instrucciones > summary .chevron { font-size: 14px; color: var(--tema); transition: transform 0.15s ease; }
+      .caja-instrucciones[open] > summary .chevron { transform: rotate(90deg); }
+      .caja-instrucciones .cuerpo { padding: 0 22px 16px; }
+      .caja-instrucciones ul { margin: 0; padding-left: 22px; }
+      .caja-instrucciones li { margin: 4px 0; }
+      @media (prefers-reduced-motion: reduce) { .caja-instrucciones > summary .chevron { transition: none; } }
+
+      .tarjeta { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08); }
+      .mandos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+      .control .cabecera { display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; }
+      .control .cabecera .nombre { color: var(--muted); }
+      .control .cabecera .valor { font-weight: 700; color: var(--tema-d); font-size: 17px; }
+      input[type='range'] { width: 100%; accent-color: #1a237e; height: 28px; }
+
+      .parejas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+      svg.plano { width: 100%; height: auto; display: block; }
+      .titulo-panel { font-size: 18px; font-weight: 700; color: var(--tema-d); margin: 0 0 4px; }
+      .subtitulo-panel { font-size: 14px; color: var(--muted); margin: 0 0 10px; }
+      .ecu { font-size: 17px; font-weight: 700; margin: 6px 0 0; }
+      .ecu.base { color: var(--tema-d); }
+      .ecu.par { color: var(--paralela); }
+      .ecu.perp { color: var(--perpendicular); }
+      .verificacion { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: var(--tema-bg); font-size: 14.5px; color: var(--tema-d); }
+
+      .grupo-botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      button { font-family: inherit; font-size: 14px; padding: 8px 14px; border-radius: 7px; border: 2px solid var(--tema); background: #fff; color: var(--tema-d); font-weight: 600; cursor: pointer; }
+      button:hover { background: var(--tema-bg); }
+      button.primario { background: var(--tema); color: #fff; }
+      button.primario:hover { background: var(--tema-d); }
+      :focus-visible { outline: 3px solid #b26a00; outline-offset: 2px; }
+
+      .par-reto { font-size: 19px; font-weight: 700; color: var(--tema-d); background: var(--tema-bg); border-radius: 8px; padding: 10px 14px; display: inline-block; }
+      .fb { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-size: 15px; display: none; }
+      .fb.bien { background: var(--ok-bg); color: var(--ok-txt); border-left: 5px solid var(--ok-txt); display: block; }
+      .fb.mal { background: var(--no-bg); color: var(--no-txt); border-left: 5px solid var(--no-txt); display: block; }
+      .marcador { font-size: 14px; color: var(--muted); margin-top: 10px; }
+
+      table { border-collapse: collapse; width: 100%; margin-top: 12px; font-size: 15px; }
+      caption { text-align: left; font-size: 14px; color: var(--muted); padding-bottom: 6px; }
+      th, td { border: 1px solid #d5d9e8; padding: 8px 10px; text-align: left; }
+      th { background: var(--tema-bg); color: var(--tema-d); }
+
+      footer { margin-top: 34px; padding-top: 16px; border-top: 2px solid var(--tema-bg2); font-size: 13.5px; color: var(--muted); }
+      footer a { color: var(--tema-d); }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+      @media (max-width: 900px) {
+        .parejas { grid-template-columns: 1fr; }
+        .mandos { grid-template-columns: 1fr; }
+        header.principal h1 { font-size: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="contenedor">
+      <header class="principal">
+        <div class="ruta">Spanish ASE Math · Nivel 4 · Tema 1 · Lección 1.3</div>
+        <h1>Rectas paralelas y perpendiculares</h1>
+        <p>Una misma recta base, dos planos: a la izquierda con su paralela, a la derecha con su perpendicular.</p>
+      </header>
+
+      <details class="caja-instrucciones">
+        <summary>
+          <span class="chevron" aria-hidden="true">▶</span>
+          Cómo usar el interactivo
+        </summary>
+        <div class="cuerpo">
+          <ul>
+            <li>Los tres deslizadores de arriba definen la recta base: la elevación y el avance de su pendiente, y su intercepto.</li>
+            <li>La recta base (azul) aparece en los dos planos. En el de la izquierda se le añade una paralela; en el de la derecha, una perpendicular.</li>
+            <li>Los deslizadores de cada plano suben o bajan la segunda recta sin cambiar su pendiente: la relación se mantiene.</li>
+            <li>El cuadradito en el cruce del plano derecho marca el ángulo recto. Fíjate en que la paralela nunca se cruza con la base.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="tarjeta">
+        <h3>Recta base</h3>
+        <div class="ecu base" id="ecuBase">y = 2x + 1</div>
+        <div class="mandos" style="margin-top: 10px">
+          <div class="control">
+            <div class="cabecera"><span class="nombre">Elevación de la pendiente</span><span class="valor" id="valP">2</span></div>
+            <input type="range" id="slP" min="-8" max="8" step="1" value="2" aria-label="Elevación de la pendiente de la recta base" />
+          </div>
+          <div class="control">
+            <div class="cabecera"><span class="nombre">Avance de la pendiente</span><span class="valor" id="valQ">1</span></div>
+            <input type="range" id="slQ" min="1" max="6" step="1" value="1" aria-label="Avance de la pendiente de la recta base" />
+          </div>
+          <div class="control">
+            <div class="cabecera"><span class="nombre">Intercepto de la base</span><span class="valor" id="valB1">1</span></div>
+            <input type="range" id="slB1" min="-8" max="8" step="1" value="1" aria-label="Intercepto de la recta base" />
+          </div>
+        </div>
+      </div>
+
+      <div class="parejas">
+        <div class="tarjeta">
+          <p class="titulo-panel">Paralelas</p>
+          <p class="subtitulo-panel">Misma pendiente, distinto intercepto: m₁ = m₂.</p>
+          <svg class="plano" id="planoPar" viewBox="0 0 520 520" role="img"
+            aria-label="Plano cartesiano con la recta base y una recta paralela de la misma pendiente."></svg>
+          <div class="control">
+            <div class="cabecera"><span class="nombre">Intercepto de la paralela</span><span class="valor" id="valB2">5</span></div>
+            <input type="range" id="slB2" min="-8" max="8" step="1" value="5" aria-label="Intercepto de la recta paralela" />
+          </div>
+          <p class="ecu base" id="ecuPar1">y = 2x + 1</p>
+          <p class="ecu par" id="ecuPar2">y = 2x + 5</p>
+          <p class="verificacion" id="verPar"></p>
+        </div>
+
+        <div class="tarjeta">
+          <p class="titulo-panel">Perpendiculares</p>
+          <p class="subtitulo-panel">Pendientes recíprocas negativas: m₁ × m₂ = −1.</p>
+          <svg class="plano" id="planoPerp" viewBox="0 0 520 520" role="img"
+            aria-label="Plano cartesiano con la recta base y una recta perpendicular que la corta en ángulo recto."></svg>
+          <div class="control">
+            <div class="cabecera"><span class="nombre">Intercepto de la perpendicular</span><span class="valor" id="valB3">-2</span></div>
+            <input type="range" id="slB3" min="-8" max="8" step="1" value="-2" aria-label="Intercepto de la recta perpendicular" />
+          </div>
+          <p class="ecu base" id="ecuPerp1">y = 2x + 1</p>
+          <p class="ecu perp" id="ecuPerp2">y = −(1/2)x − 2</p>
+          <p class="verificacion" id="verPerp"></p>
+        </div>
+      </div>
+
+      <p class="sr-only" id="lector" role="status" aria-live="polite"></p>
+
+      <h2 class="seccion">Reto: clasifica el par de rectas</h2>
+      <div class="tarjeta">
+        <p style="margin: 0 0 10px; font-size: 15px">Compara las pendientes y decide qué relación tienen estas dos rectas.</p>
+        <div class="par-reto" id="parReto">y = 2x + 1 · y = 2x − 4</div>
+        <div class="grupo-botones">
+          <button type="button" data-resp="paralelas">Paralelas</button>
+          <button type="button" data-resp="perpendiculares">Perpendiculares</button>
+          <button type="button" data-resp="ninguna">Ninguna de las dos</button>
+        </div>
+        <div class="grupo-botones">
+          <button type="button" class="primario" id="btnOtroPar">Otro par</button>
+        </div>
+        <p class="fb" id="fbReto" role="status" aria-live="polite"></p>
+        <p class="marcador" id="marcador">Aciertos: 0 de 0 intentos.</p>
+      </div>
+
+      <h2 class="seccion">Lo que conviene observar</h2>
+      <div class="tarjeta">
+        <table>
+          <caption>Relación entre las pendientes de dos rectas y su posición en el plano.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Relación</th>
+              <th scope="col">Pendientes</th>
+              <th scope="col">En el plano</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Paralelas</td><td>m₁ = m₂</td><td>Nunca se cruzan, por lejos que se prolonguen.</td></tr>
+            <tr><td>Perpendiculares</td><td>m₁ × m₂ = −1 (recíproca negativa)</td><td>Se cortan formando un ángulo recto.</td></tr>
+            <tr><td>Ninguna de las dos</td><td>Pendientes distintas y producto distinto de −1</td><td>Se cruzan en un punto, pero sin ángulo recto.</td></tr>
+            <tr><td>Caso especial</td><td>m₁ = 0 (horizontal)</td><td>Su perpendicular es vertical: x = k, de pendiente indefinida.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer>
+        <p>José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago. Material del portal GEDparaHispanos.</p>
+        <p>Obra bajo licencia
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var MIN = -8, MAX = 8, PAD = 26, TAM = 520;
+        var CELL = (TAM - 2 * PAD) / (MAX - MIN);
+
+        var P = 2, Q = 1, B1 = 1, B2 = 5, B3 = -2;
+
+        function ns(n, a) {
+          var el = document.createElementNS('http://www.w3.org/2000/svg', n);
+          for (var k in a) { el.setAttribute(k, a[k]); }
+          return el;
+        }
+        function limpiar(g) { while (g.firstChild) { g.removeChild(g.firstChild); } }
+        function mcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a; }
+        function red(n, d) { var g = mcd(n, d) || 1; n = n / g; d = d / g; if (d < 0) { n = -n; d = -d; } return [n, d]; }
+        function men(v) { return String(v).replace('-', '−'); }
+        function sx(x) { return PAD + (x - MIN) * CELL; }
+        function sy(y) { return PAD + (MAX - y) * CELL; }
+
+        function fracAbs(n, d) { var r = red(Math.abs(n), Math.abs(d)); return r[1] === 1 ? String(r[0]) : r[0] + '/' + r[1]; }
+        function coefX(n, d) {
+          var r = red(n, d), s = r[0] < 0 ? '−' : '', a = Math.abs(r[0]);
+          if (a === 0) { return null; }
+          if (r[1] === 1) { return s + (a === 1 ? '' : a) + 'x'; }
+          return s + '(' + a + '/' + r[1] + ')x';
+        }
+        function ecuacion(p, q, b) {
+          var cx = coefX(p, q);
+          if (cx === null) { return 'y = ' + men(b); }
+          return 'y = ' + cx + (b === 0 ? '' : (b < 0 ? ' − ' : ' + ') + Math.abs(b));
+        }
+        function textoM(p, q) { var r = red(p, q); return r[1] === 1 ? men(r[0]) : men(r[0]) + '/' + r[1]; }
+
+        // ---------- Planos ----------
+        function prepararPlano(svg) {
+          limpiar(svg);
+          var g = ns('g', {}), i;
+          for (i = MIN; i <= MAX; i++) {
+            g.appendChild(ns('line', { x1: sx(i), y1: sy(MIN), x2: sx(i), y2: sy(MAX), stroke: '#dfe3f0', 'stroke-width': 1 }));
+            g.appendChild(ns('line', { x1: sx(MIN), y1: sy(i), x2: sx(MAX), y2: sy(i), stroke: '#dfe3f0', 'stroke-width': 1 }));
+          }
+          g.appendChild(ns('line', { x1: sx(MIN), y1: sy(0), x2: sx(MAX), y2: sy(0), stroke: '#5c6180', 'stroke-width': 2.2 }));
+          g.appendChild(ns('line', { x1: sx(0), y1: sy(MIN), x2: sx(0), y2: sy(MAX), stroke: '#5c6180', 'stroke-width': 2.2 }));
+          for (i = MIN; i <= MAX; i += 2) {
+            if (i === 0) { continue; }
+            var tx = ns('text', { x: sx(i), y: sy(0) + 15, 'text-anchor': 'middle', 'font-size': 11, fill: '#555' });
+            tx.textContent = men(i);
+            g.appendChild(tx);
+            var ty = ns('text', { x: sx(0) - 7, y: sy(i) + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#555' });
+            ty.textContent = men(i);
+            g.appendChild(ty);
+          }
+          svg.appendChild(g);
+          var din = ns('g', {});
+          svg.appendChild(din);
+          return din;
+        }
+
+        function extremos(m, b) {
+          var pts = [];
+          var yI = m * MIN + b, yD = m * MAX + b;
+          if (yI >= MIN && yI <= MAX) { pts.push({ x: MIN, y: yI }); }
+          if (yD >= MIN && yD <= MAX) { pts.push({ x: MAX, y: yD }); }
+          if (m !== 0) {
+            var xA = (MIN - b) / m, xB = (MAX - b) / m;
+            if (xA >= MIN && xA <= MAX) { pts.push({ x: xA, y: MIN }); }
+            if (xB >= MIN && xB <= MAX) { pts.push({ x: xB, y: MAX }); }
+          }
+          return pts.length >= 2 ? [pts[0], pts[1]] : null;
+        }
+
+        function trazar(g, m, b, color, grosor, guion) {
+          var e = extremos(m, b);
+          if (!e) { return; }
+          var at = {
+            x1: sx(e[0].x), y1: sy(e[0].y), x2: sx(e[1].x), y2: sy(e[1].y),
+            stroke: color, 'stroke-width': grosor, 'stroke-linecap': 'round'
+          };
+          if (guion) { at['stroke-dasharray'] = guion; }
+          g.appendChild(ns('line', at));
+        }
+
+        function trazarVertical(g, k, color, grosor) {
+          g.appendChild(ns('line', { x1: sx(k), y1: sy(MIN), x2: sx(k), y2: sy(MAX), stroke: color, 'stroke-width': grosor, 'stroke-linecap': 'round' }));
+        }
+
+        function anguloRecto(g, ix, iy, u1, u2) {
+          var s = 15;
+          var x0 = sx(ix), y0 = sy(iy);
+          var p1 = [x0 + u1[0] * s, y0 + u1[1] * s];
+          var p2 = [x0 + u1[0] * s + u2[0] * s, y0 + u1[1] * s + u2[1] * s];
+          var p3 = [x0 + u2[0] * s, y0 + u2[1] * s];
+          g.appendChild(ns('path', {
+            d: 'M ' + p1[0] + ' ' + p1[1] + ' L ' + p2[0] + ' ' + p2[1] + ' L ' + p3[0] + ' ' + p3[1],
+            fill: 'none', stroke: '#333', 'stroke-width': 2
+          }));
+        }
+
+        function unitario(m) {
+          var vx = 1, vy = -m; // en coordenadas de pantalla la y crece hacia abajo
+          var n = Math.hypot(vx, vy);
+          return [vx / n, vy / n];
+        }
+
+        // ---------- Actualización ----------
+        var dinPar = null, dinPerp = null;
+
+        function actualizar() {
+          var r = red(P, Q), p = r[0], q = r[1], m1 = p / q;
+
+          document.getElementById('ecuBase').textContent = ecuacion(p, q, B1);
+          document.getElementById('valP').textContent = men(P);
+          document.getElementById('valQ').textContent = Q;
+          document.getElementById('valB1').textContent = men(B1);
+          document.getElementById('valB2').textContent = men(B2);
+          document.getElementById('valB3').textContent = men(B3);
+
+          // --- Plano de paralelas ---
+          limpiar(dinPar);
+          trazar(dinPar, m1, B1, '#1a237e', 3);
+          trazar(dinPar, m1, B2, '#00695c', 3, '9 6');
+          document.getElementById('ecuPar1').textContent = 'Base: ' + ecuacion(p, q, B1);
+          document.getElementById('ecuPar2').textContent = 'Paralela: ' + ecuacion(p, q, B2);
+          document.getElementById('verPar').textContent = B1 === B2
+            ? 'Con el mismo intercepto las dos ecuaciones describen la misma recta: sepáralas moviendo el intercepto de la paralela.'
+            : 'm₁ = ' + textoM(p, q) + ' y m₂ = ' + textoM(p, q) + '. Como las pendientes son iguales y los interceptos no (' +
+              men(B1) + ' y ' + men(B2) + '), las rectas son paralelas y nunca se cruzan.';
+
+          // --- Plano de perpendiculares ---
+          limpiar(dinPerp);
+          trazar(dinPerp, m1, B1, '#1a237e', 3);
+          document.getElementById('ecuPerp1').textContent = 'Base: ' + ecuacion(p, q, B1);
+
+          if (p === 0) {
+            trazarVertical(dinPerp, B3, '#ad1457', 3);
+            document.getElementById('ecuPerp2').textContent = 'Perpendicular: x = ' + men(B3);
+            document.getElementById('verPerp').textContent =
+              'La base es horizontal (m₁ = 0). Su perpendicular es vertical: no tiene pendiente, porque su avance es 0, y se escribe x = ' + men(B3) + '.';
+            anguloRecto(dinPerp, B3, B1, [1, 0], [0, -1]);
+          } else {
+            var r2 = red(-q, p), p2 = r2[0], q2 = r2[1], m2 = p2 / q2;
+            trazar(dinPerp, m2, B3, '#ad1457', 3);
+            document.getElementById('ecuPerp2').textContent = 'Perpendicular: ' + ecuacion(p2, q2, B3);
+            var ix = (B3 - B1) / (m1 - m2), iy = m1 * ix + B1;
+            if (ix >= MIN && ix <= MAX && iy >= MIN && iy <= MAX) {
+              anguloRecto(dinPerp, ix, iy, unitario(m1), unitario(m2));
+            }
+            document.getElementById('verPerp').textContent =
+              'm₁ = ' + textoM(p, q) + ' y m₂ = ' + textoM(p2, q2) + '. Se invierte la fracción y se cambia el signo: el producto es ' +
+              textoM(p, q) + ' × ' + textoM(p2, q2) + ' = −1, así que se cortan en ángulo recto.';
+          }
+
+          document.getElementById('lector').textContent =
+            'Base ' + ecuacion(p, q, B1) + '. Paralela ' + ecuacion(p, q, B2) + '. ' +
+            (p === 0 ? 'Perpendicular x = ' + men(B3) + '.' : 'Perpendicular ' + ecuacion(red(-q, p)[0], red(-q, p)[1], B3) + '.');
+        }
+
+        function enlazar(id, asigna) {
+          document.getElementById(id).addEventListener('input', function () {
+            var n = parseInt(this.value, 10);
+            if (isNaN(n)) { return; }
+            asigna(n);
+            actualizar();
+          });
+        }
+        enlazar('slP', function (n) { P = n; });
+        enlazar('slQ', function (n) { Q = n; });
+        enlazar('slB1', function (n) { B1 = n; });
+        enlazar('slB2', function (n) { B2 = n; });
+        enlazar('slB3', function (n) { B3 = n; });
+
+        // ---------- Reto de clasificación ----------
+        var pares = [
+          { a: 'y = 2x + 1', b: 'y = 2x − 4', r: 'paralelas', exp: 'Las dos tienen m = 2.' },
+          { a: 'y = 2x + 1', b: 'y = −(1/2)x + 3', r: 'perpendiculares', exp: 'El producto es 2 × (−1/2) = −1.' },
+          { a: 'y = −3x + 2', b: 'y = −3x − 7', r: 'paralelas', exp: 'Ambas tienen m = −3; solo cambia el intercepto.' },
+          { a: 'y = 4x + 1', b: 'y = −(1/4)x', r: 'perpendiculares', exp: 'El producto es 4 × (−1/4) = −1.' },
+          { a: 'y = (2/3)x − 5', b: 'y = (3/2)x + 1', r: 'ninguna', exp: 'Se invirtió la fracción, pero no se cambió el signo: el producto es 1, no −1.' },
+          { a: '2x + y = 6', b: 'y = 2x − 1', r: 'ninguna', exp: 'La primera es y = −2x + 6, con m = −2; la otra tiene m = 2. Ni iguales ni recíprocas negativas.' },
+          { a: 'x + 4y = 8', b: 'y = 4x + 3', r: 'perpendiculares', exp: 'La primera es y = −(1/4)x + 2; el producto es (−1/4) × 4 = −1.' },
+          { a: '3x − y = 5', b: 'y = 3x + 2', r: 'paralelas', exp: 'La primera es y = 3x − 5: misma pendiente que la otra.' },
+          { a: 'y = (5/2)x', b: '5x − 2y = 8', r: 'paralelas', exp: 'La segunda es y = (5/2)x − 4: misma pendiente.' },
+          { a: 'y = x + 6', b: 'y = −x + 6', r: 'perpendiculares', exp: 'El producto es 1 × (−1) = −1, aunque compartan el intercepto.' }
+        ];
+        var actual = 0, aciertos = 0, intentos = 0;
+
+        function mostrarPar() {
+          document.getElementById('parReto').textContent = pares[actual].a + ' · ' + pares[actual].b;
+          var fb = document.getElementById('fbReto');
+          fb.className = 'fb';
+          fb.textContent = '';
+        }
+
+        Array.prototype.forEach.call(document.querySelectorAll('[data-resp]'), function (btn) {
+          btn.addEventListener('click', function () {
+            var elegida = btn.getAttribute('data-resp'), par = pares[actual], fb = document.getElementById('fbReto');
+            intentos++;
+            if (elegida === par.r) {
+              aciertos++;
+              fb.className = 'fb bien';
+              fb.textContent = 'Correcto: son ' + par.r + '. ' + par.exp;
+            } else {
+              fb.className = 'fb mal';
+              fb.textContent = 'No es así. ' + par.exp + ' Escribe cada recta como y = mx + b y compara las pendientes.';
+            }
+            document.getElementById('marcador').textContent = 'Aciertos: ' + aciertos + ' de ' + intentos + ' intentos.';
+          });
+        });
+
+        document.getElementById('btnOtroPar').addEventListener('click', function () {
+          var s = actual;
+          while (s === actual && pares.length > 1) { s = Math.floor(Math.random() * pares.length); }
+          actual = s;
+          mostrarPar();
+        });
+
+        dinPar = prepararPlano(document.getElementById('planoPar'));
+        dinPerp = prepararPlano(document.getElementById('planoPerp'));
+        actualizar();
+        mostrarPar();
+      })();
+    </script>
+  </body>
+</html>

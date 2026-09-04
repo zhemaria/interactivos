@@ -1,0 +1,515 @@
+<!doctype html>
+<!--
+  La recta en forma pendiente-intercepto — GEDparaHispanos
+  José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>La recta en forma pendiente-intercepto · y = mx + b</title>
+    <meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+    <meta name="description" content="Interactivo para mover la pendiente y el intercepto de una recta y ver la ecuación en sus tres formas: pendiente-intercepto, punto-pendiente y estándar." />
+    <meta name="license" content="CC BY-NC-SA 4.0" />
+    <link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+    <style>
+      :root {
+        --tema: #1a237e;
+        --tema-d: #10174f;
+        --tema-bg: #e8eaf6;
+        --tema-bg2: #c5cae9;
+        --avance: #00695c;
+        --elevacion: #b3261e;
+        --intercepto: #6a1b9a;
+        --txt: #222;
+        --muted: #555;
+        --bg: #f5f7fa;
+        --ok-txt: #1b5e20;
+        --ok-bg: #e8f5e9;
+        --no-txt: #a4160f;
+        --no-bg: #fdecea;
+      }
+      * { box-sizing: border-box; }
+      body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        margin: 0; background: var(--bg); color: var(--txt);
+        line-height: 1.6; font-size: 16px;
+      }
+      .contenedor { max-width: 1040px; margin: 0 auto; padding: 24px 20px 40px; }
+      header.principal {
+        background: linear-gradient(135deg, #10174f 0%, #1a237e 55%, #283593 100%);
+        color: #fff; padding: 28px 30px; border-radius: 14px; margin-bottom: 20px;
+        box-shadow: 0 4px 14px rgba(16, 23, 79, 0.28);
+      }
+      header.principal .ruta { font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; }
+      header.principal h1 { margin: 8px 0 6px; font-size: 25px; font-weight: 700; }
+      header.principal p { margin: 0; font-size: 15px; }
+
+      h2.seccion {
+        color: var(--tema-d); font-size: 21px; margin: 30px 0 12px;
+        padding-bottom: 6px; border-bottom: 3px solid var(--tema-bg);
+      }
+      h3 { color: var(--tema-d); font-size: 17px; margin: 0 0 8px; }
+
+      .caja-instrucciones {
+        background: var(--tema-bg); border-left: 6px solid var(--tema);
+        border-radius: 0 10px 10px 0; margin-bottom: 20px;
+      }
+      .caja-instrucciones > summary {
+        list-style: none; cursor: pointer; padding: 12px 22px; color: var(--tema-d);
+        font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px;
+      }
+      .caja-instrucciones > summary::-webkit-details-marker { display: none; }
+      .caja-instrucciones > summary:hover { background: var(--tema-bg2); border-radius: 0 10px 0 0; }
+      .caja-instrucciones > summary .chevron { font-size: 14px; color: var(--tema); transition: transform 0.15s ease; }
+      .caja-instrucciones[open] > summary .chevron { transform: rotate(90deg); }
+      .caja-instrucciones .cuerpo { padding: 0 22px 16px; }
+      .caja-instrucciones ul { margin: 0; padding-left: 22px; }
+      .caja-instrucciones li { margin: 4px 0; }
+      @media (prefers-reduced-motion: reduce) { .caja-instrucciones > summary .chevron { transition: none; } }
+
+      .taller { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr); gap: 18px; align-items: start; }
+      .tarjeta { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08); }
+      svg.plano { width: 100%; height: auto; display: block; }
+
+      .control { margin-top: 14px; }
+      .control .cabecera { display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; }
+      .control .cabecera .nombre { color: var(--muted); }
+      .control .cabecera .valor { font-weight: 700; color: var(--tema-d); font-size: 17px; }
+      input[type='range'] { width: 100%; accent-color: #1a237e; height: 28px; }
+      .campo-num { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; }
+      .campo-num input {
+        width: 64px; padding: 6px 8px; font-size: 15px; font-family: inherit;
+        border: 2px solid #9fa8da; border-radius: 6px; text-align: center;
+      }
+
+      .ecuacion {
+        background: var(--tema-bg); border-radius: 8px; padding: 12px 14px; text-align: center;
+        font-size: 24px; font-weight: 700; color: var(--tema-d); margin: 4px 0 12px;
+      }
+      .forma { border-top: 1px solid #e3e6ef; padding: 9px 0; }
+      .forma .rotulo { font-size: 13.5px; color: var(--muted); }
+      .forma .expr { font-size: 18px; font-weight: 700; color: var(--tema-d); }
+      .forma .nota { font-size: 13.5px; color: var(--muted); }
+      .explica { font-size: 14px; color: var(--muted); margin: 10px 0 0; }
+
+      .grupo-botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      button {
+        font-family: inherit; font-size: 14px; padding: 8px 14px; border-radius: 7px;
+        border: 2px solid var(--tema); background: #fff; color: var(--tema-d); font-weight: 600; cursor: pointer;
+      }
+      button:hover { background: var(--tema-bg); }
+      button.primario { background: var(--tema); color: #fff; }
+      button.primario:hover { background: var(--tema-d); }
+      :focus-visible { outline: 3px solid #b26a00; outline-offset: 2px; }
+
+      .reto-objetivo {
+        font-size: 20px; font-weight: 700; color: var(--tema-d);
+        background: var(--tema-bg); border-radius: 8px; padding: 10px 14px; display: inline-block;
+      }
+      .fb { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-size: 15px; display: none; }
+      .fb.bien { background: var(--ok-bg); color: var(--ok-txt); border-left: 5px solid var(--ok-txt); display: block; }
+      .fb.mal { background: var(--no-bg); color: var(--no-txt); border-left: 5px solid var(--no-txt); display: block; }
+      .marcador { font-size: 14px; color: var(--muted); margin-top: 10px; }
+
+      table { border-collapse: collapse; width: 100%; margin-top: 12px; font-size: 15px; }
+      caption { text-align: left; font-size: 14px; color: var(--muted); padding-bottom: 6px; }
+      th, td { border: 1px solid #d5d9e8; padding: 8px 10px; text-align: left; }
+      th { background: var(--tema-bg); color: var(--tema-d); }
+
+      footer {
+        margin-top: 34px; padding-top: 16px; border-top: 2px solid var(--tema-bg2);
+        font-size: 13.5px; color: var(--muted);
+      }
+      footer a { color: var(--tema-d); }
+      .sr-only {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+      }
+      @media (max-width: 860px) {
+        .taller { grid-template-columns: 1fr; }
+        header.principal h1 { font-size: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="contenedor">
+      <header class="principal">
+        <div class="ruta">Spanish ASE Math · Nivel 4 · Tema 1 · Lección 1.3</div>
+        <h1>La recta en forma pendiente-intercepto</h1>
+        <p>Mueve la pendiente y el intercepto, y observa la misma recta escrita en sus tres formas.</p>
+      </header>
+
+      <details class="caja-instrucciones">
+        <summary>
+          <span class="chevron" aria-hidden="true">▶</span>
+          Cómo usar el interactivo
+        </summary>
+        <div class="cuerpo">
+          <ul>
+            <li>Los deslizadores cambian la pendiente m (como fracción: elevación entre avance) y el intercepto b.</li>
+            <li>Con el teclado: presiona Tab hasta un deslizador y usa las flechas; también puedes escribir los valores en las casillas.</li>
+            <li>El punto morado sobre el eje y es el intercepto (0, b). La escalera verde y roja muestra el avance y la elevación de la pendiente.</li>
+            <li>El panel escribe la misma recta en forma pendiente-intercepto, punto-pendiente y estándar.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="taller">
+        <div class="tarjeta">
+          <svg class="plano" id="plano" viewBox="0 0 680 680" role="img"
+            aria-label="Plano cartesiano con la recta y igual a m x más b, el punto de intercepto y la escalera de avance y elevación."></svg>
+        </div>
+
+        <div>
+          <div class="tarjeta">
+            <h3>La recta ahora mismo</h3>
+            <div class="ecuacion" id="ecuPrincipal">y = 2x + 1</div>
+
+            <div class="control">
+              <div class="cabecera"><span class="nombre">Elevación de la pendiente</span><span class="valor" id="valP">2</span></div>
+              <input type="range" id="slP" min="-10" max="10" step="1" value="2" aria-label="Elevación de la pendiente, numerador de m" />
+            </div>
+            <div class="control">
+              <div class="cabecera"><span class="nombre">Avance de la pendiente</span><span class="valor" id="valQ">1</span></div>
+              <input type="range" id="slQ" min="1" max="8" step="1" value="1" aria-label="Avance de la pendiente, denominador de m" />
+            </div>
+            <div class="control">
+              <div class="cabecera"><span class="nombre">Intercepto en y</span><span class="valor" id="valB">1</span></div>
+              <input type="range" id="slB" min="-10" max="10" step="1" value="1" aria-label="Intercepto b" />
+            </div>
+
+            <div class="grupo-botones">
+              <span class="campo-num">m = <input type="number" id="inP" value="2" min="-10" max="10" step="1" aria-label="Numerador de la pendiente" />
+                /
+                <input type="number" id="inQ" value="1" min="1" max="8" step="1" aria-label="Denominador de la pendiente" /></span>
+              <span class="campo-num">b = <input type="number" id="inB" value="1" min="-10" max="10" step="1" aria-label="Intercepto b" /></span>
+            </div>
+
+            <p class="explica" id="txtLectura"></p>
+          </div>
+
+          <div class="tarjeta" style="margin-top: 18px">
+            <h3>La misma recta en tres formas</h3>
+            <div class="forma">
+              <div class="rotulo">Pendiente-intercepto</div>
+              <div class="expr" id="fPI">y = 2x + 1</div>
+              <div class="nota" id="nPI"></div>
+            </div>
+            <div class="forma">
+              <div class="rotulo">Punto-pendiente</div>
+              <div class="expr" id="fPP">y − 3 = 2(x − 1)</div>
+              <div class="nota" id="nPP"></div>
+            </div>
+            <div class="forma">
+              <div class="rotulo">Estándar</div>
+              <div class="expr" id="fEST">2x − y = −1</div>
+              <div class="nota" id="nEST"></div>
+            </div>
+          </div>
+
+          <div class="tarjeta" style="margin-top: 18px">
+            <h3>Reto: ajusta la recta</h3>
+            <p style="margin: 0 0 10px; font-size: 15px">Mueve m y b hasta que la recta sea esta:</p>
+            <div class="reto-objetivo" id="txtReto">2x − y = −3</div>
+            <div class="grupo-botones">
+              <button type="button" class="primario" id="btnComprobar">Comprobar</button>
+              <button type="button" id="btnOtroReto">Otro reto</button>
+            </div>
+            <p class="fb" id="fbReto" role="status" aria-live="polite"></p>
+            <p class="marcador" id="marcador">Retos resueltos: 0 de 0 intentos.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="sr-only" id="lector" role="status" aria-live="polite"></p>
+
+      <h2 class="seccion">Lo que conviene observar</h2>
+      <div class="tarjeta">
+        <table>
+          <caption>Efecto de cada parámetro de la ecuación sobre la recta.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Si cambias esto…</th>
+              <th scope="col">…la recta hace esto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>El intercepto b, dejando m fija</td><td>La recta sube o baja entera, sin cambiar de inclinación: todas quedan paralelas.</td></tr>
+            <tr><td>La elevación de m, dejando el avance fijo</td><td>La recta se inclina más (o cambia de dirección si el signo cambia), pero sigue cruzando el eje y en el mismo punto.</td></tr>
+            <tr><td>El avance de m, dejando la elevación fija</td><td>Cuanto mayor es el avance, más tendida queda la recta: la pendiente se acerca a 0.</td></tr>
+            <tr><td>La elevación a 0</td><td>m = 0 y la recta es horizontal: y = b.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer>
+        <p>José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago. Material del portal GEDparaHispanos.</p>
+        <p>Obra bajo licencia
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var MIN = -10, MAX = 10, PAD = 32, TAM = 680;
+        var CELL = (TAM - 2 * PAD) / (MAX - MIN);
+        var svg = document.getElementById('plano');
+
+        var P = 2, Q = 1, B = 1;
+
+        function sx(x) { return PAD + (x - MIN) * CELL; }
+        function sy(y) { return PAD + (MAX - y) * CELL; }
+        function ns(n, a) {
+          var el = document.createElementNS('http://www.w3.org/2000/svg', n);
+          for (var k in a) { el.setAttribute(k, a[k]); }
+          return el;
+        }
+        function limpiar(g) { while (g.firstChild) { g.removeChild(g.firstChild); } }
+        function mcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a; }
+        function red(n, d) { var g = mcd(n, d) || 1; n = n / g; d = d / g; if (d < 0) { n = -n; d = -d; } return [n, d]; }
+        function men(v) { return String(v).replace('-', '−'); }
+
+        // Coeficiente de x: "2", "−(2/3)", "" cuando vale 1
+        function coefX(n, d) {
+          var r = red(n, d), s = r[0] < 0 ? '−' : '', a = Math.abs(r[0]);
+          if (a === 0) { return null; }
+          if (r[1] === 1) { return s + (a === 1 ? '' : a) + 'x'; }
+          return s + '(' + a + '/' + r[1] + ')x';
+        }
+        function fracAbs(n, d) {
+          var r = red(Math.abs(n), d);
+          return r[1] === 1 ? String(r[0]) : r[0] + '/' + r[1];
+        }
+        function terminoSuma(n, d) {
+          if (n === 0) { return ''; }
+          return (n < 0 ? ' − ' : ' + ') + fracAbs(n, d);
+        }
+        function ecuacionPI(p, q, bn, bd) {
+          var cx = coefX(p, q);
+          if (cx === null) { return 'y = ' + (bn === 0 ? '0' : (bn < 0 ? '−' : '') + fracAbs(bn, bd)); }
+          return 'y = ' + cx + terminoSuma(bn, bd);
+        }
+
+        // Forma estándar Ax + By = C con A ≥ 0 y coeficientes enteros reducidos
+        function estandar(p, q, b) {
+          var r = red(p, q); p = r[0]; q = r[1];
+          var A = -p, Bc = q, C = q * b;
+          if (A < 0) { A = -A; Bc = -Bc; C = -C; }
+          var g = mcd(mcd(A, Bc), Math.abs(C)) || 1;
+          A = A / g; Bc = Bc / g; C = C / g;
+          var izq = '';
+          if (A !== 0) { izq += (A === 1 ? '' : A) + 'x'; }
+          if (Bc !== 0) {
+            var ab = Math.abs(Bc), pieza = (ab === 1 ? '' : ab) + 'y';
+            izq += izq === '' ? (Bc < 0 ? '−' + pieza : pieza) : (Bc < 0 ? ' − ' : ' + ') + pieza;
+          }
+          return izq + ' = ' + men(C);
+        }
+
+        // Un punto de red sobre la recta, distinto del intercepto si cabe en el plano
+        function puntoDeRecta() {
+          var r = red(P, Q), p = r[0], q = r[1];
+          var candidatos = [1, -1, 2, -2, 3, -3];
+          for (var i = 0; i < candidatos.length; i++) {
+            var t = candidatos[i], x = t * q, y = B + t * p;
+            if (x >= MIN && x <= MAX && y >= MIN && y <= MAX) { return { x: x, y: y }; }
+          }
+          return { x: 0, y: B };
+        }
+
+        // ---------- Dibujo ----------
+        function dibujarFondo() {
+          var gGrid = ns('g', {}), i;
+          for (i = MIN; i <= MAX; i++) {
+            gGrid.appendChild(ns('line', { x1: sx(i), y1: sy(MIN), x2: sx(i), y2: sy(MAX), stroke: '#dfe3f0', 'stroke-width': 1 }));
+            gGrid.appendChild(ns('line', { x1: sx(MIN), y1: sy(i), x2: sx(MAX), y2: sy(i), stroke: '#dfe3f0', 'stroke-width': 1 }));
+          }
+          gGrid.appendChild(ns('line', { x1: sx(MIN), y1: sy(0), x2: sx(MAX), y2: sy(0), stroke: '#5c6180', 'stroke-width': 2.2 }));
+          gGrid.appendChild(ns('line', { x1: sx(0), y1: sy(MIN), x2: sx(0), y2: sy(MAX), stroke: '#5c6180', 'stroke-width': 2.2 }));
+          for (i = MIN; i <= MAX; i += 2) {
+            if (i === 0) { continue; }
+            var tx = ns('text', { x: sx(i), y: sy(0) + 16, 'text-anchor': 'middle', 'font-size': 12, fill: '#555' });
+            tx.textContent = men(i);
+            gGrid.appendChild(tx);
+            var ty = ns('text', { x: sx(0) - 8, y: sy(i) + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#555' });
+            ty.textContent = men(i);
+            gGrid.appendChild(ty);
+          }
+          var lx = ns('text', { x: sx(MAX) - 2, y: sy(0) - 8, 'text-anchor': 'end', 'font-size': 14, 'font-style': 'italic', fill: '#5c6180' });
+          lx.textContent = 'x';
+          gGrid.appendChild(lx);
+          var ly = ns('text', { x: sx(0) + 10, y: sy(MAX) + 6, 'font-size': 14, 'font-style': 'italic', fill: '#5c6180' });
+          ly.textContent = 'y';
+          gGrid.appendChild(ly);
+          svg.appendChild(gGrid);
+          svg.appendChild(ns('g', { id: 'gDin' }));
+        }
+
+        function etiqueta(g, x, y, texto, color, ancla) {
+          var t = ns('text', {
+            x: x, y: y, 'text-anchor': ancla || 'middle', 'font-size': 14, 'font-weight': 700,
+            fill: color, stroke: '#ffffff', 'stroke-width': 4.5, 'paint-order': 'stroke'
+          });
+          t.textContent = texto;
+          g.appendChild(t);
+        }
+
+        function dibujarDinamico() {
+          var g = document.getElementById('gDin');
+          limpiar(g);
+          var m = P / Q;
+
+          // Recta recortada al plano
+          var pts = [];
+          var yIzq = m * MIN + B, yDer = m * MAX + B;
+          if (yIzq >= MIN && yIzq <= MAX) { pts.push({ x: MIN, y: yIzq }); }
+          if (yDer >= MIN && yDer <= MAX) { pts.push({ x: MAX, y: yDer }); }
+          if (m !== 0) {
+            var xAba = (MIN - B) / m, xArr = (MAX - B) / m;
+            if (xAba >= MIN && xAba <= MAX) { pts.push({ x: xAba, y: MIN }); }
+            if (xArr >= MIN && xArr <= MAX) { pts.push({ x: xArr, y: MAX }); }
+          }
+          if (pts.length >= 2) {
+            g.appendChild(ns('line', {
+              x1: sx(pts[0].x), y1: sy(pts[0].y), x2: sx(pts[1].x), y2: sy(pts[1].y),
+              stroke: '#1a237e', 'stroke-width': 3, 'stroke-linecap': 'round'
+            }));
+          }
+
+          // Escalera de la pendiente desde el intercepto
+          var r = red(P, Q), p = r[0], q = r[1];
+          var dir = (B + p >= MIN && B + p <= MAX && q <= MAX) ? 1 : -1;
+          var x0 = 0, y0 = B, x1 = dir * q, y1 = B + dir * p;
+          if (x1 >= MIN && x1 <= MAX && y1 >= MIN && y1 <= MAX && p !== 0) {
+            g.appendChild(ns('line', {
+              x1: sx(x0), y1: sy(y0), x2: sx(x1), y2: sy(y0),
+              stroke: '#00695c', 'stroke-width': 3.5, 'stroke-dasharray': '7 5'
+            }));
+            g.appendChild(ns('line', {
+              x1: sx(x1), y1: sy(y0), x2: sx(x1), y2: sy(y1),
+              stroke: '#b3261e', 'stroke-width': 3.5, 'stroke-dasharray': '7 5'
+            }));
+            etiqueta(g, sx((x0 + x1) / 2), sy(y0) + (dir * p > 0 ? 27 : -19), 'avance = ' + men(dir * q), '#00695c');
+            etiqueta(g, sx(x1) + (dir > 0 ? 10 : -10), sy((y0 + y1) / 2), 'elevación = ' + men(dir * p), '#b3261e', dir > 0 ? 'start' : 'end');
+            g.appendChild(ns('circle', { cx: sx(x1), cy: sy(y1), r: 6, fill: '#ffffff', stroke: '#1a237e', 'stroke-width': 2.5 }));
+          }
+
+          // Intercepto
+          g.appendChild(ns('circle', { cx: sx(0), cy: sy(B), r: 12, fill: '#6a1b9a', stroke: '#ffffff', 'stroke-width': 3 }));
+          etiqueta(g, sx(0) - 16, sy(B) + 5, 'b = ' + men(B) + '  →  (0, ' + men(B) + ')', '#6a1b9a', 'end');
+        }
+
+        // ---------- Panel ----------
+        function actualizar() {
+          var r = red(P, Q), p = r[0], q = r[1];
+          var ec = ecuacionPI(P, Q, B, 1);
+          document.getElementById('ecuPrincipal').textContent = ec;
+          document.getElementById('fPI').textContent = ec;
+          document.getElementById('nPI').textContent =
+            'm = ' + (q === 1 ? men(p) : men(p) + '/' + q) + ' y b = ' + men(B) + ', o sea que cruza el eje y en (0, ' + men(B) + ').';
+
+          var pt = puntoDeRecta();
+          var izq = pt.y === 0 ? 'y' : 'y ' + (pt.y > 0 ? '−' : '+') + ' ' + Math.abs(pt.y);
+          var der = pt.x === 0 ? 'x' : 'x ' + (pt.x > 0 ? '−' : '+') + ' ' + Math.abs(pt.x);
+          var factor = q === 1 ? (p === 1 ? '' : p === -1 ? '−' : men(p)) : (p < 0 ? '−' : '') + '(' + Math.abs(p) + '/' + q + ')';
+          document.getElementById('fPP').textContent = izq + ' = ' + factor + '(' + der + ')';
+          document.getElementById('nPP').textContent = 'Se usó el punto (' + men(pt.x) + ', ' + men(pt.y) + ') de la recta; con cualquier otro punto se llega a la misma ecuación.';
+
+          document.getElementById('fEST').textContent = estandar(P, Q, B);
+          document.getElementById('nEST').textContent = 'Coeficientes enteros, con el término en x positivo.';
+
+          var lectura;
+          if (p === 0) {
+            lectura = 'La pendiente es 0: la recta es horizontal y todos sus puntos tienen y = ' + men(B) + '.';
+          } else if (p > 0) {
+            lectura = 'Desde (0, ' + men(B) + ') la recta sube ' + p + (p === 1 ? ' unidad' : ' unidades') + ' por cada ' + q + (q === 1 ? ' unidad' : ' unidades') + ' hacia la derecha.';
+          } else {
+            lectura = 'Desde (0, ' + men(B) + ') la recta baja ' + Math.abs(p) + (Math.abs(p) === 1 ? ' unidad' : ' unidades') + ' por cada ' + q + (q === 1 ? ' unidad' : ' unidades') + ' hacia la derecha.';
+          }
+          document.getElementById('txtLectura').textContent = lectura;
+
+          document.getElementById('valP').textContent = men(P);
+          document.getElementById('valQ').textContent = Q;
+          document.getElementById('valB').textContent = men(B);
+          document.getElementById('slP').value = P;
+          document.getElementById('slQ').value = Q;
+          document.getElementById('slB').value = B;
+          document.getElementById('inP').value = P;
+          document.getElementById('inQ').value = Q;
+          document.getElementById('inB').value = B;
+
+          document.getElementById('lector').textContent = 'Recta ' + ec + '. Forma estándar ' + estandar(P, Q, B) + '.';
+          dibujarDinamico();
+        }
+
+        function enlazar(idRango, idNum, asigna) {
+          function leer(v) {
+            var n = parseInt(v, 10);
+            if (isNaN(n)) { actualizar(); return; }
+            asigna(n);
+            actualizar();
+          }
+          document.getElementById(idRango).addEventListener('input', function () { leer(this.value); });
+          document.getElementById(idNum).addEventListener('change', function () { leer(this.value); });
+        }
+        enlazar('slP', 'inP', function (n) { P = Math.max(-10, Math.min(10, n)); });
+        enlazar('slQ', 'inQ', function (n) { Q = Math.max(1, Math.min(8, n)); });
+        enlazar('slB', 'inB', function (n) { B = Math.max(-10, Math.min(10, n)); });
+
+        // ---------- Retos ----------
+        var retos = [
+          { texto: '2x − y = −3', p: 2, q: 1, b: 3, pista: 'forma estándar' },
+          { texto: '2x + 3y = 12', p: -2, q: 3, b: 4, pista: 'forma estándar' },
+          { texto: 'y − 5 = 3(x − 2)', p: 3, q: 1, b: -1, pista: 'forma punto-pendiente' },
+          { texto: 'y + 1 = −2(x − 3)', p: -2, q: 1, b: 5, pista: 'forma punto-pendiente' },
+          { texto: 'x + 4y = 8', p: -1, q: 4, b: 2, pista: 'forma estándar' },
+          { texto: 'Pasa por (0, −4) con pendiente 3/2', p: 3, q: 2, b: -4, pista: 'descripción' },
+          { texto: 'y − 2 = (1/2)(x + 4)', p: 1, q: 2, b: 4, pista: 'forma punto-pendiente' },
+          { texto: '5x + y = 3', p: -5, q: 1, b: 3, pista: 'forma estándar' }
+        ];
+        var actual = 0, resueltos = 0, intentos = 0;
+
+        function mostrarReto() {
+          document.getElementById('txtReto').textContent = retos[actual].texto;
+          var fb = document.getElementById('fbReto');
+          fb.className = 'fb';
+          fb.textContent = '';
+        }
+
+        document.getElementById('btnComprobar').addEventListener('click', function () {
+          var r = retos[actual], fb = document.getElementById('fbReto');
+          var a = red(P, Q), objetivo = red(r.p, r.q);
+          var correcto = a[0] === objetivo[0] && a[1] === objetivo[1] && B === r.b;
+          intentos++;
+          var mia = ecuacionPI(P, Q, B, 1);
+          if (correcto) {
+            resueltos++;
+            fb.className = 'fb bien';
+            fb.textContent = 'Correcto. En forma pendiente-intercepto la recta es ' + mia + '.';
+          } else {
+            fb.className = 'fb mal';
+            fb.textContent = 'Todavía no. Tu recta es ' + mia + '. Despeja y en la ecuación del reto (' + r.pista + ') para leer m y b, y ajusta los deslizadores.';
+          }
+          document.getElementById('marcador').textContent = 'Retos resueltos: ' + resueltos + ' de ' + intentos + ' intentos.';
+        });
+
+        document.getElementById('btnOtroReto').addEventListener('click', function () {
+          var s = actual;
+          while (s === actual && retos.length > 1) { s = Math.floor(Math.random() * retos.length); }
+          actual = s;
+          mostrarReto();
+        });
+
+        dibujarFondo();
+        actualizar();
+        mostrarReto();
+      })();
+    </script>
+  </body>
+</html>

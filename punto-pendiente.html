@@ -1,0 +1,623 @@
+<!doctype html>
+<!--
+  La recta en forma punto-pendiente — GEDparaHispanos
+  José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>La recta en forma punto-pendiente · y − y₁ = m(x − x₁)</title>
+    <meta name="author" content="José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago" />
+    <meta name="description" content="Interactivo para escribir la ecuación de una recta desde un punto y la pendiente, o desde dos puntos, y despejarla paso a paso hasta y = mx + b." />
+    <meta name="license" content="CC BY-NC-SA 4.0" />
+    <link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+    <style>
+      :root {
+        --tema: #1a237e;
+        --tema-d: #10174f;
+        --tema-bg: #e8eaf6;
+        --tema-bg2: #c5cae9;
+        --avance: #00695c;
+        --elevacion: #b3261e;
+        --puntoB: #6a1b9a;
+        --txt: #222;
+        --muted: #555;
+        --bg: #f5f7fa;
+        --ok-txt: #1b5e20;
+        --ok-bg: #e8f5e9;
+        --no-txt: #a4160f;
+        --no-bg: #fdecea;
+      }
+      * { box-sizing: border-box; }
+      body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: var(--txt); line-height: 1.6; font-size: 16px; }
+      .contenedor { max-width: 1040px; margin: 0 auto; padding: 24px 20px 40px; }
+      header.principal {
+        background: linear-gradient(135deg, #10174f 0%, #1a237e 55%, #283593 100%);
+        color: #fff; padding: 28px 30px; border-radius: 14px; margin-bottom: 20px;
+        box-shadow: 0 4px 14px rgba(16, 23, 79, 0.28);
+      }
+      header.principal .ruta { font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase; }
+      header.principal h1 { margin: 8px 0 6px; font-size: 25px; font-weight: 700; }
+      header.principal p { margin: 0; font-size: 15px; }
+
+      h2.seccion { color: var(--tema-d); font-size: 21px; margin: 30px 0 12px; padding-bottom: 6px; border-bottom: 3px solid var(--tema-bg); }
+      h3 { color: var(--tema-d); font-size: 17px; margin: 0 0 8px; }
+
+      .caja-instrucciones { background: var(--tema-bg); border-left: 6px solid var(--tema); border-radius: 0 10px 10px 0; margin-bottom: 20px; }
+      .caja-instrucciones > summary { list-style: none; cursor: pointer; padding: 12px 22px; color: var(--tema-d); font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+      .caja-instrucciones > summary::-webkit-details-marker { display: none; }
+      .caja-instrucciones > summary:hover { background: var(--tema-bg2); border-radius: 0 10px 0 0; }
+      .caja-instrucciones > summary .chevron { font-size: 14px; color: var(--tema); transition: transform 0.15s ease; }
+      .caja-instrucciones[open] > summary .chevron { transform: rotate(90deg); }
+      .caja-instrucciones .cuerpo { padding: 0 22px 16px; }
+      .caja-instrucciones ul { margin: 0; padding-left: 22px; }
+      .caja-instrucciones li { margin: 4px 0; }
+      @media (prefers-reduced-motion: reduce) { .caja-instrucciones > summary .chevron { transition: none; } }
+
+      .taller { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr); gap: 18px; align-items: start; }
+      .tarjeta { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08); }
+      svg.plano { width: 100%; height: auto; display: block; touch-action: none; }
+      svg.plano .arrastrable { cursor: grab; }
+      svg.plano .arrastrable:focus { outline: none; }
+      svg.plano .arrastrable:focus-visible .foco { display: block; }
+      .foco { display: none; }
+
+      .control { margin-top: 14px; }
+      .control .cabecera { display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; }
+      .control .cabecera .nombre { color: var(--muted); }
+      .control .cabecera .valor { font-weight: 700; color: var(--tema-d); font-size: 17px; }
+      input[type='range'] { width: 100%; accent-color: #1a237e; height: 28px; }
+      .campo-num { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; }
+      .campo-num input { width: 64px; padding: 6px 8px; font-size: 15px; font-family: inherit; border: 2px solid #9fa8da; border-radius: 6px; text-align: center; }
+
+      .ecuacion { background: var(--tema-bg); border-radius: 8px; padding: 12px 14px; text-align: center; font-size: 23px; font-weight: 700; color: var(--tema-d); margin: 4px 0 12px; }
+      .pasos { counter-reset: paso; list-style: none; margin: 0; padding: 0; }
+      .pasos li { counter-increment: paso; position: relative; padding: 8px 0 8px 38px; border-top: 1px solid #e3e6ef; font-size: 16px; }
+      .pasos li::before {
+        content: counter(paso); position: absolute; left: 0; top: 9px;
+        width: 26px; height: 26px; border-radius: 50%; background: var(--tema); color: #fff;
+        font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      }
+      .pasos .detalle { display: block; font-size: 13.5px; color: var(--muted); }
+      .forma { border-top: 1px solid #e3e6ef; padding: 9px 0; }
+      .forma .rotulo { font-size: 13.5px; color: var(--muted); }
+      .forma .expr { font-size: 18px; font-weight: 700; color: var(--tema-d); }
+      .explica { font-size: 14px; color: var(--muted); margin: 10px 0 0; }
+      .aviso { font-size: 14px; color: var(--elevacion); font-weight: 600; margin: 10px 0 0; min-height: 1.2em; }
+
+      .grupo-botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      button { font-family: inherit; font-size: 14px; padding: 8px 14px; border-radius: 7px; border: 2px solid var(--tema); background: #fff; color: var(--tema-d); font-weight: 600; cursor: pointer; }
+      button:hover { background: var(--tema-bg); }
+      button.primario { background: var(--tema); color: #fff; }
+      button.primario:hover { background: var(--tema-d); }
+      button[aria-pressed='true'] { background: var(--tema); color: #fff; }
+      :focus-visible { outline: 3px solid #b26a00; outline-offset: 2px; }
+
+      .reto-objetivo { font-size: 20px; font-weight: 700; color: var(--tema-d); background: var(--tema-bg); border-radius: 8px; padding: 10px 14px; display: inline-block; }
+      .fb { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-size: 15px; display: none; }
+      .fb.bien { background: var(--ok-bg); color: var(--ok-txt); border-left: 5px solid var(--ok-txt); display: block; }
+      .fb.mal { background: var(--no-bg); color: var(--no-txt); border-left: 5px solid var(--no-txt); display: block; }
+      .marcador { font-size: 14px; color: var(--muted); margin-top: 10px; }
+
+      table { border-collapse: collapse; width: 100%; margin-top: 12px; font-size: 15px; }
+      caption { text-align: left; font-size: 14px; color: var(--muted); padding-bottom: 6px; }
+      th, td { border: 1px solid #d5d9e8; padding: 8px 10px; text-align: left; }
+      th { background: var(--tema-bg); color: var(--tema-d); }
+
+      footer { margin-top: 34px; padding-top: 16px; border-top: 2px solid var(--tema-bg2); font-size: 13.5px; color: var(--muted); }
+      footer a { color: var(--tema-d); }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+      @media (max-width: 860px) { .taller { grid-template-columns: 1fr; } header.principal h1 { font-size: 22px; } }
+    </style>
+  </head>
+  <body>
+    <div class="contenedor">
+      <header class="principal">
+        <div class="ruta">Spanish ASE Math · Nivel 4 · Tema 1 · Lección 1.3</div>
+        <h1>La recta en forma punto-pendiente</h1>
+        <p>Escribe la ecuación desde un punto y la pendiente, o desde dos puntos, y despéjala paso a paso hasta y = mx + b.</p>
+      </header>
+
+      <details class="caja-instrucciones">
+        <summary>
+          <span class="chevron" aria-hidden="true">▶</span>
+          Cómo usar el interactivo
+        </summary>
+        <div class="cuerpo">
+          <ul>
+            <li>Elige el modo: un punto con la pendiente que tú fijas, o dos puntos de los que se calcula la pendiente.</li>
+            <li>Arrastra los puntos con el ratón o el dedo; con el teclado, presiona Tab hasta un punto y muévelo con las flechas.</li>
+            <li>En el modo de un punto, los deslizadores fijan la pendiente como fracción (elevación entre avance).</li>
+            <li>El panel muestra la sustitución en y − y₁ = m(x − x₁) y los pasos hasta llegar a y = mx + b y a la forma estándar.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="taller">
+        <div class="tarjeta">
+          <svg class="plano" id="plano" viewBox="0 0 680 680" role="img"
+            aria-label="Plano cartesiano con la recta, el punto conocido y el triángulo de avance y elevación."></svg>
+          <p class="aviso" id="aviso" role="status" aria-live="polite"></p>
+        </div>
+
+        <div>
+          <div class="tarjeta">
+            <div class="grupo-botones" style="margin-top: 0">
+              <button type="button" id="btnModo1" aria-pressed="true">Un punto y la pendiente</button>
+              <button type="button" id="btnModo2" aria-pressed="false">Dos puntos</button>
+            </div>
+
+            <div class="ecuacion" id="ecuPP">y − 5 = 3(x − 2)</div>
+
+            <div id="controlesM">
+              <div class="control">
+                <div class="cabecera"><span class="nombre">Elevación de la pendiente</span><span class="valor" id="valP">3</span></div>
+                <input type="range" id="slP" min="-10" max="10" step="1" value="3" aria-label="Elevación de la pendiente, numerador de m" />
+              </div>
+              <div class="control">
+                <div class="cabecera"><span class="nombre">Avance de la pendiente</span><span class="valor" id="valQ">1</span></div>
+                <input type="range" id="slQ" min="1" max="8" step="1" value="1" aria-label="Avance de la pendiente, denominador de m" />
+              </div>
+            </div>
+
+            <div class="grupo-botones">
+              <span class="campo-num" id="campoA">A <input type="number" id="inAx" value="2" min="-10" max="10" step="1" aria-label="Coordenada x del punto A" />
+                <input type="number" id="inAy" value="5" min="-10" max="10" step="1" aria-label="Coordenada y del punto A" /></span>
+              <span class="campo-num" id="campoB" hidden>B <input type="number" id="inBx" value="4" min="-10" max="10" step="1" aria-label="Coordenada x del punto B" />
+                <input type="number" id="inBy" value="8" min="-10" max="10" step="1" aria-label="Coordenada y del punto B" /></span>
+            </div>
+            <p class="explica" id="txtPendiente"></p>
+          </div>
+
+          <div class="tarjeta" style="margin-top: 18px">
+            <h3>Del punto a la ecuación, paso a paso</h3>
+            <ol class="pasos" id="listaPasos"></ol>
+            <div class="forma">
+              <div class="rotulo">Pendiente-intercepto</div>
+              <div class="expr" id="fPI">y = 3x − 1</div>
+            </div>
+            <div class="forma">
+              <div class="rotulo">Estándar</div>
+              <div class="expr" id="fEST">3x − y = 1</div>
+            </div>
+          </div>
+
+          <div class="tarjeta" style="margin-top: 18px">
+            <h3>Reto: construye la recta</h3>
+            <p style="margin: 0 0 10px; font-size: 15px">Coloca el punto y la pendiente para obtener esta recta:</p>
+            <div class="reto-objetivo" id="txtReto">y = 3x − 1</div>
+            <div class="grupo-botones">
+              <button type="button" class="primario" id="btnComprobar">Comprobar</button>
+              <button type="button" id="btnOtroReto">Otro reto</button>
+            </div>
+            <p class="fb" id="fbReto" role="status" aria-live="polite"></p>
+            <p class="marcador" id="marcador">Retos resueltos: 0 de 0 intentos.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="sr-only" id="lector" role="status" aria-live="polite"></p>
+
+      <h2 class="seccion">Lo que conviene observar</h2>
+      <div class="tarjeta">
+        <table>
+          <caption>Ideas clave de la forma punto-pendiente.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Situación</th>
+              <th scope="col">Qué ocurre con la ecuación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Mueves el punto a lo largo de la misma recta</td><td>La forma punto-pendiente cambia de aspecto, pero al despejar y siempre da el mismo y = mx + b.</td></tr>
+            <tr><td>El punto está sobre el eje y</td><td>x₁ = 0 y la ecuación se convierte directamente en y = mx + b: el punto es el intercepto.</td></tr>
+            <tr><td>Modo de dos puntos</td><td>Primero se calcula m = (y₂ − y₁)/(x₂ − x₁) y luego se sustituye en la forma punto-pendiente.</td></tr>
+            <tr><td>Los dos puntos tienen la misma x</td><td>El avance es 0: la pendiente no existe y la recta se escribe x = x₁, no con esta forma.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer>
+        <p>José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago. Material del portal GEDparaHispanos.</p>
+        <p>Obra bajo licencia
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var MIN = -10, MAX = 10, PAD = 32, TAM = 680;
+        var CELL = (TAM - 2 * PAD) / (MAX - MIN);
+        var svg = document.getElementById('plano');
+
+        var modo = 1;
+        var A = { x: 2, y: 5 };
+        var Bp = { x: 4, y: 8 };
+        var P = 3, Q = 1;
+        var ultimo = 'A';
+        var gDin, gPuntos;
+
+        function sx(x) { return PAD + (x - MIN) * CELL; }
+        function sy(y) { return PAD + (MAX - y) * CELL; }
+        function ns(n, a) {
+          var el = document.createElementNS('http://www.w3.org/2000/svg', n);
+          for (var k in a) { el.setAttribute(k, a[k]); }
+          return el;
+        }
+        function limpiar(g) { while (g.firstChild) { g.removeChild(g.firstChild); } }
+        function mcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a; }
+        function red(n, d) { var g = mcd(n, d) || 1; n = n / g; d = d / g; if (d < 0) { n = -n; d = -d; } return [n, d]; }
+        function men(v) { return String(v).replace('-', '−'); }
+        function limitar(v) { return Math.max(MIN, Math.min(MAX, v)); }
+
+        function fracAbs(n, d) { var r = red(Math.abs(n), Math.abs(d)); return r[1] === 1 ? String(r[0]) : r[0] + '/' + r[1]; }
+        function coefX(n, d) {
+          var r = red(n, d), s = r[0] < 0 ? '−' : '', a = Math.abs(r[0]);
+          if (a === 0) { return null; }
+          if (r[1] === 1) { return s + (a === 1 ? '' : a) + 'x'; }
+          return s + '(' + a + '/' + r[1] + ')x';
+        }
+        function terminoSuma(n, d) { if (n === 0) { return ''; } return (n < 0 ? ' − ' : ' + ') + fracAbs(n, d); }
+        function ecuacionPI(p, q, bn, bd) {
+          var cx = coefX(p, q);
+          if (cx === null) { return 'y = ' + (bn === 0 ? '0' : (bn < 0 ? '−' : '') + fracAbs(bn, bd)); }
+          return 'y = ' + cx + terminoSuma(bn, bd);
+        }
+        function factorM(p, q) {
+          var r = red(p, q);
+          if (r[1] === 1) { return r[0] === 1 ? '' : r[0] === -1 ? '−' : men(r[0]); }
+          return (r[0] < 0 ? '−' : '') + '(' + Math.abs(r[0]) + '/' + r[1] + ')';
+        }
+        function parentesis(v, letra) {
+          if (v === 0) { return letra; }
+          return letra + (v > 0 ? ' − ' : ' + ') + Math.abs(v);
+        }
+        function estandar(p, q, bn, bd) {
+          // y = (p/q)x + bn/bd  →  A x + B y = C
+          var rm = red(p, q), rb = red(bn, bd);
+          var A2 = -rm[0] * rb[1], B2 = rm[1] * rb[1], C2 = rm[1] * rb[0];
+          if (A2 < 0) { A2 = -A2; B2 = -B2; C2 = -C2; }
+          var g = mcd(mcd(A2, B2), Math.abs(C2)) || 1;
+          A2 = A2 / g; B2 = B2 / g; C2 = C2 / g;
+          var izq = '';
+          if (A2 !== 0) { izq += (A2 === 1 ? '' : A2) + 'x'; }
+          if (B2 !== 0) {
+            var ab = Math.abs(B2), pieza = (ab === 1 ? '' : ab) + 'y';
+            izq += izq === '' ? (B2 < 0 ? '−' + pieza : pieza) : (B2 < 0 ? ' − ' : ' + ') + pieza;
+          }
+          return izq + ' = ' + men(C2);
+        }
+
+        // ---------- Estado derivado ----------
+        function pendienteActual() {
+          if (modo === 1) { var rm = red(P, Q); return { p: rm[0], q: rm[1], vertical: false }; }
+          var dx = Bp.x - A.x, dy = Bp.y - A.y;
+          if (dx === 0) { return { p: 0, q: 1, vertical: true }; }
+          var r = red(dy, dx);
+          return { p: r[0], q: r[1], vertical: false };
+        }
+        function interceptoFrac(m, punto) {
+          // b = y1 − (p/q)·x1  =  (q·y1 − p·x1) / q
+          var r = red(m.q * punto.y - m.p * punto.x, m.q);
+          return { n: r[0], d: r[1] };
+        }
+
+        // ---------- Dibujo ----------
+        function dibujarFondo() {
+          var g = ns('g', {}), i;
+          for (i = MIN; i <= MAX; i++) {
+            g.appendChild(ns('line', { x1: sx(i), y1: sy(MIN), x2: sx(i), y2: sy(MAX), stroke: '#dfe3f0', 'stroke-width': 1 }));
+            g.appendChild(ns('line', { x1: sx(MIN), y1: sy(i), x2: sx(MAX), y2: sy(i), stroke: '#dfe3f0', 'stroke-width': 1 }));
+          }
+          g.appendChild(ns('line', { x1: sx(MIN), y1: sy(0), x2: sx(MAX), y2: sy(0), stroke: '#5c6180', 'stroke-width': 2.2 }));
+          g.appendChild(ns('line', { x1: sx(0), y1: sy(MIN), x2: sx(0), y2: sy(MAX), stroke: '#5c6180', 'stroke-width': 2.2 }));
+          for (i = MIN; i <= MAX; i += 2) {
+            if (i === 0) { continue; }
+            var tx = ns('text', { x: sx(i), y: sy(0) + 16, 'text-anchor': 'middle', 'font-size': 12, fill: '#555' });
+            tx.textContent = men(i);
+            g.appendChild(tx);
+            var ty = ns('text', { x: sx(0) - 8, y: sy(i) + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#555' });
+            ty.textContent = men(i);
+            g.appendChild(ty);
+          }
+          var lx = ns('text', { x: sx(MAX) - 2, y: sy(0) - 8, 'text-anchor': 'end', 'font-size': 14, 'font-style': 'italic', fill: '#5c6180' });
+          lx.textContent = 'x';
+          g.appendChild(lx);
+          var ly = ns('text', { x: sx(0) + 10, y: sy(MAX) + 6, 'font-size': 14, 'font-style': 'italic', fill: '#5c6180' });
+          ly.textContent = 'y';
+          g.appendChild(ly);
+          svg.appendChild(g);
+          gDin = ns('g', {});
+          gPuntos = ns('g', {});
+          svg.appendChild(gDin);
+          svg.appendChild(gPuntos);
+        }
+
+        function etiqueta(g, x, y, texto, color, ancla) {
+          var t = ns('text', {
+            x: x, y: y, 'text-anchor': ancla || 'middle', 'font-size': 14, 'font-weight': 700,
+            fill: color, stroke: '#ffffff', 'stroke-width': 4.5, 'paint-order': 'stroke'
+          });
+          t.textContent = texto;
+          g.appendChild(t);
+        }
+
+        function dibujarDinamico() {
+          limpiar(gDin);
+          limpiar(gPuntos);
+          var m = pendienteActual();
+
+          if (m.vertical) {
+            gDin.appendChild(ns('line', { x1: sx(A.x), y1: sy(MIN), x2: sx(A.x), y2: sy(MAX), stroke: '#1a237e', 'stroke-width': 3 }));
+          } else {
+            var pend = m.p / m.q;
+            var b = A.y - pend * A.x;
+            var pts = [];
+            var yI = pend * MIN + b, yD = pend * MAX + b;
+            if (yI >= MIN && yI <= MAX) { pts.push({ x: MIN, y: yI }); }
+            if (yD >= MIN && yD <= MAX) { pts.push({ x: MAX, y: yD }); }
+            if (pend !== 0) {
+              var xA = (MIN - b) / pend, xB = (MAX - b) / pend;
+              if (xA >= MIN && xA <= MAX) { pts.push({ x: xA, y: MIN }); }
+              if (xB >= MIN && xB <= MAX) { pts.push({ x: xB, y: MAX }); }
+            }
+            if (pts.length >= 2) {
+              gDin.appendChild(ns('line', {
+                x1: sx(pts[0].x), y1: sy(pts[0].y), x2: sx(pts[1].x), y2: sy(pts[1].y),
+                stroke: '#1a237e', 'stroke-width': 3, 'stroke-linecap': 'round'
+              }));
+            }
+            // Escalera desde el punto A
+            var dir = (A.y + m.p >= MIN && A.y + m.p <= MAX && A.x + m.q <= MAX) ? 1 : -1;
+            var x1 = A.x + dir * m.q, y1 = A.y + dir * m.p;
+            if (m.p !== 0 && x1 >= MIN && x1 <= MAX && y1 >= MIN && y1 <= MAX) {
+              gDin.appendChild(ns('line', { x1: sx(A.x), y1: sy(A.y), x2: sx(x1), y2: sy(A.y), stroke: '#00695c', 'stroke-width': 3.5, 'stroke-dasharray': '7 5' }));
+              gDin.appendChild(ns('line', { x1: sx(x1), y1: sy(A.y), x2: sx(x1), y2: sy(y1), stroke: '#b3261e', 'stroke-width': 3.5, 'stroke-dasharray': '7 5' }));
+              etiqueta(gDin, sx((A.x + x1) / 2), sy(A.y) + (dir * m.p > 0 ? 27 : -19), 'avance = ' + men(dir * m.q), '#00695c');
+              etiqueta(gDin, sx(x1) + (dir > 0 ? 10 : -10), sy((A.y + y1) / 2), 'elevación = ' + men(dir * m.p), '#b3261e', dir > 0 ? 'start' : 'end');
+            }
+          }
+
+          crearPunto('A', A, '#1a237e');
+          if (modo === 2) { crearPunto('B', Bp, '#6a1b9a'); }
+        }
+
+        function crearPunto(nombre, punto, color) {
+          var g = ns('g', {
+            class: 'arrastrable', tabindex: '0', role: 'button', 'data-punto': nombre,
+            'aria-label': 'Punto ' + nombre + ' en (' + punto.x + ', ' + punto.y + '). Usa las flechas para moverlo.'
+          });
+          g.appendChild(ns('circle', { class: 'foco', cx: sx(punto.x), cy: sy(punto.y), r: 22, fill: 'none', stroke: '#b26a00', 'stroke-width': 3 }));
+          g.appendChild(ns('circle', { cx: sx(punto.x), cy: sy(punto.y), r: 14, fill: color, stroke: '#ffffff', 'stroke-width': 3 }));
+          var t = ns('text', { x: sx(punto.x), y: sy(punto.y) + 5, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 700, fill: '#ffffff', 'pointer-events': 'none' });
+          t.textContent = nombre;
+          g.appendChild(t);
+          etiqueta(g, sx(punto.x), sy(punto.y) - 22, '(' + men(punto.x) + ', ' + men(punto.y) + ')', color);
+          gPuntos.appendChild(g);
+        }
+
+        // ---------- Panel ----------
+        function actualizar() {
+          var m = pendienteActual();
+          document.getElementById('controlesM').hidden = modo !== 1;
+          document.getElementById('campoB').hidden = modo !== 2;
+          document.getElementById('inAx').value = A.x;
+          document.getElementById('inAy').value = A.y;
+          document.getElementById('inBx').value = Bp.x;
+          document.getElementById('inBy').value = Bp.y;
+          document.getElementById('valP').textContent = men(P);
+          document.getElementById('valQ').textContent = Q;
+          document.getElementById('slP').value = P;
+          document.getElementById('slQ').value = Q;
+
+          var lista = document.getElementById('listaPasos');
+          limpiar(lista);
+
+          if (m.vertical) {
+            document.getElementById('ecuPP').textContent = 'x = ' + men(A.x);
+            document.getElementById('txtPendiente').textContent = 'Los dos puntos tienen la misma x, así que el avance es 0 y la pendiente no existe.';
+            agregarPaso(lista, 'La recta es vertical: x = ' + men(A.x) + '.', 'La forma punto-pendiente necesita un valor de m, y aquí no lo hay.');
+            document.getElementById('fPI').textContent = 'No aplica: la recta vertical no se puede escribir como y = mx + b.';
+            document.getElementById('fEST').textContent = 'x = ' + men(A.x);
+            dibujarDinamico();
+            return;
+          }
+
+          var mTexto = m.q === 1 ? men(m.p) : men(m.p) + '/' + m.q;
+          var b = interceptoFrac(m, A);
+          var ecPP = parentesis(A.y, 'y') + ' = ' + factorM(m.p, m.q) + '(' + parentesis(A.x, 'x') + ')';
+          document.getElementById('ecuPP').textContent = ecPP;
+
+          if (modo === 2) {
+            var dx = Bp.x - A.x, dy = Bp.y - A.y;
+            document.getElementById('txtPendiente').textContent =
+              'm = (' + men(Bp.y) + ' − ' + men(A.y) + ') / (' + men(Bp.x) + ' − ' + men(A.x) + ') = ' + men(dy) + '/' + men(dx) + ' = ' + mTexto + '.';
+            agregarPaso(lista, 'Pendiente: m = ' + mTexto + '.', 'Se calcula con m = (y₂ − y₁)/(x₂ − x₁) antes de sustituir.');
+          } else {
+            document.getElementById('txtPendiente').textContent = 'Pendiente fijada: m = ' + mTexto + '. Punto conocido: (' + men(A.x) + ', ' + men(A.y) + ').';
+          }
+
+          agregarPaso(lista, 'Sustituir: ' + ecPP, 'Se colocan el punto (' + men(A.x) + ', ' + men(A.y) + ') y la pendiente en y − y₁ = m(x − x₁).');
+
+          var prod = red(m.p * A.x, m.q); // m·x₁
+          var derecha = coefX(m.p, m.q);
+          var textoDistribuir = parentesis(A.y, 'y') + ' = ' + (derecha === null ? '0' : derecha) + terminoSuma(-prod[0], prod[1]);
+          agregarPaso(lista, 'Distribuir: ' + textoDistribuir, 'Se multiplica la pendiente por cada término del paréntesis.');
+
+          var ecPI = ecuacionPI(m.p, m.q, b.n, b.d);
+          agregarPaso(lista, 'Despejar y: ' + ecPI, 'Se pasa el término independiente al otro lado: b = y₁ − m·x₁.');
+
+          document.getElementById('fPI').textContent = ecPI;
+          document.getElementById('fEST').textContent = estandar(m.p, m.q, b.n, b.d);
+
+          document.getElementById('lector').textContent = 'Punto-pendiente: ' + ecPP + '. Equivale a ' + ecPI + '.';
+          dibujarDinamico();
+        }
+
+        function agregarPaso(lista, texto, detalle) {
+          var li = document.createElement('li');
+          li.textContent = texto;
+          var span = document.createElement('span');
+          span.className = 'detalle';
+          span.textContent = detalle;
+          li.appendChild(span);
+          lista.appendChild(li);
+        }
+
+        // ---------- Interacción ----------
+        function mover(nombre, x, y) {
+          x = limitar(Math.round(x));
+          y = limitar(Math.round(y));
+          if (modo === 2) {
+            var otro = nombre === 'A' ? Bp : A;
+            if (x === otro.x && y === otro.y) {
+              document.getElementById('aviso').textContent = 'Los puntos A y B no pueden ocupar el mismo lugar.';
+              return false;
+            }
+          }
+          document.getElementById('aviso').textContent = '';
+          var p = nombre === 'A' ? A : Bp;
+          if (p.x === x && p.y === y) { return false; }
+          p.x = x; p.y = y;
+          ultimo = nombre;
+          actualizar();
+          return true;
+        }
+
+        function coordsDesdeEvento(evt) {
+          var r = svg.getBoundingClientRect();
+          var px = (evt.clientX - r.left) * (TAM / r.width);
+          var py = (evt.clientY - r.top) * (TAM / r.height);
+          return { x: MIN + (px - PAD) / CELL, y: MAX - (py - PAD) / CELL };
+        }
+
+        var arrastrando = null;
+        svg.addEventListener('pointerdown', function (evt) {
+          var c = coordsDesdeEvento(evt);
+          var dA = Math.hypot(c.x - A.x, c.y - A.y);
+          var dB = modo === 2 ? Math.hypot(c.x - Bp.x, c.y - Bp.y) : Infinity;
+          if (Math.min(dA, dB) <= 1.1) {
+            arrastrando = dA <= dB ? 'A' : 'B';
+            ultimo = arrastrando;
+            svg.setPointerCapture(evt.pointerId);
+            evt.preventDefault();
+          } else {
+            mover(modo === 1 ? 'A' : ultimo, c.x, c.y);
+          }
+        });
+        svg.addEventListener('pointermove', function (evt) {
+          if (!arrastrando) { return; }
+          mover(arrastrando, coordsDesdeEvento(evt).x, coordsDesdeEvento(evt).y);
+          evt.preventDefault();
+        });
+        function soltar(evt) {
+          if (arrastrando) {
+            try { svg.releasePointerCapture(evt.pointerId); } catch (e) {}
+            arrastrando = null;
+          }
+        }
+        svg.addEventListener('pointerup', soltar);
+        svg.addEventListener('pointercancel', soltar);
+
+        svg.addEventListener('keydown', function (evt) {
+          var destino = evt.target.closest ? evt.target.closest('[data-punto]') : null;
+          if (!destino) { return; }
+          var nombre = destino.getAttribute('data-punto');
+          var p = nombre === 'A' ? A : Bp;
+          var paso = { ArrowUp: [0, 1], ArrowDown: [0, -1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[evt.key];
+          if (!paso) { return; }
+          evt.preventDefault();
+          if (mover(nombre, p.x + paso[0], p.y + paso[1])) {
+            var nuevo = gPuntos.querySelector('[data-punto="' + nombre + '"]');
+            if (nuevo) { nuevo.focus(); }
+          }
+        });
+
+        ['inAx', 'inAy', 'inBx', 'inBy'].forEach(function (id) {
+          document.getElementById(id).addEventListener('change', function () {
+            var v = parseInt(this.value, 10);
+            if (isNaN(v)) { actualizar(); return; }
+            var nombre = id.indexOf('A') > -1 ? 'A' : 'B';
+            var p = nombre === 'A' ? A : Bp;
+            if (id.slice(-1) === 'x') { mover(nombre, v, p.y); } else { mover(nombre, p.x, v); }
+            actualizar();
+          });
+        });
+
+        document.getElementById('slP').addEventListener('input', function () { P = parseInt(this.value, 10); actualizar(); });
+        document.getElementById('slQ').addEventListener('input', function () { Q = parseInt(this.value, 10); actualizar(); });
+
+        function fijarModo(n) {
+          modo = n;
+          document.getElementById('btnModo1').setAttribute('aria-pressed', n === 1 ? 'true' : 'false');
+          document.getElementById('btnModo2').setAttribute('aria-pressed', n === 2 ? 'true' : 'false');
+          if (n === 2 && Bp.x === A.x && Bp.y === A.y) { Bp = { x: A.x + 2, y: A.y + 2 }; }
+          document.getElementById('aviso').textContent = '';
+          actualizar();
+        }
+        document.getElementById('btnModo1').addEventListener('click', function () { fijarModo(1); });
+        document.getElementById('btnModo2').addEventListener('click', function () { fijarModo(2); });
+
+        // ---------- Retos ----------
+        var retos = [
+          { texto: 'y = 3x − 1', p: 3, q: 1, b: -1 },
+          { texto: 'Pendiente −2 y pasa por (3, 1)', p: -2, q: 1, b: 7 },
+          { texto: 'y = (1/2)x + 3', p: 1, q: 2, b: 3 },
+          { texto: 'Pasa por (1, 2) y (3, 8)', p: 3, q: 1, b: -1 },
+          { texto: 'y + 2 = 4(x − 1)', p: 4, q: 1, b: -6 },
+          { texto: 'y = −(2/3)x + 4', p: -2, q: 3, b: 4 },
+          { texto: 'Pasa por (−2, 5) con pendiente 1', p: 1, q: 1, b: 7 },
+          { texto: '3x + y = 6', p: -3, q: 1, b: 6 }
+        ];
+        var actual = 0, resueltos = 0, intentos = 0;
+
+        function mostrarReto() {
+          document.getElementById('txtReto').textContent = retos[actual].texto;
+          var fb = document.getElementById('fbReto');
+          fb.className = 'fb';
+          fb.textContent = '';
+        }
+
+        document.getElementById('btnComprobar').addEventListener('click', function () {
+          var r = retos[actual], fb = document.getElementById('fbReto'), m = pendienteActual();
+          intentos++;
+          if (m.vertical) {
+            fb.className = 'fb mal';
+            fb.textContent = 'Tu recta es vertical y no tiene pendiente. Separa los puntos en horizontal para poder compararla.';
+          } else {
+            var b = interceptoFrac(m, A);
+            var objetivo = red(r.p, r.q);
+            var correcto = m.p === objetivo[0] && m.q === objetivo[1] && b.d === 1 && b.n === r.b;
+            var mia = ecuacionPI(m.p, m.q, b.n, b.d);
+            if (correcto) {
+              resueltos++;
+              fb.className = 'fb bien';
+              fb.textContent = 'Correcto. Con el punto (' + men(A.x) + ', ' + men(A.y) + ') la ecuación queda ' + mia + '.';
+            } else {
+              fb.className = 'fb mal';
+              fb.textContent = 'Todavía no. Tu recta es ' + mia + '. Revisa la pendiente y comprueba que el punto pertenezca a la recta pedida.';
+            }
+          }
+          document.getElementById('marcador').textContent = 'Retos resueltos: ' + resueltos + ' de ' + intentos + ' intentos.';
+        });
+
+        document.getElementById('btnOtroReto').addEventListener('click', function () {
+          var s = actual;
+          while (s === actual && retos.length > 1) { s = Math.floor(Math.random() * retos.length); }
+          actual = s;
+          mostrarReto();
+        });
+
+        dibujarFondo();
+        actualizar();
+        mostrarReto();
+      })();
+    </script>
+  </body>
+</html>

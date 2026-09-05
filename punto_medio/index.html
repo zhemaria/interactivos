@@ -1,832 +1,754 @@
-<!DOCTYPE html>
-<html lang="es"><head> 
-  <meta charset="UTF-8"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <title>3-U7-Lección 3: INTERACTIVO - Punto medio de un segmento</title> 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-    
-    body {
-      display: flex;
-      justify-content: center;
-      padding: 0;
-      overflow-x: hidden;
-      background-color: #f9f9f9;
-    }
-    
-    #contenedor {
-      width: 100%;
-      max-width: 520px;
-      background-color: #f9f9f9;
-      border-radius: 4px;
-      padding: 15px;
-      position: relative;
-    }
-    
-    h2 {
-      font-size: 20px;
-      text-align: center;
-      margin-bottom: 15px;
-      color: #333;
-    }
-    
-    .info-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 15px;
-    }
-    
-    .btn {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.2s;
-    }
-    
-    .btn-nuevos {
-      background-color: #4caf50;
-      color: white;
-    }
-    
-    .plano-container {
-      position: relative;
-      border: 1px solid #ddd;
-      margin-bottom: 15px;
-      background-color: white;
-      overflow: hidden;
-    }
-    
-    .calculo {
-      margin-bottom: 15px;
-    }
-    
-    .calculo-label {
-      font-weight: bold;
-      margin-bottom: 5px;
-      font-size: 15px;
-    }
-    
-    .formula {
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 10px;
-    }
-    
-    .entrada-container {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    
-    #respuestaX, #respuestaY {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      width: 80px;
-    }
-    
-    .btn-verificar {
-      background-color: #1976d2;
-      color: white;
-    }
-    
-    #feedback {
-      margin-top: 10px;
-      padding: 8px;
-      border-radius: 4px;
-      font-size: 14px;
-      display: none;
-    }
-    
-    .feedback-correcto {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-    }
-    
-    .feedback-incorrecto {
-      background-color: #ffebee;
-      color: #c62828;
-    }
-    
-    .solucion-toggle {
-      color: #555;
-      text-decoration: underline;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      text-align: left;
-      padding: 0;
-      margin-top: 10px;
-      display: block;
-    }
-    
-    #solucion {
-      display: none;
-    }
-    
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 100;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .modal-content {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 480px;
-      width: 90%;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      position: relative;
-    }
-    
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 20px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      color: #888;
-    }
-    
-    .solucion-titulo {
-      font-weight: bold;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-    
-    .pasos p {
-      margin-bottom: 8px;
-    }
-    
-    .resultado-final {
-      font-weight: bold;
-      margin-top: 10px;
-      font-size: 15px;
-    }
-    
-    .coordenadas-container {
-      margin-top: 15px;
-      margin-bottom: 15px;
-    }
-    
-    .coordenadas-pregunta {
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 15px;
-    }
-    
-    .puntos-inputs {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 15px;
-    }
-    
-    .punto-input {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    
-    .punto-a-label {
-      color: #e53935;
-      font-weight: bold;
-      margin-right: 5px;
-    }
-    
-    .punto-b-label {
-      color: #1e88e5;
-      font-weight: bold;
-      margin-right: 5px;
-    }
-    
-    .punto-m-label {
-      color: #9c27b0;
-      font-weight: bold;
-      margin-right: 5px;
-    }
-    
-    .coord-input {
-      width: 40px;
-      padding: 5px;
-      text-align: center;
-      margin: 0 2px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    
-    .verificar-btn {
-      background-color: #9c27b0;
-      color: white;
-      padding: 8px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    
-    #mensajeError {
-      display: none;
-      background-color: #fff;
-      border: 1px solid #f44336;
-      padding: 15px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 10;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      max-width: 300px;
-      width: 90%;
-      border-radius: 4px;
-    }
-    
-    .error-titulo {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    
-    .error-mensaje {
-      margin-bottom: 10px;
-    }
-    
-    .error-btn {
-      background-color: #2196F3;
-      color: white;
-      padding: 8px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      float: right;
-    }
-    
-    .respuesta-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    
-    .respuesta-label {
-      width: 150px;
-    }
-  </style> 
- </head><body><div id="contenedor">
-<h1 style="text-align: center;">Cálculo del punto medio <br>de un segmento</h1>
-<div class="info-container"><button id="btnNuevosPuntos" class="btn btn-nuevos" style="color: #000000;">Nuevos puntos</button></div>
-<div class="plano-container"><svg xmlns="http://www.w3.org/2000/svg" id="planoCartesiano" width="480" height="380" role="img" aria-label="Plano cartesiano con los puntos A y B del segmento"></svg></div>
-<div id="panelCoordenadas">
-<div class="coordenadas-container">
-<p class="coordenadas-pregunta">¿Cuáles son las coordenadas de los puntos?</p>
-<div class="puntos-inputs">
-<div class="punto-input"><span class="punto-a-label" style="color: #7e1d26;">Punto A</span>: ( <input type="text" id="inputXA" class="coord-input" pattern="-?\d+" inputmode="numeric" aria-label="Coordenada x del punto A"> , <input type="text" id="inputYA" class="coord-input" pattern="-?\d+" inputmode="numeric" aria-label="Coordenada y del punto A"> )</div>
-<div class="punto-input"><span class="punto-b-label" style="color: #005c99;">Punto B</span>: ( <input type="text" id="inputXB" class="coord-input" pattern="-?\d+" inputmode="numeric" aria-label="Coordenada x del punto B"> , <input type="text" id="inputYB" class="coord-input" pattern="-?\d+" inputmode="numeric" aria-label="Coordenada y del punto B"> )</div>
-<button id="btnVerificarCoordenadas" class="verificar-btn">Verificar</button></div>
-</div>
-</div>
-<div id="panelPuntoMedio" style="display: none;">
-<p class="calculo-label">Calcula el punto medio del segmento AB:</p>
-<p class="formula">Recuerda que la fórmula es: M = ((x₁+x₂)/2, (y₁+y₂)/2)</p>
-<div class="respuesta-container"><span class="respuesta-label punto-m-label">Punto M</span>: ( <input type="text" id="respuestaX" placeholder="x" inputmode="numeric" aria-label="Coordenada x del punto medio M"> , <input type="text" id="respuestaY" placeholder="y" inputmode="numeric" aria-label="Coordenada y del punto medio M"> ) <button id="btnVerificar" class="btn btn-verificar">Verificar</button></div>
-<div id="feedback" role="alert"></div>
-<button id="btnMostrarSolucion" class="solucion-toggle">Mostrar solución</button>
-<div id="solucion"></div>
-</div>
-<div id="mensajeError" role="alert">
-<p class="error-titulo">Coordenadas incorrectas. Revisa los siguientes puntos:</p>
-<p id="errorDetalles" class="error-mensaje"></p>
-<button id="btnAceptarError" class="error-btn">Aceptar</button></div>
-<div id="modalSolucion" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloModal">
-<div class="modal-content"><button class="close-btn" aria-label="Cerrar solución">×</button>
-<div id="tituloModal" class="solucion-titulo">Solución paso a paso:</div>
-<div id="pasosSolucion" class="pasos">
-<p id="paso1">1. Identificar las coordenadas: A(2, 3) y B(6, 7)</p>
-<p id="paso2">2. Calcular la coordenada x del punto medio: (2 + 6) ÷ 2 = 4</p>
-<p id="paso3">3. Calcular la coordenada y del punto medio: (3 + 7) ÷ 2 = 5</p>
-<p id="resultado" class="resultado-final">El punto medio M es (4, 5)</p>
-</div>
-</div>
-</div>
-</div>
-<p><script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Configuración del plano
-      const svg = document.getElementById('planoCartesiano');
-      const ancho = 480;
-      const alto = 380;
-      const margen = 40;
-      // Tamaño del grid
-      const tamañoGrid = 20;
-      
-      // Rango del plano (ampliado para evitar puntos fuera del grid)
-      const minX = -10;
-      const maxX = 10;
-      const minY = -9;
-      const maxY = 9;
-      
-      // Estado de la aplicación
-      let puntoA = { x: 0, y: 0 };
-      let puntoB = { x: 0, y: 0 };
-      let puntoM = { x: 0, y: 0 }; // Punto medio
-      let mostrandoSolucion = false;
-      let coordenadasVerificadas = false;
-      let respuestaCorrecta = false; // Para rastrear si la respuesta ya fue correcta
-      
-      // Referencias a elementos del DOM
-      const btnNuevosPuntos = document.getElementById('btnNuevosPuntos');
-      const respuestaInputX = document.getElementById('respuestaX');
-      const respuestaInputY = document.getElementById('respuestaY');
-      const btnVerificar = document.getElementById('btnVerificar');
-      const feedbackDiv = document.getElementById('feedback');
-      const btnMostrarSolucion = document.getElementById('btnMostrarSolucion');
-      const solucionDiv = document.getElementById('solucion');
-      const panelCoordenadas = document.getElementById('panelCoordenadas');
-      const panelPuntoMedio = document.getElementById('panelPuntoMedio');
-      const inputXA = document.getElementById('inputXA');
-      const inputYA = document.getElementById('inputYA');
-      const inputXB = document.getElementById('inputXB');
-      const inputYB = document.getElementById('inputYB');
-      const btnVerificarCoordenadas = document.getElementById('btnVerificarCoordenadas');
-      const mensajeError = document.getElementById('mensajeError');
-      const errorDetalles = document.getElementById('errorDetalles');
-      const btnAceptarError = document.getElementById('btnAceptarError');
-      const modalSolucion = document.getElementById('modalSolucion');
-      const closeModalBtn = document.querySelector('.close-btn');
-      const pasosSolucion = document.getElementById('pasosSolucion');
-      
-      // Función para convertir coordenadas del mundo real a coordenadas SVG
-      function coordenadaMundoASVG(x, y) {
-        const svgX = margen + (x - minX) * tamañoGrid;
-        const svgY = alto - margen - (y - minY) * tamañoGrid;
-        return { x: svgX, y: svgY };
+<!doctype html>
+<!--
+  Punto medio de un segmento
+  Interactivo de apoyo a la Lección 1.1 · Spanish ASE Math · Nivel 4 · Tema 1
+  José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago
+  Licencia: Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+-->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Punto medio de un segmento</title>
+    <meta name="description" content="Interactivo para practicar la lectura de coordenadas y el cálculo del punto medio de un segmento en el plano cartesiano." />
+    <meta name="author" content="José M. Fernández" />
+    <meta name="license" content="CC BY-NC-SA 4.0" />
+    <link rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23ffffff%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%2294%22%20height%3D%2294%22%20fill%3D%22none%22%20stroke%3D%22%23002060%22%20stroke-width%3D%226%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20fill%3D%22%23002060%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22700%22%20font-size%3D%2278%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%26%23209%3B%3C%2Ftext%3E%3C%2Fsvg%3E" />
+    <style>
+      :root {
+        --tema: #1a237e;
+        --tema-d: #10174f;
+        --tema-bg: #e8eaf6;
+        --tema-bg2: #c5cae9;
+        --acento: #00695c;
+        --txt: #222;
+        --bg: #f5f7fa;
+        --ok: #1b5e20;
+        --ok-bg: #e8f5e9;
+        --no: #b71c1c;
+        --no-bg: #ffebee;
+        --pa: #b71c1c;   /* punto A */
+        --pb: #0d47a1;   /* punto B */
+        --pm: #6a1b9a;   /* punto medio M */
       }
-      
-      // Función para calcular el punto medio
-      function calcularPuntoMedio() {
-        const x = (puntoA.x + puntoB.x) / 2;
-        const y = (puntoA.y + puntoB.y) / 2;
-        
-        // Redondear a 2 decimales si no es un número entero
-        const xRedondeado = Number.isInteger(x) ? x : parseFloat(x.toFixed(2));
-        const yRedondeado = Number.isInteger(y) ? y : parseFloat(y.toFixed(2));
-        
-        return { x: xRedondeado, y: yRedondeado };
+      * { box-sizing: border-box; }
+      body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        margin: 0; background: var(--bg); color: var(--txt);
+        line-height: 1.6; font-size: 16px;
       }
-      
-      // Actualizar la visualización
-      function actualizarVisualizacion(mostrarEtiquetas = false, mostrarPuntoMedio = false) {
-        // Limpiar el SVG
-        while (svg.firstChild) {
-          svg.removeChild(svg.firstChild);
+      .contenedor { max-width: 880px; margin: 0 auto; padding: 24px; }
+
+      .sr-only {
+        position: absolute; width: 1px; height: 1px; padding: 0;
+        margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0);
+        white-space: nowrap; border: 0;
+      }
+
+      header.principal {
+        background: var(--tema);
+        background: linear-gradient(135deg, #10174f 0%, #1a237e 55%, #283593 100%);
+        color: #fff; padding: 32px 30px; border-radius: 14px;
+        margin-bottom: 22px; box-shadow: 0 4px 14px rgba(16, 23, 79, 0.28);
+      }
+      header.principal .ruta {
+        font-size: 13px; opacity: 0.94; letter-spacing: 0.4px; text-transform: uppercase;
+      }
+      header.principal h1 { margin: 8px 0 6px; font-size: 25px; font-weight: 700; }
+      header.principal .meta { font-size: 14px; opacity: 0.96; }
+
+      h3 { color: var(--tema-d); font-size: 17px; margin: 20px 0 8px; }
+      p { margin: 10px 0; }
+
+      .caja-objetivos {
+        background: var(--tema-bg); border-left: 6px solid var(--tema);
+        padding: 18px 22px; border-radius: 0 10px 10px 0; margin-bottom: 22px;
+      }
+      .caja-objetivos h2 { margin: 0 0 10px; color: var(--tema-d); font-size: 19px; }
+      .caja-objetivos ul { margin: 0; padding-left: 22px; }
+      .caja-objetivos li { margin: 5px 0; }
+
+      .bloque {
+        background: #fff; border-radius: 10px; padding: 18px 24px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.06); margin-bottom: 18px;
+      }
+
+      .formula {
+        text-align: center; font-size: 20px; font-weight: 700;
+        color: var(--tema-d); margin: 14px 0;
+      }
+
+      .caja-tip {
+        background: #e8f5e9; border-left: 5px solid #2e7d32;
+        padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0;
+        color: #1b5e20; font-size: 15px;
+      }
+      .caja-tip strong { color: #1b5e20; }
+
+      .caja-atencion {
+        background: #fff8e1; border-left: 5px solid #f9a825;
+        padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0;
+        font-size: 15px; color: #5c3900;
+      }
+      .caja-atencion strong { color: #5c3900; }
+
+      /* ---------- Botones ---------- */
+      .btn {
+        background: var(--tema); color: #fff; border: 2px solid var(--tema);
+        padding: 9px 18px; border-radius: 8px; font-size: 14px; font-weight: 700;
+        cursor: pointer; font-family: inherit; transition: background 0.15s;
+      }
+      .btn:hover { background: var(--tema-d); border-color: var(--tema-d); }
+      .btn.sec { background: #fff; color: var(--tema-d); border-color: var(--tema); }
+      .btn.sec:hover { background: var(--tema-bg); }
+      .btn:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+
+      /* ---------- Indicador de pasos ---------- */
+      .pasos-guia {
+        display: flex; flex-wrap: wrap; gap: 8px;
+        border-bottom: 2px solid var(--tema-bg); padding-bottom: 14px; margin-bottom: 16px;
+      }
+      .paso-guia {
+        flex: 1; min-width: 220px; border-radius: 9px; padding: 10px 14px;
+        border: 2px solid var(--tema-bg2); background: #fff; color: #555; font-size: 14px;
+      }
+      .paso-guia .n-paso {
+        display: inline-block; width: 22px; height: 22px; line-height: 20px;
+        border-radius: 50%; border: 2px solid currentColor;
+        text-align: center; font-size: 12px; margin-right: 8px; font-weight: 700;
+      }
+      .paso-guia .t-paso { font-weight: 700; color: var(--tema-d); }
+      .paso-guia[data-estado='activo'] {
+        border-color: var(--tema); background: var(--tema-bg); color: var(--tema-d);
+      }
+      .paso-guia[data-estado='hecho'] {
+        border-color: #2e7d32; background: var(--ok-bg); color: var(--ok);
+      }
+      .paso-guia[data-estado='hecho'] .t-paso { color: var(--ok); }
+      .paso-guia .marca { float: right; font-weight: 700; }
+
+      /* ---------- Consigna ---------- */
+      .consigna {
+        background: var(--tema-bg); border-left: 6px solid var(--tema);
+        border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 0 0 16px;
+        color: var(--tema-d); text-align: center;
+      }
+      .consigna .linea1 { display: block; font-size: 15px; margin-bottom: 8px; }
+      .consigna .linea2 {
+        display: flex; flex-wrap: wrap; justify-content: center;
+        align-items: baseline; gap: 8px 14px;
+      }
+      .consigna .punto-ref {
+        white-space: nowrap; background: #fff; border: 1px solid var(--tema-bg2);
+        border-radius: 8px; padding: 5px 12px; font-size: 18px; font-weight: 700;
+      }
+      .consigna .nexo { font-size: 16px; font-weight: 400; }
+      .pa { color: var(--pa); }
+      .pb { color: var(--pb); }
+      .pm { color: var(--pm); }
+
+      /* ---------- Plano ---------- */
+      .lienzo { text-align: center; margin: 4px 0 14px; }
+      svg.plano {
+        max-width: 520px; width: 100%; height: auto;
+        border: 2px solid var(--tema-bg2); border-radius: 10px; background: #fff;
+      }
+      .leyenda { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: #555; margin: 8px 0 14px; justify-content: center; }
+      .leyenda span { display: flex; align-items: center; gap: 6px; }
+
+      /* ---------- Zonas de respuesta ---------- */
+      .zona {
+        background: #fafafa; border: 1px solid #e3e3e3; border-radius: 8px;
+        padding: 14px 18px; margin-bottom: 12px;
+      }
+      .zona[hidden] { display: none; }
+      .zona h3 { margin: 0 0 4px; font-size: 16px; }
+      .zona .pista { font-size: 14px; color: #555; margin: 0 0 12px; }
+      .fila-punto {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+        font-size: 17px; font-weight: 700;
+      }
+      .fila-punto .nombre { min-width: 86px; }
+      .fila-punto input {
+        width: 74px; font-size: 16px; padding: 7px 6px; text-align: center;
+        border: 2px solid #cfcfcf; border-radius: 7px; font-family: inherit; font-weight: 700;
+      }
+      .fila-punto input:focus { border-color: var(--tema); outline: none; }
+      .fila-punto input:focus-visible { outline: 3px solid var(--acento); outline-offset: 1px; }
+      .fila-punto .par { font-weight: 400; color: #555; }
+
+      .acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+
+      .marcador {
+        background: var(--tema-bg); border-radius: 8px; padding: 10px 16px;
+        font-size: 14px; color: var(--tema-d); text-align: center; margin-bottom: 12px;
+      }
+      .marcador .cifra { font-size: 20px; font-weight: 700; }
+
+      .fb {
+        border-radius: 8px; padding: 12px 16px; font-size: 15px; min-height: 24px;
+        border-left: 6px solid transparent; background: #f0f0f0; color: #333;
+      }
+      .fb .icono { font-weight: 700; margin-right: 6px; }
+      .fb.ok { background: var(--ok-bg); border-left-color: #2e7d32; color: var(--ok); }
+      .fb.no { background: var(--no-bg); border-left-color: #c62828; color: var(--no); }
+      .fb.aviso { background: #fff8e1; border-left-color: #f9a825; color: #5c3900; }
+
+      /* ---------- Procedimiento en acordeón ---------- */
+      details.procedimiento {
+        background: #fff; border: 2px solid var(--tema); border-radius: 12px;
+        margin: 16px 0; overflow: hidden;
+      }
+      details.procedimiento > summary {
+        list-style: none; cursor: pointer; display: flex; align-items: center;
+        gap: 12px; padding: 13px 20px; background: var(--tema-bg);
+        color: var(--tema-d); font-weight: 700; font-size: 16px;
+      }
+      details.procedimiento > summary::-webkit-details-marker { display: none; }
+      details.procedimiento > summary:focus-visible { outline: 3px solid var(--acento); outline-offset: -3px; }
+      details.procedimiento > summary .chevron { transition: transform 0.2s; flex-shrink: 0; }
+      details.procedimiento[open] > summary .chevron { transform: rotate(90deg); }
+      .proc-inner { padding: 6px 20px 18px; }
+      .paso { margin: 9px 0; padding-left: 32px; position: relative; }
+      .paso .n {
+        position: absolute; left: 0; top: 2px; background: var(--tema-bg);
+        color: var(--tema-d); width: 22px; height: 22px; border-radius: 50%;
+        font-size: 13px; font-weight: 700; text-align: center; line-height: 22px;
+      }
+      .paso .op {
+        display: block; margin-top: 4px; font-family: 'Cascadia Mono', Consolas, monospace;
+        font-size: 15px; color: var(--tema-d); background: #f5f7fa;
+        border-radius: 6px; padding: 6px 10px; white-space: pre-line;
+      }
+      .proc-final {
+        margin-top: 12px; background: var(--ok-bg); border-left: 5px solid #2e7d32;
+        border-radius: 0 8px 8px 0; padding: 10px 14px; color: var(--ok); font-weight: 700;
+      }
+
+      footer {
+        text-align: center; padding: 20px; color: #555; font-size: 13px;
+        border-top: 1px solid #ddd; margin-top: 20px;
+      }
+      footer a { color: var(--tema-d); }
+
+      @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+      @media (max-width: 560px) {
+        .contenedor { padding: 14px; }
+        header.principal { padding: 22px 20px; }
+        header.principal h1 { font-size: 21px; }
+        .bloque { padding: 14px 16px; }
+        .paso-guia { min-width: 100%; }
+        .consigna .punto-ref { font-size: 16px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="contenedor">
+      <header class="principal">
+        <div class="ruta">Spanish ASE Math · Nivel 4 · Tema 1 · Geometría analítica</div>
+        <h1>Punto medio de un segmento</h1>
+        <div class="meta">Interactivo de apoyo a la Lección 1.1 · Leer coordenadas y promediarlas · 10–15 minutos</div>
+      </header>
+
+      <div class="caja-objetivos">
+        <h2>Qué se practica en este interactivo</h2>
+        <ul>
+          <li>Leer las coordenadas de los extremos de un segmento.</li>
+          <li>Calcular el punto medio promediando las coordenadas.</li>
+          <li>Comprobar visualmente que el punto medio divide el segmento en dos partes iguales.</li>
+          <li>Manejar resultados con decimales cuando la suma de las coordenadas es impar.</li>
+        </ul>
+      </div>
+
+      <div class="bloque">
+        <p class="formula">M = ( (x₁ + x₂) ÷ 2 , (y₁ + y₂) ÷ 2 )</p>
+
+        <div class="pasos-guia">
+          <div class="paso-guia" id="guia-1" data-estado="activo">
+            <span class="n-paso" aria-hidden="true">1</span>
+            <span class="t-paso">Leer los extremos</span>
+            <span class="marca" id="marca-1" aria-hidden="true"></span>
+            <br />Identifica las coordenadas de A y de B en el plano.
+          </div>
+          <div class="paso-guia" id="guia-2">
+            <span class="n-paso" aria-hidden="true">2</span>
+            <span class="t-paso">Calcular el punto medio</span>
+            <span class="marca" id="marca-2" aria-hidden="true"></span>
+            <br />Promedia las dos coordenadas x y las dos coordenadas y.
+          </div>
+        </div>
+
+        <p class="consigna" id="consigna">
+          <span class="linea1" id="consigna-linea1">Observa el segmento y lee las coordenadas de sus extremos</span>
+          <span class="linea2" id="consigna-linea2"></span>
+        </p>
+
+        <div class="lienzo">
+          <svg class="plano" id="plano" viewBox="0 0 500 440" xmlns="http://www.w3.org/2000/svg"
+               role="img" aria-labelledby="desc-plano">
+            <title id="desc-plano">Plano cartesiano con el segmento que une los puntos A y B.</title>
+            <g id="rejilla"></g>
+            <g id="ejes"></g>
+            <g id="numeros"></g>
+            <g id="figura"></g>
+          </svg>
+        </div>
+
+        <div class="leyenda" aria-hidden="true">
+          <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="#b71c1c" /></svg> Extremo A</span>
+          <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="#0d47a1" /></svg> Extremo B</span>
+          <span><svg width="16" height="16" viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10" transform="rotate(45 8 8)" fill="#6a1b9a" /></svg> Punto medio M</span>
+        </div>
+
+        <div class="marcador" id="marcador">
+          <span class="cifra" id="marcador-cifra">0 / 0</span> aciertos ·
+          <span id="marcador-racha">Racha actual: 0 · Mejor: 0</span>
+        </div>
+
+        <!-- ===== Paso 1 ===== -->
+        <div class="zona" id="zona-1">
+          <h3>Paso 1 · ¿Cuáles son las coordenadas de los extremos?</h3>
+          <p class="pista">Cuenta primero el desplazamiento horizontal y después el vertical.</p>
+          <div class="fila-punto">
+            <span class="nombre pa">Punto A</span>
+            <span class="par">(</span>
+            <input type="text" id="ax" inputmode="numeric" autocomplete="off" aria-label="Coordenada x del punto A" />
+            <span class="par">,</span>
+            <input type="text" id="ay" inputmode="numeric" autocomplete="off" aria-label="Coordenada y del punto A" />
+            <span class="par">)</span>
+          </div>
+          <div class="fila-punto">
+            <span class="nombre pb">Punto B</span>
+            <span class="par">(</span>
+            <input type="text" id="bx" inputmode="numeric" autocomplete="off" aria-label="Coordenada x del punto B" />
+            <span class="par">,</span>
+            <input type="text" id="by" inputmode="numeric" autocomplete="off" aria-label="Coordenada y del punto B" />
+            <span class="par">)</span>
+          </div>
+          <button type="button" class="btn" id="btn-verificar-1">Comprobar los extremos</button>
+        </div>
+
+        <!-- ===== Paso 2 ===== -->
+        <div class="zona" id="zona-2" hidden>
+          <h3>Paso 2 · Calcula el punto medio del segmento AB</h3>
+          <p class="pista">Se admite la coma o el punto decimal. Si la suma es impar, el resultado termina en 0.5.</p>
+          <div class="fila-punto">
+            <span class="nombre pm">Punto M</span>
+            <span class="par">(</span>
+            <input type="text" id="mx" inputmode="decimal" autocomplete="off" aria-label="Coordenada x del punto medio" />
+            <span class="par">,</span>
+            <input type="text" id="my" inputmode="decimal" autocomplete="off" aria-label="Coordenada y del punto medio" />
+            <span class="par">)</span>
+          </div>
+          <button type="button" class="btn" id="btn-verificar-2">Comprobar el punto medio</button>
+        </div>
+
+        <div class="acciones">
+          <button type="button" class="btn sec" id="btn-nuevo">Otro segmento</button>
+          <button type="button" class="btn sec" id="btn-reiniciar">Reiniciar el marcador</button>
+        </div>
+
+        <div class="fb" id="fb" role="status" aria-live="polite">Lee las coordenadas de A y de B y escríbelas arriba.</div>
+
+        <details class="procedimiento" id="procedimiento">
+          <summary><span class="chevron" aria-hidden="true">▶</span> Ver el procedimiento paso a paso</summary>
+          <div class="proc-inner" id="proc-inner"></div>
+        </details>
+
+        <div class="caja-tip">
+          <strong>Qué significa promediar aquí.</strong> El punto medio no es una fórmula que memorizar: es el promedio de los dos extremos. Se suman las dos coordenadas x y se divide entre 2, y se hace lo mismo con las dos coordenadas y. Por eso el resultado siempre queda justo a mitad de camino.
+        </div>
+
+        <div class="caja-atencion">
+          <strong>Dos descuidos frecuentes.</strong> El primero es sumar y olvidar la división entre 2, con lo que el punto sale al doble de distancia. El segundo es restar en lugar de sumar: la resta da la <em>diferencia</em> entre los puntos (que sirve para la distancia), no su promedio.
+        </div>
+      </div>
+
+      <footer>
+        Spanish ASE Math · Nivel 4 · Tema 1 · Interactivo de apoyo a la Lección 1.1<br />
+        José M. Fernández, ABE/ASE Math Master Teacher, Harry S. Truman College — City Colleges of Chicago<br />
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer">Licencia CC BY-NC-SA 4.0</a>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var SVGNS = 'http://www.w3.org/2000/svg';
+        function crear(t, a) {
+          var el = document.createElementNS(SVGNS, t);
+          for (var k in a) { el.setAttribute(k, a[k]); }
+          return el;
         }
-        
-        // Establecer un fondo blanco para el SVG
-        const fondo = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        fondo.setAttribute('width', ancho);
-        fondo.setAttribute('height', alto);
-        fondo.setAttribute('fill', 'white');
-        svg.appendChild(fondo);
-        
-        // Dibujar la cuadrícula (líneas verticales)
-        for (let x = minX; x <= maxX; x++) {
-          const posX = margen + (x - minX) * tamañoGrid;
-          const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          linea.setAttribute('x1', posX);
-          linea.setAttribute('y1', 0);
-          linea.setAttribute('x2', posX);
-          linea.setAttribute('y2', alto);
-          linea.setAttribute('stroke', '#dddddd');
-          linea.setAttribute('stroke-width', '1');
-          svg.appendChild(linea);
+        function vaciar(n) { while (n.firstChild) { n.removeChild(n.firstChild); } }
+        function texto(a, c) { var t = crear('text', a); t.textContent = c; return t; }
+        function sg(v) { return String(v).replace('-', '\u2212'); }   // signo menos tipografico
+        function par(v) { return v < 0 ? '(' + sg(v) + ')' : String(v); }
+
+        /* ============ Geometría del plano ============ */
+        var OX = 250, OY = 220, UNIDAD = 20, LIMX = 11, LIMY = 10;
+        function px(u) { return OX + u * UNIDAD; }
+        function py(u) { return OY - u * UNIDAD; }
+
+        var gRejilla = document.getElementById('rejilla');
+        var gEjes = document.getElementById('ejes');
+        var gNumeros = document.getElementById('numeros');
+        var gFigura = document.getElementById('figura');
+
+        function dibujarPlano() {
+          vaciar(gRejilla); vaciar(gEjes); vaciar(gNumeros);
+          var u;
+          for (u = -LIMX; u <= LIMX; u++) {
+            gRejilla.appendChild(crear('line', {
+              x1: px(u), y1: py(LIMY), x2: px(u), y2: py(-LIMY),
+              stroke: (u % 5 === 0) ? '#bdbdbd' : '#e8e8e8', 'stroke-width': 1
+            }));
+          }
+          for (u = -LIMY; u <= LIMY; u++) {
+            gRejilla.appendChild(crear('line', {
+              x1: px(-LIMX), y1: py(u), x2: px(LIMX), y2: py(u),
+              stroke: (u % 5 === 0) ? '#bdbdbd' : '#e8e8e8', 'stroke-width': 1
+            }));
+          }
+          gEjes.appendChild(crear('line', {x1: px(-LIMX) - 12, y1: OY, x2: px(LIMX) + 12, y2: OY, stroke: '#10174f', 'stroke-width': 2.5}));
+          gEjes.appendChild(crear('line', {x1: OX, y1: py(LIMY) - 12, x2: OX, y2: py(-LIMY) + 12, stroke: '#10174f', 'stroke-width': 2.5}));
+          gEjes.appendChild(crear('polygon', {points: (px(LIMX) + 16) + ',' + OY + ' ' + (px(LIMX) + 6) + ',' + (OY - 5) + ' ' + (px(LIMX) + 6) + ',' + (OY + 5), fill: '#10174f'}));
+          gEjes.appendChild(crear('polygon', {points: OX + ',' + (py(LIMY) - 16) + ' ' + (OX - 5) + ',' + (py(LIMY) - 6) + ' ' + (OX + 5) + ',' + (py(LIMY) - 6), fill: '#10174f'}));
+          gEjes.appendChild(texto({x: px(LIMX) + 14, y: OY + 18, 'font-family': 'Segoe UI, sans-serif', 'font-size': 15, 'font-weight': 700, fill: '#10174f', 'text-anchor': 'end'}, 'x'));
+          gEjes.appendChild(texto({x: OX + 12, y: py(LIMY) - 8, 'font-family': 'Segoe UI, sans-serif', 'font-size': 15, 'font-weight': 700, fill: '#10174f'}, 'y'));
+
+          for (u = -LIMX; u <= LIMX; u++) {
+            if (u === 0) { continue; }
+            gNumeros.appendChild(crear('line', {x1: px(u), y1: OY - 4, x2: px(u), y2: OY + 4, stroke: '#10174f', 'stroke-width': 1.5}));
+            if (u % 2 === 0) {
+              gNumeros.appendChild(texto({x: px(u), y: OY + 17, 'font-family': 'Segoe UI, sans-serif', 'font-size': 11, fill: '#555', 'text-anchor': 'middle'}, String(u)));
+            }
+          }
+          for (u = -LIMY; u <= LIMY; u++) {
+            if (u === 0) { continue; }
+            gNumeros.appendChild(crear('line', {x1: OX - 4, y1: py(u), x2: OX + 4, y2: py(u), stroke: '#10174f', 'stroke-width': 1.5}));
+            if (u % 2 === 0) {
+              gNumeros.appendChild(texto({x: OX - 8, y: py(u) + 4, 'font-family': 'Segoe UI, sans-serif', 'font-size': 11, fill: '#555', 'text-anchor': 'end'}, String(u)));
+            }
+          }
+          gNumeros.appendChild(texto({x: OX - 8, y: OY + 17, 'font-family': 'Segoe UI, sans-serif', 'font-size': 11, fill: '#555', 'text-anchor': 'end'}, '0'));
         }
-        
-        // Dibujar la cuadrícula (líneas horizontales)
-        for (let y = minY; y <= maxY; y++) {
-          const posY = alto - margen - (y - minY) * tamañoGrid;
-          const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          linea.setAttribute('x1', 0);
-          linea.setAttribute('y1', posY);
-          linea.setAttribute('x2', ancho);
-          linea.setAttribute('y2', posY);
-          linea.setAttribute('stroke', '#dddddd');
-          linea.setAttribute('stroke-width', '1');
-          svg.appendChild(linea);
+
+        function etiqueta(p, nombre, color) {
+          var derecha = px(p.x) < 380;
+          return texto({
+            x: px(p.x) + (derecha ? 14 : -14), y: py(p.y) - 12,
+            'font-family': 'Segoe UI, sans-serif', 'font-size': 13, 'font-weight': 700,
+            fill: color, 'text-anchor': derecha ? 'start' : 'end',
+            'paint-order': 'stroke', stroke: '#fff', 'stroke-width': 3.5
+          }, nombre + '(' + sg(p.x) + ', ' + sg(p.y) + ')');
         }
-        
-        // Dibujar los ejes principales
-        const ejeX = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        ejeX.setAttribute('x1', 0);
-        ejeX.setAttribute('y1', alto - margen - (-minY) * tamañoGrid);
-        ejeX.setAttribute('x2', ancho);
-        ejeX.setAttribute('y2', alto - margen - (-minY) * tamañoGrid);
-        ejeX.setAttribute('stroke', 'black');
-        ejeX.setAttribute('stroke-width', '1.5');
-        svg.appendChild(ejeX);
-        
-        const ejeY = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        ejeY.setAttribute('x1', margen + (-minX) * tamañoGrid);
-        ejeY.setAttribute('y1', 0);
-        ejeY.setAttribute('x2', margen + (-minX) * tamañoGrid);
-        ejeY.setAttribute('y2', alto);
-        ejeY.setAttribute('stroke', 'black');
-        ejeY.setAttribute('stroke-width', '1.5');
-        svg.appendChild(ejeY);
-        
-        // Añadir etiqueta "x" e "y" para los ejes
-        const etiquetaEjeX = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        etiquetaEjeX.setAttribute('x', ancho - 15);
-        etiquetaEjeX.setAttribute('y', alto - margen - (-minY) * tamañoGrid - 10);
-        etiquetaEjeX.setAttribute('font-size', '14');
-        etiquetaEjeX.setAttribute('font-style', 'italic');
-        etiquetaEjeX.textContent = 'x';
-        svg.appendChild(etiquetaEjeX);
-        
-        const etiquetaEjeY = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        etiquetaEjeY.setAttribute('x', margen + (-minX) * tamañoGrid);
-        etiquetaEjeY.setAttribute('y', 15);
-        etiquetaEjeY.setAttribute('font-size', '14');
-        etiquetaEjeY.setAttribute('font-style', 'italic');
-        etiquetaEjeY.setAttribute('text-anchor', 'middle');
-        etiquetaEjeY.textContent = 'y';
-        svg.appendChild(etiquetaEjeY);
-        
-        // Etiquetas y marcas de los ejes
-        for (let x = minX; x <= maxX; x += 1) {
-          if (x === 0) continue;
-          if (x % 1 !== 0) continue;
-          
-          const posX = margen + (x - minX) * tamañoGrid;
-          const etiqueta = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          etiqueta.setAttribute('x', posX);
-          
-          const posY = alto - margen - (-minY) * tamañoGrid;
-          etiqueta.setAttribute('y', posY + 15);
-          
-          etiqueta.setAttribute('text-anchor', 'middle');
-          etiqueta.setAttribute('font-size', '12');
-          etiqueta.textContent = x;
-          svg.appendChild(etiqueta);
-          
-          const marcaX = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          marcaX.setAttribute('x1', posX);
-          marcaX.setAttribute('y1', posY - 3);
-          marcaX.setAttribute('x2', posX);
-          marcaX.setAttribute('y2', posY + 3);
-          marcaX.setAttribute('stroke', 'black');
-          marcaX.setAttribute('stroke-width', '1.5');
-          svg.appendChild(marcaX);
-        }
-        
-        for (let y = minY; y <= maxY; y += 1) {
-          if (y === 0) continue;
-          if (y % 1 !== 0) continue;
-          
-          const posY = alto - margen - (y - minY) * tamañoGrid;
-          const posX = margen + (-minX) * tamañoGrid;
-          
-          const etiqueta = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          etiqueta.setAttribute('x', posX - 10);
-          etiqueta.setAttribute('y', posY + 4);
-          etiqueta.setAttribute('text-anchor', 'end');
-          etiqueta.setAttribute('font-size', '12');
-          etiqueta.textContent = y;
-          svg.appendChild(etiqueta);
-          
-          const marcaY = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          marcaY.setAttribute('x1', posX - 3);
-          marcaY.setAttribute('y1', posY);
-          marcaY.setAttribute('x2', posX + 3);
-          marcaY.setAttribute('y2', posY);
-          marcaY.setAttribute('stroke', 'black');
-          marcaY.setAttribute('stroke-width', '1.5');
-          svg.appendChild(marcaY);
-        }
-        
-        // Etiqueta del origen
-        const origenX = margen + (-minX) * tamañoGrid;
-        const origenY = alto - margen - (-minY) * tamañoGrid;
-        const etiqueta = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        etiqueta.setAttribute('x', origenX - 12);
-        etiqueta.setAttribute('y', origenY + 15);
-        etiqueta.setAttribute('font-size', '12');
-        etiqueta.textContent = '0';
-        svg.appendChild(etiqueta);
-        
-        // Convertir las coordenadas de los puntos a coordenadas SVG
-        const puntoASVG = coordenadaMundoASVG(puntoA.x, puntoA.y);
-        const puntoBSVG = coordenadaMundoASVG(puntoB.x, puntoB.y);
-        
-        // Calcular el punto medio
-        puntoM = calcularPuntoMedio();
-        const puntoMSVG = coordenadaMundoASVG(puntoM.x, puntoM.y);
-        
-        // Dibujar la línea entre puntos A y B
-        const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        linea.setAttribute('x1', puntoASVG.x);
-        linea.setAttribute('y1', puntoASVG.y);
-        linea.setAttribute('x2', puntoBSVG.x);
-        linea.setAttribute('y2', puntoBSVG.y);
-        linea.setAttribute('stroke', '#888888');
-        linea.setAttribute('stroke-width', '1.5');
-        svg.appendChild(linea);
-        
-        // Dibujar el punto A con su letra
-        const puntoAGrupo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        
-        const circuloA = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circuloA.setAttribute('cx', puntoASVG.x);
-        circuloA.setAttribute('cy', puntoASVG.y);
-        circuloA.setAttribute('r', '6');
-        circuloA.setAttribute('fill', 'red');
-        circuloA.setAttribute('stroke', 'white');
-        circuloA.setAttribute('stroke-width', '1');
-        puntoAGrupo.appendChild(circuloA);
-        
-        const letraA = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        letraA.setAttribute('x', puntoASVG.x);
-        letraA.setAttribute('y', puntoASVG.y + 1);
-        letraA.setAttribute('text-anchor', 'middle');
-        letraA.setAttribute('dominant-baseline', 'middle');
-        letraA.setAttribute('font-size', '10');
-        letraA.setAttribute('fill', 'white');
-        letraA.setAttribute('font-weight', 'bold');
-        letraA.textContent = 'A';
-        puntoAGrupo.appendChild(letraA);
-        
-        svg.appendChild(puntoAGrupo);
-        
-        // Dibujar el punto B con su letra
-        const puntoBGrupo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        
-        const circuloB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circuloB.setAttribute('cx', puntoBSVG.x);
-        circuloB.setAttribute('cy', puntoBSVG.y);
-        circuloB.setAttribute('r', '6');
-        circuloB.setAttribute('fill', 'blue');
-        circuloB.setAttribute('stroke', 'white');
-        circuloB.setAttribute('stroke-width', '1');
-        puntoBGrupo.appendChild(circuloB);
-        
-        const letraB = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        letraB.setAttribute('x', puntoBSVG.x);
-        letraB.setAttribute('y', puntoBSVG.y + 1);
-        letraB.setAttribute('text-anchor', 'middle');
-        letraB.setAttribute('dominant-baseline', 'middle');
-        letraB.setAttribute('font-size', '10');
-        letraB.setAttribute('fill', 'white');
-        letraB.setAttribute('font-weight', 'bold');
-        letraB.textContent = 'B';
-        puntoBGrupo.appendChild(letraB);
-        
-        svg.appendChild(puntoBGrupo);
-        
-        // Si las coordenadas están verificadas, mostrar etiquetas
-        if (mostrarEtiquetas || coordenadasVerificadas) {
-          const etiquetaA = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          etiquetaA.setAttribute('x', puntoASVG.x + 10);
-          etiquetaA.setAttribute('y', puntoASVG.y - 10);
-          etiquetaA.setAttribute('fill', 'red');
-          etiquetaA.setAttribute('font-weight', 'bold');
-          etiquetaA.setAttribute('font-size', '13');
-          etiquetaA.textContent = `A(${puntoA.x},${puntoA.y})`;
-          svg.appendChild(etiquetaA);
-          
-          const etiquetaB = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          etiquetaB.setAttribute('x', puntoBSVG.x + 10);
-          etiquetaB.setAttribute('y', puntoBSVG.y - 10);
-          etiquetaB.setAttribute('fill', 'blue');
-          etiquetaB.setAttribute('font-weight', 'bold');
-          etiquetaB.setAttribute('font-size', '13');
-          etiquetaB.textContent = `B(${puntoB.x},${puntoB.y})`;
-          svg.appendChild(etiquetaB);
-          
-          if (mostrarPuntoMedio || respuestaCorrecta) {
-            const puntoMGrupo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            
-            const circuloM = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circuloM.setAttribute('cx', puntoMSVG.x);
-            circuloM.setAttribute('cy', puntoMSVG.y);
-            circuloM.setAttribute('r', '6');
-            circuloM.setAttribute('fill', '#9c27b0');
-            circuloM.setAttribute('stroke', 'white');
-            circuloM.setAttribute('stroke-width', '1');
-            puntoMGrupo.appendChild(circuloM);
-            
-            const letraM = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            letraM.setAttribute('x', puntoMSVG.x);
-            letraM.setAttribute('y', puntoMSVG.y + 1);
-            letraM.setAttribute('text-anchor', 'middle');
-            letraM.setAttribute('dominant-baseline', 'middle');
-            letraM.setAttribute('font-size', '10');
-            letraM.setAttribute('fill', 'white');
-            letraM.setAttribute('font-weight', 'bold');
-            letraM.textContent = 'M';
-            puntoMGrupo.appendChild(letraM);
-            
-            svg.appendChild(puntoMGrupo);
-            
-            const etiquetaM = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            etiquetaM.setAttribute('x', puntoMSVG.x + 10);
-            etiquetaM.setAttribute('y', puntoMSVG.y - 10);
-            etiquetaM.setAttribute('fill', '#9c27b0');
-            etiquetaM.setAttribute('font-weight', 'bold');
-            etiquetaM.setAttribute('font-size', '13');
-            etiquetaM.textContent = `M(${puntoM.x},${puntoM.y})`;
-            svg.appendChild(etiquetaM);
+
+        function dibujarFigura(opciones) {
+          vaciar(gFigura);
+          var a = A, b = B, m = M;
+          gFigura.appendChild(crear('line', {x1: px(a.x), y1: py(a.y), x2: px(b.x), y2: py(b.y), stroke: '#1a237e', 'stroke-width': 3.5}));
+
+          if (opciones.medio) {
+            // Marcas de las dos mitades iguales
+            [[a, m], [m, b]].forEach(function (par) {
+              var mx = (px(par[0].x) + px(par[1].x)) / 2;
+              var my = (py(par[0].y) + py(par[1].y)) / 2;
+              var ang = Math.atan2(py(par[1].y) - py(par[0].y), px(par[1].x) - px(par[0].x)) * 180 / Math.PI;
+              gFigura.appendChild(crear('line', {
+                x1: mx, y1: my - 7, x2: mx, y2: my + 7,
+                stroke: '#6a1b9a', 'stroke-width': 2.5,
+                transform: 'rotate(' + ang + ' ' + mx + ' ' + my + ')'
+              }));
+            });
+          }
+
+          gFigura.appendChild(crear('circle', {cx: px(a.x), cy: py(a.y), r: 7, fill: '#b71c1c', stroke: '#fff', 'stroke-width': 2}));
+          gFigura.appendChild(texto({x: px(a.x), y: py(a.y) + 4, 'font-size': 10, 'font-weight': 700, fill: '#fff', 'text-anchor': 'middle', 'font-family': 'Segoe UI, sans-serif'}, 'A'));
+          gFigura.appendChild(crear('circle', {cx: px(b.x), cy: py(b.y), r: 7, fill: '#0d47a1', stroke: '#fff', 'stroke-width': 2}));
+          gFigura.appendChild(texto({x: px(b.x), y: py(b.y) + 4, 'font-size': 10, 'font-weight': 700, fill: '#fff', 'text-anchor': 'middle', 'font-family': 'Segoe UI, sans-serif'}, 'B'));
+
+          if (opciones.etiquetas) {
+            gFigura.appendChild(etiqueta(a, 'A', '#b71c1c'));
+            gFigura.appendChild(etiqueta(b, 'B', '#0d47a1'));
+          }
+
+          if (opciones.medio) {
+            gFigura.appendChild(crear('rect', {
+              x: px(m.x) - 7, y: py(m.y) - 7, width: 14, height: 14,
+              transform: 'rotate(45 ' + px(m.x) + ' ' + py(m.y) + ')',
+              fill: '#6a1b9a', stroke: '#fff', 'stroke-width': 2
+            }));
+            gFigura.appendChild(etiqueta(m, 'M', '#6a1b9a'));
           }
         }
-        
-        // Actualizar la solución
-        actualizarSolucion();
-      }
-      
-      // Función para actualizar la solución paso a paso
-      function actualizarSolucion() {
-        puntoM = calcularPuntoMedio();
-        
-        const paso1 = document.getElementById('paso1');
-        const paso2 = document.getElementById('paso2');
-        const paso3 = document.getElementById('paso3');
-        const resultado = document.getElementById('resultado');
-        
-        if (paso1) paso1.textContent = `1. Identificar las coordenadas: A(${puntoA.x}, ${puntoA.y}) y B(${puntoB.x}, ${puntoB.y})`;
-        if (paso2) paso2.textContent = `2. Calcular la coordenada x del punto medio: (${puntoA.x} + ${puntoB.x}) ÷ 2 = ${puntoM.x}`;
-        if (paso3) paso3.textContent = `3. Calcular la coordenada y del punto medio: (${puntoA.y} + ${puntoB.y}) ÷ 2 = ${puntoM.y}`;
-        if (resultado) resultado.textContent = `El punto medio M es (${puntoM.x}, ${puntoM.y})`;
-        
-        return puntoM;
-      }
-      
-      // Función para mostrar el mensaje de error
-      function mostrarError(mensaje) {
-        errorDetalles.innerHTML = mensaje;
-        mensajeError.style.display = 'block';
-      }
-      
-      // Evento del botón Aceptar del error
-      btnAceptarError.addEventListener('click', function() {
-        mensajeError.style.display = 'none';
-      });
-      
-      // Evento para verificar coordenadas
-      function verificarCoordenadas() {
-        const xA = parseInt(inputXA.value);
-        const yA = parseInt(inputYA.value);
-        const xB = parseInt(inputXB.value);
-        const yB = parseInt(inputYB.value);
-        
-        if (isNaN(xA) || isNaN(yA) || isNaN(xB) || isNaN(yB)) {
-          mostrarError('Por favor, introduce valores numéricos válidos para todas las coordenadas.');
-          return;
-        }
-        
-        if (xA === puntoA.x && yA === puntoA.y && xB === puntoB.x && yB === puntoB.y) {
-          coordenadasVerificadas = true;
-          panelCoordenadas.style.display = 'none';
-          panelPuntoMedio.style.display = 'block';
-          actualizarVisualizacion(true, false);
-        } else {
-          let mensaje = '';
-          if (xA !== puntoA.x || yA !== puntoA.y) {
-            mensaje += '- Las coordenadas del punto A no son correctas.<br>';
+
+        /* ============ Estado ============ */
+        var A = {x: 0, y: 0}, B = {x: 0, y: 0}, M = {x: 0, y: 0};
+        var etapa = 1;
+        var fallosEtapa1 = 0, fallosEtapa2 = 0;
+        var stats = {aciertos: 0, intentos: 0, racha: 0, mejor: 0};
+
+        var zona1 = document.getElementById('zona-1');
+        var zona2 = document.getElementById('zona-2');
+        var guia1 = document.getElementById('guia-1');
+        var guia2 = document.getElementById('guia-2');
+        var marca1 = document.getElementById('marca-1');
+        var marca2 = document.getElementById('marca-2');
+        var linea1 = document.getElementById('consigna-linea1');
+        var linea2 = document.getElementById('consigna-linea2');
+        var fb = document.getElementById('fb');
+        var procedimiento = document.getElementById('procedimiento');
+        var procInner = document.getElementById('proc-inner');
+        var campos = {
+          ax: document.getElementById('ax'), ay: document.getElementById('ay'),
+          bx: document.getElementById('bx'), by: document.getElementById('by'),
+          mx: document.getElementById('mx'), my: document.getElementById('my')
+        };
+
+        function mensaje(t, clase) {
+          fb.className = 'fb' + (clase ? ' ' + clase : '');
+          fb.innerHTML = '';
+          if (clase === 'ok' || clase === 'no') {
+            var i = document.createElement('span');
+            i.className = 'icono'; i.setAttribute('aria-hidden', 'true');
+            i.textContent = clase === 'ok' ? '✓' : '✗';
+            fb.appendChild(i);
           }
-          if (xB !== puntoB.x || yB !== puntoB.y) {
-            mensaje += '- Las coordenadas del punto B no son correctas.';
+          fb.appendChild(document.createTextNode(t));
+        }
+
+        function actualizarMarcador() {
+          document.getElementById('marcador-cifra').textContent = stats.aciertos + ' / ' + stats.intentos;
+          document.getElementById('marcador-racha').textContent = 'Racha actual: ' + stats.racha + ' · Mejor: ' + stats.mejor;
+        }
+        function anotar(ok) {
+          stats.intentos++;
+          if (ok) { stats.aciertos++; stats.racha++; if (stats.racha > stats.mejor) { stats.mejor = stats.racha; } }
+          else { stats.racha = 0; }
+          actualizarMarcador();
+        }
+
+        function num(v) { return sg(v); }
+
+        function pintarConsigna() {
+          vaciar(linea2);
+          if (etapa === 1) {
+            linea1.textContent = 'Observa el segmento y lee las coordenadas de sus extremos';
+            var chip = document.createElement('span');
+            chip.className = 'punto-ref';
+            chip.textContent = 'Segmento AB';
+            linea2.appendChild(chip);
+            return;
           }
-          mostrarError(mensaje);
+          linea1.textContent = 'Calcule el punto medio del segmento que une';
+          [[A, 'A', 'pa'], [B, 'B', 'pb']].forEach(function (d, k) {
+            if (k === 1) {
+              var nexo = document.createElement('span');
+              nexo.className = 'nexo';
+              nexo.textContent = 'y';
+              linea2.appendChild(nexo);
+            }
+            var chip = document.createElement('span');
+            chip.className = 'punto-ref ' + d[2];
+            chip.textContent = d[1] + ' (' + sg(d[0].x) + ', ' + sg(d[0].y) + ')';
+            linea2.appendChild(chip);
+          });
         }
-      }
-      
-      // Evento para verificar la respuesta del punto medio
-      btnVerificar.addEventListener('click', function() {
-        const respuestaX = parseFloat(respuestaInputX.value.replace(',', '.'));
-        const respuestaY = parseFloat(respuestaInputY.value.replace(',', '.'));
-        
-        puntoM = calcularPuntoMedio();
-        
-        if (isNaN(respuestaX) || isNaN(respuestaY)) {
-          feedbackDiv.className = 'feedback-incorrecto';
-          feedbackDiv.textContent = 'Por favor, introduce valores numéricos válidos.';
-          feedbackDiv.style.display = 'block';
-          return;
+
+        function fijarEtapa(n) {
+          etapa = n;
+          zona1.hidden = (n !== 1);
+          zona2.hidden = (n !== 2);
+          guia1.setAttribute('data-estado', n === 1 ? 'activo' : 'hecho');
+          marca1.textContent = n === 1 ? '' : '✓';
+          guia2.setAttribute('data-estado', n === 2 ? 'activo' : '');
+          marca2.textContent = '';
+          pintarConsigna();
         }
-        
-        if (Math.abs(respuestaX - puntoM.x) < 0.01 && Math.abs(respuestaY - puntoM.y) < 0.01) {
-          respuestaCorrecta = true;
-          feedbackDiv.className = 'feedback-correcto';
-          feedbackDiv.textContent = `¡Correcto! El punto medio es (${puntoM.x}, ${puntoM.y})`;
-          actualizarVisualizacion(true, true);
-        } else {
-          feedbackDiv.className = 'feedback-incorrecto';
-          feedbackDiv.textContent = 'Incorrecto. Inténtalo de nuevo.';
+
+        /* ============ Generación ============ */
+        function entero(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        function nuevoSegmento() {
+          var intentos = 0;
+          do {
+            A = {x: entero(-9, 9), y: entero(-9, 9)};
+            B = {x: entero(-9, 9), y: entero(-9, 9)};
+            intentos++;
+          } while (intentos < 30 && Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2)) < 5);
+          M = {x: (A.x + B.x) / 2, y: (A.y + B.y) / 2};
+          fallosEtapa1 = 0; fallosEtapa2 = 0;
+          ['ax', 'ay', 'bx', 'by', 'mx', 'my'].forEach(function (k) { campos[k].value = ''; });
+          procedimiento.open = false;
+          construirProcedimiento();
+          dibujarFigura({etiquetas: false, medio: false});
+          fijarEtapa(1);
+          mensaje('Lee las coordenadas de A y de B y escríbelas arriba.', 'aviso');
+          campos.ax.focus();
         }
-        
-        feedbackDiv.style.display = 'block';
-      });
-      
-      // Evento para mostrar/ocultar la solución
-      btnMostrarSolucion.addEventListener('click', function() {
-        const puntoMedio = actualizarSolucion();
-        
-        modalSolucion.style.display = 'flex';
-        
-        respuestaCorrecta = true;
-        actualizarVisualizacion(true, true);
-        
-        if (btnMostrarSolucion.textContent === 'Mostrar solución') {
-          btnMostrarSolucion.textContent = 'Ocultar solución';
-        } else {
-          btnMostrarSolucion.textContent = 'Mostrar solución';
-        }
-      });
-      
-      // Cerrar el modal de solución
-      closeModalBtn.addEventListener('click', function() {
-        modalSolucion.style.display = 'none';
-        btnMostrarSolucion.textContent = 'Mostrar solución';
-      });
-      
-      // Cerrar el modal haciendo clic fuera de él
-      window.addEventListener('click', function(event) {
-        if (event.target === modalSolucion) {
-          modalSolucion.style.display = 'none';
-          btnMostrarSolucion.textContent = 'Mostrar solución';
-        }
-      });
-      
-      // Función para generar nuevos puntos aleatorios
-      function generarPuntosAleatorios() {
-        const rangoSeguroMin = -4;
-        const rangoSeguroMax = 4;
-        const distanciaMinima = 3;
-        
-        puntoA.x = Math.floor(Math.random() * (rangoSeguroMax - rangoSeguroMin + 1)) + rangoSeguroMin;
-        puntoA.y = Math.floor(Math.random() * (rangoSeguroMax - rangoSeguroMin + 1)) + rangoSeguroMin;
-        
-        let intentos = 0;
-        const maxIntentos = 20;
-        
-        do {
-          puntoB.x = Math.floor(Math.random() * (rangoSeguroMax - rangoSeguroMin + 1)) + rangoSeguroMin;
-          puntoB.y = Math.floor(Math.random() * (rangoSeguroMax - rangoSeguroMin + 1)) + rangoSeguroMin;
-          
-          const dx = puntoB.x - puntoA.x;
-          const dy = puntoB.y - puntoA.y;
-          const distancia = Math.sqrt(dx * dx + dy * dy);
-          
-          intentos++;
-          
-          if (distancia >= distanciaMinima || intentos >= maxIntentos) {
-            break;
+
+        /* ============ Procedimiento ============ */
+        function paso(n, txt, op) {
+          var d = document.createElement('div');
+          d.className = 'paso';
+          var s = document.createElement('span');
+          s.className = 'n'; s.setAttribute('aria-hidden', 'true'); s.textContent = n;
+          d.appendChild(s);
+          d.appendChild(document.createTextNode(txt));
+          if (op) {
+            var e = document.createElement('span');
+            e.className = 'op'; e.textContent = op;
+            d.appendChild(e);
           }
-        } while (true);
-        
-        puntoM = calcularPuntoMedio();
-        
-        coordenadasVerificadas = false;
-        respuestaCorrecta = false;
-        panelCoordenadas.style.display = 'block';
-        panelPuntoMedio.style.display = 'none';
-        
-        inputXA.value = '';
-        inputYA.value = '';
-        inputXB.value = '';
-        inputYB.value = '';
-        respuestaInputX.value = '';
-        respuestaInputY.value = '';
-        feedbackDiv.style.display = 'none';
-        
-        modalSolucion.style.display = 'none';
-        btnMostrarSolucion.textContent = 'Mostrar solución';
-        
-        actualizarVisualizacion(false, false);
-      }
-      
-      // Eventos
-      btnVerificarCoordenadas.addEventListener('click', verificarCoordenadas);
-      btnNuevosPuntos.addEventListener('click', generarPuntosAleatorios);
-      
-      // Inicializar
-      generarPuntosAleatorios();
-    });
-  </script></p></body></html>
+          return d;
+        }
+
+        function construirProcedimiento() {
+          vaciar(procInner);
+          procInner.appendChild(paso(1, 'Se identifican las coordenadas de los extremos.',
+            'A: (x₁, y₁) = (' + sg(A.x) + ', ' + sg(A.y) + ')\nB: (x₂, y₂) = (' + sg(B.x) + ', ' + sg(B.y) + ')'));
+          procInner.appendChild(paso(2, 'Se escribe la fórmula del punto medio.',
+            'M = ( (x₁ + x₂) ÷ 2 , (y₁ + y₂) ÷ 2 )'));
+          procInner.appendChild(paso(3, 'Se promedian las dos coordenadas x.',
+            '(' + sg(A.x) + ' + ' + par(B.x) + ') ÷ 2 = ' + sg(A.x + B.x) + ' ÷ 2 = ' + num(M.x)));
+          procInner.appendChild(paso(4, 'Se promedian las dos coordenadas y.',
+            '(' + sg(A.y) + ' + ' + par(B.y) + ') ÷ 2 = ' + sg(A.y + B.y) + ' ÷ 2 = ' + num(M.y)));
+          var f = document.createElement('div');
+          f.className = 'proc-final';
+          f.textContent = 'El punto medio es M(' + num(M.x) + ', ' + num(M.y) + '), y divide el segmento en dos partes iguales.';
+          procInner.appendChild(f);
+        }
+
+        /* ============ Comprobaciones ============ */
+        function leerEntero(campo) {
+          var v = campo.value.replace(',', '.').trim();
+          if (v === '') { return null; }
+          var n = Number(v);
+          return isNaN(n) ? null : n;
+        }
+
+        function comprobarExtremos() {
+          var ax = leerEntero(campos.ax), ay = leerEntero(campos.ay);
+          var bx = leerEntero(campos.bx), by = leerEntero(campos.by);
+          if (ax === null || ay === null || bx === null || by === null) {
+            mensaje('Faltan datos: hay que escribir un número en los cuatro campos.', 'aviso');
+            return;
+          }
+          var okA = (ax === A.x && ay === A.y);
+          var okB = (bx === B.x && by === B.y);
+          if (okA && okB) {
+            dibujarFigura({etiquetas: true, medio: false});
+            fijarEtapa(2);
+            mensaje('Bien leído. Ahora calcula el punto medio del segmento.', 'ok');
+            campos.mx.focus();
+            return;
+          }
+          fallosEtapa1++;
+          var partes = [];
+          if (!okA) { partes.push(analizar({x: ax, y: ay}, A, 'A')); }
+          if (!okB) { partes.push(analizar({x: bx, y: by}, B, 'B')); }
+          if (fallosEtapa1 >= 3) {
+            dibujarFigura({etiquetas: true, medio: false});
+            partes.push('Se muestran las coordenadas sobre el plano para que puedas compararlas.');
+          }
+          mensaje(partes.join(' '), 'no');
+        }
+
+        function analizar(dado, esperado, nombre) {
+          if (dado.x === esperado.y && dado.y === esperado.x && esperado.x !== esperado.y) {
+            return 'En ' + nombre + ' se invirtió el orden: la primera coordenada es la horizontal.';
+          }
+          if (dado.x === -esperado.x && dado.y === esperado.y) {
+            return 'En ' + nombre + ' la coordenada y es correcta, pero falla el signo de x.';
+          }
+          if (dado.y === -esperado.y && dado.x === esperado.x) {
+            return 'En ' + nombre + ' la coordenada x es correcta, pero falla el signo de y.';
+          }
+          if (dado.x === esperado.x) {
+            return 'En ' + nombre + ' la coordenada x es correcta; revisa el conteo vertical.';
+          }
+          if (dado.y === esperado.y) {
+            return 'En ' + nombre + ' la coordenada y es correcta; revisa el conteo horizontal.';
+          }
+          return 'Las coordenadas de ' + nombre + ' no son correctas: vuelve a contar desde el origen.';
+        }
+
+        function comprobarPuntoMedio() {
+          var mx = leerEntero(campos.mx), my = leerEntero(campos.my);
+          if (mx === null || my === null) {
+            mensaje('Faltan datos: hay que escribir un número en los dos campos.', 'aviso');
+            return;
+          }
+          var ok = (Math.abs(mx - M.x) < 0.001 && Math.abs(my - M.y) < 0.001);
+          if (fallosEtapa2 === 0) { anotar(ok); }
+          if (ok) {
+            guia2.setAttribute('data-estado', 'hecho');
+            marca2.textContent = '✓';
+            dibujarFigura({etiquetas: true, medio: true});
+            mensaje('Correcto. El punto medio es M(' + num(M.x) + ', ' + num(M.y) +
+              '). Las dos marcas moradas sobre el segmento señalan que las dos mitades son iguales. Pulsa «Otro segmento» para continuar.', 'ok');
+            return;
+          }
+          fallosEtapa2++;
+          mensaje(diagnosticoMedio(mx, my), 'no');
+          if (fallosEtapa2 >= 2) { procedimiento.open = true; }
+        }
+
+        function diagnosticoMedio(mx, my) {
+          var sx = A.x + B.x, sy = A.y + B.y;
+          var dx = B.x - A.x, dy = B.y - A.y;
+          if (mx === sx && my === sy) {
+            return 'Se sumaron las coordenadas pero falta dividir entre 2: (' + sg(sx) + ', ' + sg(sy) + ') ÷ 2 = (' + num(M.x) + ', ' + num(M.y) + ').';
+          }
+          if (Math.abs(mx - dx / 2) < 0.001 && Math.abs(my - dy / 2) < 0.001) {
+            return 'Parece que se restaron las coordenadas en lugar de sumarlas. La resta da la diferencia entre los puntos; el punto medio se obtiene con la suma.';
+          }
+          if (mx === dx && my === dy) {
+            return 'El resultado corresponde a la diferencia entre B y A, no a su promedio. Hay que sumar las coordenadas y dividir entre 2.';
+          }
+          if (Math.abs(mx - M.y) < 0.001 && Math.abs(my - M.x) < 0.001 && M.x !== M.y) {
+            return 'Los dos valores están bien calculados pero cambiados de sitio: primero la coordenada x y después la y.';
+          }
+          if (Math.abs(mx - M.x) < 0.001) {
+            return 'La coordenada x del punto medio es correcta. Revisa la y: (' + sg(A.y) + ' + ' + par(B.y) + ') ÷ 2.';
+          }
+          if (Math.abs(my - M.y) < 0.001) {
+            return 'La coordenada y del punto medio es correcta. Revisa la x: (' + sg(A.x) + ' + ' + par(B.x) + ') ÷ 2.';
+          }
+          return 'Todavía no. Promedia cada coordenada por separado: (' + sg(A.x) + ' + ' + par(B.x) + ') ÷ 2 para la x y (' + sg(A.y) + ' + ' + par(B.y) + ') ÷ 2 para la y.';
+        }
+
+        /* ============ Eventos ============ */
+        document.getElementById('btn-verificar-1').addEventListener('click', comprobarExtremos);
+        document.getElementById('btn-verificar-2').addEventListener('click', comprobarPuntoMedio);
+        ['ax', 'ay', 'bx', 'by'].forEach(function (k) {
+          campos[k].addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); comprobarExtremos(); }
+          });
+        });
+        ['mx', 'my'].forEach(function (k) {
+          campos[k].addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); comprobarPuntoMedio(); }
+          });
+        });
+        document.getElementById('btn-nuevo').addEventListener('click', nuevoSegmento);
+        document.getElementById('btn-reiniciar').addEventListener('click', function () {
+          stats = {aciertos: 0, intentos: 0, racha: 0, mejor: 0};
+          actualizarMarcador();
+          mensaje('Marcador reiniciado.', '');
+        });
+
+        /* ============ Arranque ============ */
+        dibujarPlano();
+        actualizarMarcador();
+        nuevoSegmento();
+      })();
+    </script>
+  </body>
+</html>

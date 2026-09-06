@@ -89,7 +89,6 @@
         transform: translate(-50%, -50%);
         z-index: 999 !important;
         display: block !important;
-        /* Posición inicial forzada en el centro */
         top: 50%;
         left: 50%;
         pointer-events: auto;
@@ -100,17 +99,40 @@
       svg {
         display: block;
       }
+      /* Estilos para el triángulo base */
       #slope-triangle {
-        stroke: green;
+        stroke: #006400;
         stroke-width: 0.15;
-        fill: rgba(0, 255, 0, 0.2);
+        fill: rgba(0, 100, 0, 0.15);
         stroke-dasharray: 0.3, 0.3;
       }
       .slope-text {
         font-size: 0.8px;
-        fill: green;
+        fill: #006400; /* Verde oscuro */
+        font-weight: bold;
         text-anchor: middle;
+        stroke: white; /* Borde blanco para contraste */
+        stroke-width: 0.15px;
+        paint-order: stroke; /* Dibuja el borde detrás del relleno */
       }
+      
+      /* Estilos para el triángulo amplificado */
+      #amplified-triangle {
+        stroke: #C71585; /* Magenta */
+        stroke-width: 0.1;
+        fill: rgba(199, 21, 133, 0.1);
+        stroke-dasharray: 0.2, 0.2;
+      }
+      .amplified-text {
+        font-size: 0.8px;
+        fill: #C71585; /* Magenta */
+        font-weight: bold;
+        text-anchor: middle;
+        stroke: white; /* Borde blanco para contraste */
+        stroke-width: 0.15px;
+        paint-order: stroke;
+      }
+      
       #exercise-module input[type='number'] {
         width: 70px;
         margin-right: 10px;
@@ -131,23 +153,9 @@
       .incorrect {
         color: red;
       }
-      /* Ocultar inicialmente en modo ejercicio */
       #equations-exercise {
         display: none;
       }
-      /* Estilos para el triángulo mejorado */
-      #amplified-triangle {
-        stroke: green;
-        stroke-width: 0.1;
-        fill: rgba(0, 255, 0, 0.2);
-        stroke-dasharray: 0.2, 0.2;
-      }
-      .amplified-text {
-        font-size: 0.6px;
-        fill: green;
-        text-anchor: middle;
-      }
-      /* Botón de escala del triángulo */
       #triangle-scale {
         margin-top: 5px;
         width: 100px;
@@ -160,11 +168,7 @@
       <i>y=mx+b</i>
       y
       <i>
-        (y-y
-        <sub>1</sub>
-        )=m(x-x
-        <sub>1</sub>
-        )
+        (y-y<sub>1</sub>)=m(x-x<sub>1</sub>)
       </i>
     </h1>
     <div class="tabs">
@@ -172,7 +176,6 @@
       <div class="tab" data-tab="exercise">Ejercitar</div>
     </div>
     <div class="content-area">
-      <!-- Modo Practicar -->
       <div id="practice-tab" class="tab-content active">
         <div class="control-group">
           <label for="slider-m">
@@ -206,7 +209,6 @@
           <p id="eq-slope-intercept" style="font-size: 18px; font-weight: bold; color: blue">y = 1.0x + 0.0</p>
         </div>
       </div>
-      <!-- Modo Ejercitar -->
       <div id="exercise-tab" class="tab-content">
         <div id="exercise-module">
           <p><strong>Realiza el siguiente ejercicio:</strong></p>
@@ -221,7 +223,6 @@
           <button id="new-exercise">Nuevo Ejercicio</button>
           <p id="feedback"></p>
         </div>
-        <!-- Este div solo se mostrará después de pulsar "Comprobar Respuesta" -->
         <div id="equations-exercise">
           <p><strong>Ecuación de la recta:</strong></p>
           <p id="eq-point-slope-exercise" style="font-size: 18px; font-weight: bold; color: blue">y - 2.0 = 1.0(x - 2.0)</p>
@@ -229,7 +230,6 @@
         </div>
       </div>
     </div>
-    <!-- Gráfico modo practicar (siempre visible en ese modo) -->
     <div id="graph-container">
       <svg xmlns="http://www.w3.org/2000/svg" id="graph-svg" width="100%" height="100%" viewBox="-10 -10 20 20" preserveAspectRatio="xMidYMid meet">
         <line x1="-10" y1="0" x2="10" y2="0" stroke="black" stroke-width="0.1"></line>
@@ -269,7 +269,6 @@
       </div>
     </div>
     <script>
-      // Obtener referencias a los elementos DOM
       const svg = document.getElementById('graph-svg');
       const line = document.getElementById('dynamic-line');
       const sliderM = document.getElementById('slider-m');
@@ -288,50 +287,37 @@
       const deltaXText = document.getElementById('delta-x-text');
       const deltaYText = document.getElementById('delta-y-text');
       const showSlopeTriangleCheckbox = document.getElementById('show-slope-triangle');
-
-      // Elementos para el triángulo amplificado
       const amplifiedTriangle = document.getElementById('amplified-triangle');
       const amplifiedDeltaXText = document.getElementById('amplified-delta-x-text');
       const amplifiedDeltaYText = document.getElementById('amplified-delta-y-text');
       const triangleScale = document.getElementById('triangle-scale');
       const triangleScaleValue = document.getElementById('triangle-scale-value');
-
-      // --- Pestañas de Navegación ---
       const tabs = document.querySelectorAll('.tab');
       const tabContents = document.querySelectorAll('.tab-content');
 
-      // --- Estado inicial ---
       let m = parseFloat(sliderM.value);
       let b = parseFloat(sliderB.value);
       let x1 = parseFloat(inputX1.value);
       let y1 = parseFloat(inputY1.value);
-      let activeMode = 'practice'; // Modo activo por defecto
+      let activeMode = 'practice';
       let triangleScaleFactor = parseFloat(triangleScale.value);
-
-      // Variables para sistema de coordenadas
       let svgWidth, svgHeight, scaleX, scaleY, originX, originY;
       let viewBox;
 
-      // Función para restringir el valor dentro de un rango mínimo y máximo
       function clamp(value, min, max) {
         return Math.min(Math.max(value, min), max);
       }
 
-      // Inicializar el sistema de coordenadas
       function initializeGraphCoordinates() {
         svgWidth = graphContainer.clientWidth;
         svgHeight = graphContainer.clientHeight;
-        viewBox = svg.viewBox.baseVal; // Obtiene {x, y, width, height} del viewBox
-
-        // Calcular factores de escala
+        viewBox = svg.viewBox.baseVal;
         scaleX = svgWidth / viewBox.width;
         scaleY = svgHeight / viewBox.height;
-
         originX = svgWidth / 2;
         originY = svgHeight / 2;
       }
 
-      // --- Funciones de Conversión Coordenadas ---
       function toSvgX(graphX) {
         return originX + graphX * scaleX;
       }
@@ -351,56 +337,43 @@
       function updateSlidersRange() {
         const viewBoxWidth = viewBox.width;
         const viewBoxHeight = viewBox.height;
-
         sliderM.min = -5;
         sliderM.max = 5;
-
         const maxB = Math.min(10, viewBoxHeight / 2);
         sliderB.min = -maxB;
         sliderB.max = maxB;
-
         if (m < parseFloat(sliderM.min)) m = parseFloat(sliderM.min);
         if (m > parseFloat(sliderM.max)) m = parseFloat(sliderM.max);
         if (b < parseFloat(sliderB.min)) b = parseFloat(sliderB.min);
         if (b > parseFloat(sliderB.max)) b = parseFloat(sliderB.max);
-
         sliderM.value = m;
         sliderB.value = b;
       }
 
-      // --- Función para actualizar la recta, ecuaciones y triángulo ---
       function updateLineAndEquations() {
-        // Actualizar valores mostrados
         valueM.textContent = m.toFixed(1);
         valueB.textContent = b.toFixed(1);
-        // Solo actualiza inputs si no están siendo editados activamente
+        
         if (document.activeElement !== inputX1) inputX1.value = x1.toFixed(1);
         if (document.activeElement !== inputY1) inputY1.value = y1.toFixed(1);
 
-        // Calcular puntos extremos de la recta para el viewBox
         const y_at_min_x = m * viewBox.x + b;
         const y_at_max_x = m * (viewBox.x + viewBox.width) + b;
-
-        // Actualizar atributos de la línea SVG
+        
         line.setAttribute('x1', viewBox.x);
         line.setAttribute('y1', y_at_min_x);
         line.setAttribute('x2', viewBox.x + viewBox.width);
         line.setAttribute('y2', y_at_max_x);
 
-        // Actualizar posición del punto arrastrable (x1, y1)
         const pointSvgX = toSvgX(x1);
         const pointSvgY = toSvgY(y1);
-
-        // AQUÍ SE HAN CORREGIDO LAS LLAVES
         draggablePoint.style.left = `${pointSvgX}px`;
         draggablePoint.style.top = `${pointSvgY}px`;
         draggablePoint.style.display = 'block';
         draggablePoint.style.zIndex = '999';
 
-        // Actualizar ecuaciones mostradas
         const bSign = b >= 0 ? '+' : '-';
         const absB = Math.abs(b).toFixed(1);
-        // AQUÍ SE HAN CORREGIDO LAS LLAVES
         const eqText = `y = ${m.toFixed(1)}x ${bSign} ${absB}`;
         eqSlopeIntercept.textContent = eqText;
         eqSlopeInterceptExercise.textContent = eqText;
@@ -409,12 +382,11 @@
         const absY1 = Math.abs(y1).toFixed(1);
         const x1Sign = x1 >= 0 ? '-' : '+';
         const absX1 = Math.abs(x1).toFixed(1);
-        // AQUÍ SE HAN CORREGIDO LAS LLAVES
         const pointSlopeText = `y ${y1Sign} ${absY1} = ${m.toFixed(1)}(x ${x1Sign} ${absX1})`;
         eqPointSlope.textContent = pointSlopeText;
         eqPointSlopeExercise.textContent = pointSlopeText;
 
-        // --- Actualizar Triángulo de Pendiente ---
+        // --- ACTUALIZACIÓN DE COORDENADAS PARA ETIQUETAS ---
         if (showSlopeTriangleCheckbox.checked && m !== 0 && isFinite(m)) {
           const run = 1; 
           const rise = m * run; 
@@ -426,16 +398,16 @@
           const p3x = x1 + run; 
           const p3y = y1; 
 
-          // AQUÍ SE HAN CORREGIDO LAS LLAVES
           slopeTriangle.setAttribute('points', `${p1x},${p1y} ${p2x},${p2y} ${p3x},${p3y}`);
           slopeTriangle.style.display = 'block';
 
+          // Base: Mostrar hacia abajo (Y + 0.6) y hacia la izquierda (X - 0.5)
           deltaXText.setAttribute('x', p1x + run / 2);
-          deltaXText.setAttribute('y', p1y + 0.3); 
+          deltaXText.setAttribute('y', p1y + 0.6); 
           deltaXText.textContent = `Δx = ${run.toFixed(1)}`;
           deltaXText.style.display = 'block';
 
-          deltaYText.setAttribute('x', p3x + 0.3); 
+          deltaYText.setAttribute('x', p3x - 0.6); 
           deltaYText.setAttribute('y', p1y + rise / 2);
           deltaYText.textContent = `Δy = ${rise.toFixed(1)}`;
           deltaYText.style.display = 'block';
@@ -450,19 +422,25 @@
           const a3x = p1x + scaledRun;
           const a3y = p1y;
 
-          // AQUÍ SE HAN CORREGIDO LAS LLAVES
           amplifiedTriangle.setAttribute('points', `${a1x},${a1y} ${a2x},${a2y} ${a3x},${a3y}`);
-          amplifiedTriangle.style.display = 'block';
+          // Solo mostrar si la escala es diferente de 1 para evitar redibujado redundante
+          amplifiedTriangle.style.display = triangleScaleFactor !== 1 ? 'block' : 'none';
 
-          amplifiedDeltaXText.setAttribute('x', a1x + scaledRun / 2);
-          amplifiedDeltaXText.setAttribute('y', a1y + 0.3);
-          amplifiedDeltaXText.textContent = `Δx = ${scaledRun.toFixed(1)}`;
-          amplifiedDeltaXText.style.display = 'block';
+          if (triangleScaleFactor !== 1) {
+            // Amplificado: Mostrar hacia arriba (Y - 0.4) y hacia la derecha (X + 0.6)
+            amplifiedDeltaXText.setAttribute('x', a1x + scaledRun / 2);
+            amplifiedDeltaXText.setAttribute('y', a1y - 0.4);
+            amplifiedDeltaXText.textContent = `Δx = ${scaledRun.toFixed(1)}`;
+            amplifiedDeltaXText.style.display = 'block';
 
-          amplifiedDeltaYText.setAttribute('x', a3x + 0.3);
-          amplifiedDeltaYText.setAttribute('y', a1y + scaledRise / 2);
-          amplifiedDeltaYText.textContent = `Δy = ${scaledRise.toFixed(1)}`;
-          amplifiedDeltaYText.style.display = 'block';
+            amplifiedDeltaYText.setAttribute('x', a3x + 0.6);
+            amplifiedDeltaYText.setAttribute('y', a1y + scaledRise / 2);
+            amplifiedDeltaYText.textContent = `Δy = ${scaledRise.toFixed(1)}`;
+            amplifiedDeltaYText.style.display = 'block';
+          } else {
+            amplifiedDeltaXText.style.display = 'none';
+            amplifiedDeltaYText.style.display = 'none';
+          }
         } else {
           slopeTriangle.style.display = 'none';
           deltaXText.style.display = 'none';
@@ -473,7 +451,6 @@
         }
       }
 
-      // Versión mejorada de updateLineAndEquations
       function improvedUpdateLineAndEquations() {
         const margin = 0.5;
         x1 = clamp(x1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
@@ -483,7 +460,6 @@
         updateLineAndEquations();
       }
 
-      // --- Event Listeners para los controles ---
       sliderM.addEventListener('input', e => {
         m = parseFloat(e.target.value);
         b = y1 - m * x1;
@@ -551,26 +527,20 @@
 
       document.addEventListener('mousemove', e => {
         if (!isDragging) return;
-
         const rect = graphContainer.getBoundingClientRect();
         let cursorX = e.clientX - rect.left;
         let cursorY = e.clientY - rect.top;
-
         let newX1 = toGraphX(cursorX);
         let newY1 = toGraphY(cursorY);
-
         const margin = 0.5;
         newX1 = clamp(newX1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
         newY1 = clamp(newY1, viewBox.y + margin, viewBox.y + viewBox.height - margin);
-
         x1 = newX1;
         y1 = newY1;
         b = y1 - m * x1;
-
         if (b >= parseFloat(sliderB.min) && b <= parseFloat(sliderB.max)) {
           sliderB.value = b;
         }
-
         improvedUpdateLineAndEquations();
       });
 
@@ -588,28 +558,21 @@
 
       document.addEventListener('touchmove', e => {
         if (!isDragging) return;
-
         const rect = graphContainer.getBoundingClientRect();
         const touch = e.touches[0];
-
         let cursorX = touch.clientX - rect.left;
         let cursorY = touch.clientY - rect.top;
-
         let newX1 = toGraphX(cursorX);
         let newY1 = toGraphY(cursorY);
-
         const margin = 0.5;
         newX1 = clamp(newX1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
         newY1 = clamp(newY1, viewBox.y + margin, viewBox.y + viewBox.height - margin);
-
         x1 = newX1;
         y1 = newY1;
-
         b = y1 - m * x1;
         if (b >= parseFloat(sliderB.min) && b <= parseFloat(sliderB.max)) {
           sliderB.value = b;
         }
-
         improvedUpdateLineAndEquations();
         e.preventDefault();
       });
@@ -643,32 +606,17 @@
           }
           const p1y = Math.round((Math.random() * 10 - 5) * 2) / 2;
           const p2y = Math.round((Math.random() * 10 - 5) * 2) / 2;
-
           const correctM = (p2y - p1y) / (p2x - p1x);
           const correctB = p1y - correctM * p1x;
-
-          // AQUÍ SE HAN CORREGIDO LAS LLAVES
           exerciseQuestion.textContent = `Encuentra la pendiente (m) y el intercepto (b) de la recta que pasa por los puntos (${p1x}, ${p1y}) y (${p2x}, ${p2y}).`;
-          currentExercise = {
-            type: 0,
-            m: correctM,
-            b: correctB,
-            p1x: p1x,
-            p1y: p1y
-          };
+          currentExercise = { type: 0, m: correctM, b: correctB, p1x: p1x, p1y: p1y };
         } else {
           const correctM = Math.round((Math.random() * 8 - 4) * 2) / 2; 
           const correctB = Math.round((Math.random() * 10 - 5) * 2) / 2; 
           const bSign = correctB >= 0 ? '+' : '-';
           const absB = Math.abs(correctB);
-
-          // AQUÍ SE HAN CORREGIDO LAS LLAVES
           exerciseQuestion.textContent = `Identifica la pendiente (m) y el intercepto (b) de la ecuación: y = ${correctM}x ${bSign} ${absB}`;
-          currentExercise = {
-            type: 1,
-            m: correctM,
-            b: correctB
-          };
+          currentExercise = { type: 1, m: correctM, b: correctB };
         }
       }
 
@@ -676,18 +624,14 @@
         const userAnswerM = parseFloat(answerMInput.value);
         const userAnswerB = parseFloat(answerBInput.value);
         const tolerance = 0.01; 
-
         if (isNaN(userAnswerM) || isNaN(userAnswerB)) {
           feedback.textContent = 'Por favor, introduce valores numéricos para m y b.';
           feedback.className = 'incorrect';
           return;
         }
-
         document.getElementById('equations-exercise').style.display = 'block';
-
         m = currentExercise.m;
         b = currentExercise.b;
-
         if (currentExercise.type === 0) {
           x1 = currentExercise.p1x;
           y1 = currentExercise.p1y;
@@ -695,19 +639,15 @@
           x1 = 2; 
           y1 = m * x1 + b; 
         }
-
         const margin = 0.5;
         x1 = clamp(x1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
         y1 = clamp(y1, viewBox.y + margin, viewBox.y + viewBox.height - margin);
-
         improvedUpdateLineAndEquations();
-
         if (Math.abs(userAnswerM - currentExercise.m) < tolerance && Math.abs(userAnswerB - currentExercise.b) < tolerance) {
           feedback.textContent = '¡Correcto!';
           feedback.className = 'correct';
           showSuccessAnimation();
         } else {
-          // AQUÍ SE HAN CORREGIDO LAS LLAVES
           feedback.textContent = `Incorrecto. La respuesta correcta es m = ${currentExercise.m.toFixed(2)}, b = ${currentExercise.b.toFixed(2)}.`;
           feedback.className = 'incorrect';
           addVisualHint();
@@ -720,13 +660,10 @@
         tab.addEventListener('click', () => {
           tabs.forEach(t => t.classList.remove('active'));
           tabContents.forEach(c => c.classList.remove('active'));
-
           tab.classList.add('active');
           const tabName = tab.getAttribute('data-tab');
-          // AQUÍ SE HAN CORREGIDO LAS LLAVES
           const tabContent = document.getElementById(`${tabName}-tab`);
           tabContent.classList.add('active');
-
           if (tabName === 'exercise') {
             document.getElementById('equations-exercise').style.display = 'none';
             generateExercise();
@@ -748,9 +685,7 @@
       function showSuccessAnimation() {
         if (feedback.className === 'correct') {
           amplifiedTriangle.style.fillOpacity = '0.6';
-          setTimeout(() => {
-            amplifiedTriangle.style.fillOpacity = '0.2';
-          }, 500);
+          setTimeout(() => { amplifiedTriangle.style.fillOpacity = '0.2'; }, 500);
           showSlopeTriangleCheckbox.checked = true;
           improvedUpdateLineAndEquations();
         }
@@ -768,11 +703,9 @@
 
       function setupMobileOptimizations() {
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints;
-
         if (isTouchDevice) {
           draggablePoint.style.width = '18px';
           draggablePoint.style.height = '18px';
-
           const textElements = document.querySelectorAll('.slope-text, .amplified-text');
           textElements.forEach(el => {
             const currentSize = parseFloat(el.getAttribute('font-size') || '0.8');
@@ -814,8 +747,6 @@
           updateSlidersRange();
           improvedUpdateLineAndEquations();
         }, 100);
-        updateSlidersRange();
-        improvedUpdateLineAndEquations();
       });
 
       document.addEventListener('DOMContentLoaded', enhancedInitializeApp);
@@ -843,12 +774,10 @@
     </div>
     
     <script>
-      // Referencia a la ventana modal
       const modal = document.getElementById('instruction-modal');
       const closeBtn = document.getElementsByClassName('close')[0];
       const closeModalBtn = document.getElementById('close-modal-btn');
 
-      // Mostrar la ventana modal al cargar la página
       window.addEventListener('load', function () {
         if (!localStorage.getItem('hasVisitedBefore')) {
           modal.style.display = 'block';
@@ -885,10 +814,8 @@
         helpButton.onclick = function () {
           modal.style.display = 'block';
         };
-
         document.body.appendChild(helpButton);
       }
-
       addHelpButton();
     </script>
   </body>

@@ -1,14 +1,17 @@
-<!DOCTYPE html>
-<html lang="es"><head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=yes,minimal-ui">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=yes,minimal-ui" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Interactiva Pendiente y Ecuaciones</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23ffffff%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%2294%22%20height%3D%2294%22%20fill%3D%22none%22%20stroke%3D%22%23002060%22%20stroke-width%3D%226%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20fill%3D%22%23002060%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22700%22%20font-size%3D%2278%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%26%23209%3B%3C%2Ftext%3E%3C%2Fsvg%3E">
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23ffffff%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%2294%22%20height%3D%2294%22%20fill%3D%22none%22%20stroke%3D%22%23002060%22%20stroke-width%3D%226%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20fill%3D%22%23002060%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22700%22%20font-size%3D%2278%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%3E%26%23209%3B%3C%2Ftext%3E%3C%2Fsvg%3E" />
     <style>
       body {
         font-family: sans-serif;
@@ -64,10 +67,10 @@
         display: block;
         margin-bottom: 5px;
       }
-      .control-group input[type="range"] {
+      .control-group input[type='range'] {
         width: 100%;
       }
-      .control-group input[type="number"] {
+      .control-group input[type='number'] {
         width: 60px;
       }
       #equations p,
@@ -108,7 +111,7 @@
         fill: green;
         text-anchor: middle;
       }
-      #exercise-module input[type="number"] {
+      #exercise-module input[type='number'] {
         width: 70px;
         margin-right: 10px;
       }
@@ -150,41 +153,85 @@
         width: 100px;
       }
     </style>
-  </head><body><h1 style="font-size: 20px;">Pendiente y relación entre <i> y=mx+b</i> y <i>(y-y<sub>1</sub>)=m(x-x<sub>1</sub>)</i></h1>
-<div class="tabs">
-<div class="tab active" data-tab="practice">Practicar</div>
-<div class="tab" data-tab="exercise">Ejercitar</div>
-</div>
-<div class="content-area"><!-- Modo Practicar -->
-<div id="practice-tab" class="tab-content active">
-<div class="control-group"><label for="slider-m">Pendiente (m): <span id="value-m">1.0</span></label> <input type="range" id="slider-m" min="-5" max="5" step="0.1" value="1"></div>
-<div class="control-group"><label for="slider-b">Intercepto Y (b): <span id="value-b">0.0</span></label> <input type="range" id="slider-b" min="-5" max="5" step="0.1" value="0"></div>
-<div class="control-group"><label>Punto (x₁, y₁) para forma punto-pendiente:</label> <span>x₁: <input type="number" id="input-x1" step="0.1" value="2"></span> <span>y₁: <input type="number" id="input-y1" step="0.1" value="2"></span> <small>(También puedes arrastrar el punto rojo en el gráfico)</small></div>
-<div id="equations">
-<p><strong>Ecuación de la recta que pasa por el punto:</strong></p>
-<p id="eq-point-slope" style="font-size: 18px; font-weight: bold; color: blue;">y - 2.0 = 1.0(x - 2.0)</p>
-<p id="eq-slope-intercept" style="font-size: 18px; font-weight: bold; color: blue;">y = 1.0x + 0.0</p>
-</div>
-</div>
-<!-- Modo Ejercitar -->
-<div id="exercise-tab" class="tab-content">
-<div id="exercise-module">
-<p><strong>Realiza el siguiente ejercicio:</strong></p>
-<p id="exercise-question">Encuentra la pendiente (m) y el intercepto (b) de la recta que pasa por los puntos (1, 3) y (3, 7).</p>
-<div><label for="answer-m">m = </label> <input type="number" id="answer-m" step="any"> <label for="answer-b">b = </label> <input type="number" id="answer-b" step="any"></div>
-<button id="check-answer">Comprobar Respuesta</button> <button id="new-exercise">Nuevo Ejercicio</button>
-<p id="feedback"></p>
-</div>
-<!-- Este div solo se mostrará después de pulsar "Comprobar Respuesta" -->
-<div id="equations-exercise">
-<p><strong>Ecuación de la recta:</strong></p>
-<p id="eq-point-slope-exercise" style="font-size: 18px; font-weight: bold; color: blue;">y - 2.0 = 1.0(x - 2.0)</p>
-<p id="eq-slope-intercept-exercise" style="font-size: 18px; font-weight: bold; color: blue;">y = 1.0x + 0.0</p>
-</div>
-</div>
-</div>
-<!-- Gráfico modo practicar (siempre visible en ese modo) -->
-<div id="graph-container"><svg xmlns="http://www.w3.org/2000/svg" id="graph-svg" width="100%" height="100%" viewBox="-10 -10 20 20" preserveAspectRatio="xMidYMid meet">
+  </head>
+  <body>
+    <h1 style="font-size: 20px">
+      Pendiente y relación entre
+      <i>y=mx+b</i>
+      y
+      <i>
+        (y-y
+        <sub>1</sub>
+        )=m(x-x
+        <sub>1</sub>
+        )
+      </i>
+    </h1>
+    <div class="tabs">
+      <div class="tab active" data-tab="practice">Practicar</div>
+      <div class="tab" data-tab="exercise">Ejercitar</div>
+    </div>
+    <div class="content-area">
+      <!-- Modo Practicar -->
+      <div id="practice-tab" class="tab-content active">
+        <div class="control-group">
+          <label for="slider-m">
+            Pendiente (m):
+            <span id="value-m">1.0</span>
+          </label>
+          <input type="range" id="slider-m" min="-5" max="5" step="0.1" value="1" />
+        </div>
+        <div class="control-group">
+          <label for="slider-b">
+            Intercepto Y (b):
+            <span id="value-b">0.0</span>
+          </label>
+          <input type="range" id="slider-b" min="-5" max="5" step="0.1" value="0" />
+        </div>
+        <div class="control-group">
+          <label>Punto (x₁, y₁) para forma punto-pendiente:</label>
+          <span>
+            x₁:
+            <input type="number" id="input-x1" step="0.1" value="2" />
+          </span>
+          <span>
+            y₁:
+            <input type="number" id="input-y1" step="0.1" value="2" />
+          </span>
+          <small>(También puedes arrastrar el punto rojo en el gráfico)</small>
+        </div>
+        <div id="equations">
+          <p><strong>Ecuación de la recta que pasa por el punto:</strong></p>
+          <p id="eq-point-slope" style="font-size: 18px; font-weight: bold; color: blue">y - 2.0 = 1.0(x - 2.0)</p>
+          <p id="eq-slope-intercept" style="font-size: 18px; font-weight: bold; color: blue">y = 1.0x + 0.0</p>
+        </div>
+      </div>
+      <!-- Modo Ejercitar -->
+      <div id="exercise-tab" class="tab-content">
+        <div id="exercise-module">
+          <p><strong>Realiza el siguiente ejercicio:</strong></p>
+          <p id="exercise-question">Encuentra la pendiente (m) y el intercepto (b) de la recta que pasa por los puntos (1, 3) y (3, 7).</p>
+          <div>
+            <label for="answer-m">m =</label>
+            <input type="number" id="answer-m" step="any" />
+            <label for="answer-b">b =</label>
+            <input type="number" id="answer-b" step="any" />
+          </div>
+          <button id="check-answer">Comprobar Respuesta</button>
+          <button id="new-exercise">Nuevo Ejercicio</button>
+          <p id="feedback"></p>
+        </div>
+        <!-- Este div solo se mostrará después de pulsar "Comprobar Respuesta" -->
+        <div id="equations-exercise">
+          <p><strong>Ecuación de la recta:</strong></p>
+          <p id="eq-point-slope-exercise" style="font-size: 18px; font-weight: bold; color: blue">y - 2.0 = 1.0(x - 2.0)</p>
+          <p id="eq-slope-intercept-exercise" style="font-size: 18px; font-weight: bold; color: blue">y = 1.0x + 0.0</p>
+        </div>
+      </div>
+    </div>
+    <!-- Gráfico modo practicar (siempre visible en ese modo) -->
+    <div id="graph-container">
+      <svg xmlns="http://www.w3.org/2000/svg" id="graph-svg" width="100%" height="100%" viewBox="-10 -10 20 20" preserveAspectRatio="xMidYMid meet">
         <line x1="-10" y1="0" x2="10" y2="0" stroke="black" stroke-width="0.1"></line>
         <line x1="0" y1="-10" x2="0" y2="10" stroke="black" stroke-width="0.1"></line>
         <defs>
@@ -200,75 +247,65 @@
 
         <line id="dynamic-line" x1="-10" y1="0" x2="10" y2="0" stroke="blue" stroke-width="0.2"></line>
 
-        
         <polygon id="slope-triangle" points="0,0 0,0 0,0"></polygon>
         <text id="delta-x-text" x="0" y="0" class="slope-text">Δx</text>
         <text id="delta-y-text" x="0" y="0" class="slope-text">Δy</text>
 
-        
         <polygon id="amplified-triangle" points="0,0 0,0 0,0"></polygon>
-        <text id="amplified-delta-x-text" x="0" y="0" class="amplified-text">
-          Δx
-        </text>
-        <text id="amplified-delta-y-text" x="0" y="0" class="amplified-text">
-          Δy
-        </text>
+        <text id="amplified-delta-x-text" x="0" y="0" class="amplified-text">Δx</text>
+        <text id="amplified-delta-y-text" x="0" y="0" class="amplified-text">Δy</text>
       </svg>
-<div id="draggable-point" style="display: block; z-index: 999; position: absolute; top: 50%; left: 50%;"></div>
-</div>
-<div class="control-group"><input type="checkbox" id="show-slope-triangle" checked="checked"> <label for="show-slope-triangle">Mostrar triángulo de pendiente (Δy/Δx)</label>
-<div><label for="triangle-scale">Escala del triángulo: <span id="triangle-scale-value">1</span></label> <input type="range" id="triangle-scale" min="1" max="5" step="0.5" value="1"></div>
-</div>
-<p><script>
+      <div id="draggable-point" style="display: block; z-index: 999; position: absolute; top: 50%; left: 50%"></div>
+    </div>
+    <div class="control-group">
+      <input type="checkbox" id="show-slope-triangle" checked="checked" />
+      <label for="show-slope-triangle">Mostrar triángulo de pendiente (Δy/Δx)</label>
+      <div>
+        <label for="triangle-scale">
+          Escala del triángulo:
+          <span id="triangle-scale-value">1</span>
+        </label>
+        <input type="range" id="triangle-scale" min="1" max="5" step="0.5" value="1" />
+      </div>
+    </div>
+    <script>
       // Obtener referencias a los elementos DOM
-      const svg = document.getElementById("graph-svg");
-      const line = document.getElementById("dynamic-line");
-      const sliderM = document.getElementById("slider-m");
-      const sliderB = document.getElementById("slider-b");
-      const valueM = document.getElementById("value-m");
-      const valueB = document.getElementById("value-b");
-      const eqSlopeIntercept = document.getElementById("eq-slope-intercept");
-      const eqPointSlope = document.getElementById("eq-point-slope");
-      const eqSlopeInterceptExercise = document.getElementById(
-        "eq-slope-intercept-exercise"
-      );
-      const eqPointSlopeExercise = document.getElementById(
-        "eq-point-slope-exercise"
-      );
-      const inputX1 = document.getElementById("input-x1");
-      const inputY1 = document.getElementById("input-y1");
-      const draggablePoint = document.getElementById("draggable-point");
-      const graphContainer = document.getElementById("graph-container");
-      const slopeTriangle = document.getElementById("slope-triangle");
-      const deltaXText = document.getElementById("delta-x-text");
-      const deltaYText = document.getElementById("delta-y-text");
-      const showSlopeTriangleCheckbox = document.getElementById(
-        "show-slope-triangle"
-      );
+      const svg = document.getElementById('graph-svg');
+      const line = document.getElementById('dynamic-line');
+      const sliderM = document.getElementById('slider-m');
+      const sliderB = document.getElementById('slider-b');
+      const valueM = document.getElementById('value-m');
+      const valueB = document.getElementById('value-b');
+      const eqSlopeIntercept = document.getElementById('eq-slope-intercept');
+      const eqPointSlope = document.getElementById('eq-point-slope');
+      const eqSlopeInterceptExercise = document.getElementById('eq-slope-intercept-exercise');
+      const eqPointSlopeExercise = document.getElementById('eq-point-slope-exercise');
+      const inputX1 = document.getElementById('input-x1');
+      const inputY1 = document.getElementById('input-y1');
+      const draggablePoint = document.getElementById('draggable-point');
+      const graphContainer = document.getElementById('graph-container');
+      const slopeTriangle = document.getElementById('slope-triangle');
+      const deltaXText = document.getElementById('delta-x-text');
+      const deltaYText = document.getElementById('delta-y-text');
+      const showSlopeTriangleCheckbox = document.getElementById('show-slope-triangle');
 
       // Elementos para el triángulo amplificado
-      const amplifiedTriangle = document.getElementById("amplified-triangle");
-      const amplifiedDeltaXText = document.getElementById(
-        "amplified-delta-x-text"
-      );
-      const amplifiedDeltaYText = document.getElementById(
-        "amplified-delta-y-text"
-      );
-      const triangleScale = document.getElementById("triangle-scale");
-      const triangleScaleValue = document.getElementById(
-        "triangle-scale-value"
-      );
+      const amplifiedTriangle = document.getElementById('amplified-triangle');
+      const amplifiedDeltaXText = document.getElementById('amplified-delta-x-text');
+      const amplifiedDeltaYText = document.getElementById('amplified-delta-y-text');
+      const triangleScale = document.getElementById('triangle-scale');
+      const triangleScaleValue = document.getElementById('triangle-scale-value');
 
       // --- Pestañas de Navegación ---
-      const tabs = document.querySelectorAll(".tab");
-      const tabContents = document.querySelectorAll(".tab-content");
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
 
       // --- Estado inicial ---
       let m = parseFloat(sliderM.value);
       let b = parseFloat(sliderB.value);
       let x1 = parseFloat(inputX1.value);
       let y1 = parseFloat(inputY1.value);
-      let activeMode = "practice"; // Modo activo por defecto
+      let activeMode = 'practice'; // Modo activo por defecto
       let triangleScaleFactor = parseFloat(triangleScale.value);
 
       // Variables para sistema de coordenadas
@@ -290,8 +327,6 @@
         scaleX = svgWidth / viewBox.width;
         scaleY = svgHeight / viewBox.height;
 
-        // AQUÍ ESTÁ EL ERROR - La forma en que se calcula el origen
-        // Corregido: El origen debe ser transformado correctamente desde el centro del viewBox
         originX = svgWidth / 2;
         originY = svgHeight / 2;
       }
@@ -314,29 +349,21 @@
       }
 
       function updateSlidersRange() {
-        // Actualizar los rangos de los sliders dependiendo del tamaño del viewBox
-        // Esto asegura que los valores de m y b siempre estén dentro de un rango razonable
         const viewBoxWidth = viewBox.width;
         const viewBoxHeight = viewBox.height;
 
-        // Para la pendiente, permitimos valores que no sean demasiado extremos
-        // Una pendiente máxima de 5 (o -5) es bastante pronunciada pero aún visible
         sliderM.min = -5;
         sliderM.max = 5;
 
-        // Para el intercepto, usamos el tamaño del viewBox como guía
-        // pero limitamos a valores razonables para que la recta sea visible
         const maxB = Math.min(10, viewBoxHeight / 2);
         sliderB.min = -maxB;
         sliderB.max = maxB;
 
-        // Asegurar que los valores actuales estén dentro de los rangos
         if (m < parseFloat(sliderM.min)) m = parseFloat(sliderM.min);
         if (m > parseFloat(sliderM.max)) m = parseFloat(sliderM.max);
         if (b < parseFloat(sliderB.min)) b = parseFloat(sliderB.min);
         if (b > parseFloat(sliderB.max)) b = parseFloat(sliderB.max);
 
-        // Actualizar los valores de los sliders
         sliderM.value = m;
         sliderB.value = b;
       }
@@ -355,79 +382,67 @@
         const y_at_max_x = m * (viewBox.x + viewBox.width) + b;
 
         // Actualizar atributos de la línea SVG
-        line.setAttribute("x1", viewBox.x);
-        line.setAttribute("y1", y_at_min_x);
-        line.setAttribute("x2", viewBox.x + viewBox.width);
-        line.setAttribute("y2", y_at_max_x);
+        line.setAttribute('x1', viewBox.x);
+        line.setAttribute('y1', y_at_min_x);
+        line.setAttribute('x2', viewBox.x + viewBox.width);
+        line.setAttribute('y2', y_at_max_x);
 
         // Actualizar posición del punto arrastrable (x1, y1)
-        // Convertir desde coordenadas del gráfico a coordenadas SVG
         const pointSvgX = toSvgX(x1);
         const pointSvgY = toSvgY(y1);
 
-        // Aplicar posición al punto
-        draggablePoint.style.left = `${{pointSvgX}}px`;
-        draggablePoint.style.top = `${{pointSvgY}}px`;
-
-        // Asegurarse de que el punto sea visible
-        draggablePoint.style.display = "block";
-        draggablePoint.style.zIndex = "999";
+        // AQUÍ SE HAN CORREGIDO LAS LLAVES
+        draggablePoint.style.left = `${pointSvgX}px`;
+        draggablePoint.style.top = `${pointSvgY}px`;
+        draggablePoint.style.display = 'block';
+        draggablePoint.style.zIndex = '999';
 
         // Actualizar ecuaciones mostradas
-        const bSign = b >= 0 ? "+" : "-";
+        const bSign = b >= 0 ? '+' : '-';
         const absB = Math.abs(b).toFixed(1);
-        const eqText = `y = ${m.toFixed(1)}x ${{bSign}} ${{absB}}`;
+        // AQUÍ SE HAN CORREGIDO LAS LLAVES
+        const eqText = `y = ${m.toFixed(1)}x ${bSign} ${absB}`;
         eqSlopeIntercept.textContent = eqText;
         eqSlopeInterceptExercise.textContent = eqText;
 
-        const y1Sign = y1 >= 0 ? "-" : "+"; // Esto ya es correcto
+        const y1Sign = y1 >= 0 ? '-' : '+';
         const absY1 = Math.abs(y1).toFixed(1);
-        const x1Sign = x1 >= 0 ? "-" : "+"; // Esto ya es correcto
+        const x1Sign = x1 >= 0 ? '-' : '+';
         const absX1 = Math.abs(x1).toFixed(1);
-        const pointSlopeText = `y ${{y1Sign}} ${{absY1}} = ${m.toFixed(
-          1
-        )}(x ${{x1Sign}} ${{absX1}})`;
+        // AQUÍ SE HAN CORREGIDO LAS LLAVES
+        const pointSlopeText = `y ${y1Sign} ${absY1} = ${m.toFixed(1)}(x ${x1Sign} ${absX1})`;
         eqPointSlope.textContent = pointSlopeText;
         eqPointSlopeExercise.textContent = pointSlopeText;
 
         // --- Actualizar Triángulo de Pendiente ---
         if (showSlopeTriangleCheckbox.checked && m !== 0 && isFinite(m)) {
-          // Triángulo normal (escala 1)
-          const run = 1; // Usamos un recorrido horizontal de 1 unidad para el triángulo
-          const rise = m * run; // El cambio vertical correspondiente es m
+          const run = 1; 
+          const rise = m * run; 
 
           const p1x = x1;
           const p1y = y1;
           const p2x = x1 + run;
           const p2y = y1 + rise;
-          const p3x = x1 + run; // Vértice del ángulo recto
-          const p3y = y1; // Vértice del ángulo recto
+          const p3x = x1 + run; 
+          const p3y = y1; 
 
-          // Actualizar puntos del polígono normal
-          slopeTriangle.setAttribute(
-            "points",
-            `${{p1x}},${{p1y}} ${{p2x}},${{p2y}} ${{p3x}},${{p3y}}`
-          );
-          slopeTriangle.style.display = "block";
+          // AQUÍ SE HAN CORREGIDO LAS LLAVES
+          slopeTriangle.setAttribute('points', `${p1x},${p1y} ${p2x},${p2y} ${p3x},${p3y}`);
+          slopeTriangle.style.display = 'block';
 
-          // Actualizar etiquetas normales Δx y Δy
-          // Posición para Δx (a mitad del segmento horizontal)
-          deltaXText.setAttribute("x", p1x + run / 2);
-          deltaXText.setAttribute("y", p1y + 0.3); // Ligeramente debajo de la línea
+          deltaXText.setAttribute('x', p1x + run / 2);
+          deltaXText.setAttribute('y', p1y + 0.3); 
           deltaXText.textContent = `Δx = ${run.toFixed(1)}`;
-          deltaXText.style.display = "block";
+          deltaXText.style.display = 'block';
 
-          // Posición para Δy (a mitad del segmento vertical)
-          deltaYText.setAttribute("x", p3x + 0.3); // Ligeramente a la derecha de la línea
-          deltaYText.setAttribute("y", p1y + rise / 2);
+          deltaYText.setAttribute('x', p3x + 0.3); 
+          deltaYText.setAttribute('y', p1y + rise / 2);
           deltaYText.textContent = `Δy = ${rise.toFixed(1)}`;
-          deltaYText.style.display = "block";
+          deltaYText.style.display = 'block';
 
-          // Triángulo amplificado (escala ajustable)
           const scaledRun = run * triangleScaleFactor;
           const scaledRise = rise * triangleScaleFactor;
 
-          // Calcular puntos del triángulo amplificado
           const a1x = p1x;
           const a1y = p1y;
           const a2x = p1x + scaledRun;
@@ -435,91 +450,65 @@
           const a3x = p1x + scaledRun;
           const a3y = p1y;
 
-          // Actualizar puntos del triángulo amplificado
-          amplifiedTriangle.setAttribute(
-            "points",
-            `${{a1x}},${{a1y}} ${{a2x}},${{a2y}} ${{a3x}},${{a3y}}`
-          );
-          amplifiedTriangle.style.display = "block";
+          // AQUÍ SE HAN CORREGIDO LAS LLAVES
+          amplifiedTriangle.setAttribute('points', `${a1x},${a1y} ${a2x},${a2y} ${a3x},${a3y}`);
+          amplifiedTriangle.style.display = 'block';
 
-          // Actualizar etiquetas amplificadas
-          amplifiedDeltaXText.setAttribute("x", a1x + scaledRun / 2);
-          amplifiedDeltaXText.setAttribute("y", a1y + 0.3);
+          amplifiedDeltaXText.setAttribute('x', a1x + scaledRun / 2);
+          amplifiedDeltaXText.setAttribute('y', a1y + 0.3);
           amplifiedDeltaXText.textContent = `Δx = ${scaledRun.toFixed(1)}`;
-          amplifiedDeltaXText.style.display = "block";
+          amplifiedDeltaXText.style.display = 'block';
 
-          amplifiedDeltaYText.setAttribute("x", a3x + 0.3);
-          amplifiedDeltaYText.setAttribute("y", a1y + scaledRise / 2);
+          amplifiedDeltaYText.setAttribute('x', a3x + 0.3);
+          amplifiedDeltaYText.setAttribute('y', a1y + scaledRise / 2);
           amplifiedDeltaYText.textContent = `Δy = ${scaledRise.toFixed(1)}`;
-          amplifiedDeltaYText.style.display = "block";
+          amplifiedDeltaYText.style.display = 'block';
         } else {
-          // Ocultar triángulos y textos
-          slopeTriangle.style.display = "none";
-          deltaXText.style.display = "none";
-          deltaYText.style.display = "none";
-          amplifiedTriangle.style.display = "none";
-          amplifiedDeltaXText.style.display = "none";
-          amplifiedDeltaYText.style.display = "none";
+          slopeTriangle.style.display = 'none';
+          deltaXText.style.display = 'none';
+          deltaYText.style.display = 'none';
+          amplifiedTriangle.style.display = 'none';
+          amplifiedDeltaXText.style.display = 'none';
+          amplifiedDeltaYText.style.display = 'none';
         }
       }
 
       // Versión mejorada de updateLineAndEquations
       function improvedUpdateLineAndEquations() {
-        // Asegurar que los valores estén dentro de los rangos permitidos
         const margin = 0.5;
-
-        // Restringir x1 e y1
         x1 = clamp(x1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
         y1 = clamp(y1, viewBox.y + margin, viewBox.y + viewBox.height - margin);
-
-        // Restringir m y b a los rangos de los sliders
         m = clamp(m, parseFloat(sliderM.min), parseFloat(sliderM.max));
         b = clamp(b, parseFloat(sliderB.min), parseFloat(sliderB.max));
-
-        // Llamar a la función original
         updateLineAndEquations();
       }
 
       // --- Event Listeners para los controles ---
-      sliderM.addEventListener("input", (e) => {
+      sliderM.addEventListener('input', e => {
         m = parseFloat(e.target.value);
-        // Recalcular 'b' para que la recta siga pasando por (x1, y1) si la pendiente cambia
         b = y1 - m * x1;
-        // Actualizar el slider de 'b' para reflejar el cambio
         if (b >= parseFloat(sliderB.min) && b <= parseFloat(sliderB.max)) {
           sliderB.value = b;
         }
         improvedUpdateLineAndEquations();
       });
 
-      sliderB.addEventListener("input", (e) => {
+      sliderB.addEventListener('input', e => {
         b = parseFloat(e.target.value);
-        // Recalculamos y1 basado en la nueva b, m actual y x1.
         y1 = m * x1 + b;
         improvedUpdateLineAndEquations();
       });
 
-      // Modificar los event listeners de los inputs para validar los valores
-      inputX1.addEventListener("input", (e) => {
+      inputX1.addEventListener('input', e => {
         let newX1 = parseFloat(e.target.value);
         if (!isNaN(newX1)) {
-          // Restringir el valor dentro del viewBox
           const margin = 0.5;
-          newX1 = clamp(
-            newX1,
-            viewBox.x + margin,
-            viewBox.x + viewBox.width - margin
-          );
-
-          // Si el valor ha cambiado después de aplicar el clamp, actualizar el input
+          newX1 = clamp(newX1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
           if (newX1 !== parseFloat(e.target.value)) {
             e.target.value = newX1.toFixed(1);
           }
-
           x1 = newX1;
-          // Recalcular 'b' para que la recta pase por el nuevo (x1, y1) con la pendiente 'm' actual
           b = y1 - m * x1;
-          // Actualizar el slider de 'b' para reflejar el cambio
           if (b >= parseFloat(sliderB.min) && b <= parseFloat(sliderB.max)) {
             sliderB.value = b;
           }
@@ -527,26 +516,16 @@
         }
       });
 
-      inputY1.addEventListener("input", (e) => {
+      inputY1.addEventListener('input', e => {
         let newY1 = parseFloat(e.target.value);
         if (!isNaN(newY1)) {
-          // Restringir el valor dentro del viewBox
           const margin = 0.5;
-          newY1 = clamp(
-            newY1,
-            viewBox.y + margin,
-            viewBox.y + viewBox.height - margin
-          );
-
-          // Si el valor ha cambiado después de aplicar el clamp, actualizar el input
+          newY1 = clamp(newY1, viewBox.y + margin, viewBox.y + viewBox.height - margin);
           if (newY1 !== parseFloat(e.target.value)) {
             e.target.value = newY1.toFixed(1);
           }
-
           y1 = newY1;
-          // Recalcular 'b' para que la recta pase por el nuevo (x1, y1) con la pendiente 'm' actual
           b = y1 - m * x1;
-          // Actualizar el slider de 'b' para reflejar el cambio
           if (b >= parseFloat(sliderB.min) && b <= parseFloat(sliderB.max)) {
             sliderB.value = b;
           }
@@ -554,63 +533,40 @@
         }
       });
 
-      showSlopeTriangleCheckbox.addEventListener(
-        "change",
-        improvedUpdateLineAndEquations
-      );
+      showSlopeTriangleCheckbox.addEventListener('change', improvedUpdateLineAndEquations);
 
-      // Control de escala del triángulo
-      triangleScale.addEventListener("input", (e) => {
+      triangleScale.addEventListener('input', e => {
         triangleScaleFactor = parseFloat(e.target.value);
         triangleScaleValue.textContent = triangleScaleFactor.toFixed(1);
         improvedUpdateLineAndEquations();
       });
 
-      // --- Lógica para Arrastrar el Punto ---
       let isDragging = false;
 
-      draggablePoint.addEventListener("mousedown", (e) => {
+      draggablePoint.addEventListener('mousedown', e => {
         isDragging = true;
-        draggablePoint.style.cursor = "grabbing";
-        e.preventDefault(); // Prevenir selección de texto durante el arrastre
+        draggablePoint.style.cursor = 'grabbing';
+        e.preventDefault(); 
       });
 
-      // Modificar la función de arrastre del punto para mantenerlo dentro del viewBox
-      document.addEventListener("mousemove", (e) => {
+      document.addEventListener('mousemove', e => {
         if (!isDragging) return;
 
         const rect = graphContainer.getBoundingClientRect();
-
-        // Calcular las coordenadas del cursor relativas al contenedor del gráfico
         let cursorX = e.clientX - rect.left;
         let cursorY = e.clientY - rect.top;
 
-        // Convertir directamente a coordenadas del gráfico
         let newX1 = toGraphX(cursorX);
         let newY1 = toGraphY(cursorY);
 
-        // Aquí está la clave: restringir los valores a los límites del viewBox
-        // Añadir un pequeño margen (por ejemplo, 0.5 unidades) para evitar que el punto llegue al borde
         const margin = 0.5;
-        newX1 = clamp(
-          newX1,
-          viewBox.x + margin,
-          viewBox.x + viewBox.width - margin
-        );
-        newY1 = clamp(
-          newY1,
-          viewBox.y + margin,
-          viewBox.y + viewBox.height - margin
-        );
+        newX1 = clamp(newX1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
+        newY1 = clamp(newY1, viewBox.y + margin, viewBox.y + viewBox.height - margin);
 
-        // Actualizar las coordenadas con los valores restringidos
         x1 = newX1;
         y1 = newY1;
-
-        // Recalcular 'b' basado en el nuevo (x1, y1) y la pendiente 'm' actual
         b = y1 - m * x1;
 
-        // Actualizar el slider de 'b' para reflejar el cambio, si está dentro del rango
         if (b >= parseFloat(sliderB.min) && b <= parseFloat(sliderB.max)) {
           sliderB.value = b;
         }
@@ -618,52 +574,37 @@
         improvedUpdateLineAndEquations();
       });
 
-      document.addEventListener("mouseup", () => {
+      document.addEventListener('mouseup', () => {
         if (isDragging) {
           isDragging = false;
-          draggablePoint.style.cursor = "grab";
+          draggablePoint.style.cursor = 'grab';
         }
       });
 
-      // También manejar eventos touch para dispositivos móviles
-      draggablePoint.addEventListener("touchstart", (e) => {
+      draggablePoint.addEventListener('touchstart', e => {
         isDragging = true;
         e.preventDefault();
       });
 
-      // También modificar la versión para dispositivos táctiles
-      document.addEventListener("touchmove", (e) => {
+      document.addEventListener('touchmove', e => {
         if (!isDragging) return;
 
         const rect = graphContainer.getBoundingClientRect();
         const touch = e.touches[0];
 
-        // Calcular coordenadas directamente
         let cursorX = touch.clientX - rect.left;
         let cursorY = touch.clientY - rect.top;
 
-        // Convertir a coordenadas del gráfico
         let newX1 = toGraphX(cursorX);
         let newY1 = toGraphY(cursorY);
 
-        // Restringir valores dentro del viewBox
         const margin = 0.5;
-        newX1 = clamp(
-          newX1,
-          viewBox.x + margin,
-          viewBox.x + viewBox.width - margin
-        );
-        newY1 = clamp(
-          newY1,
-          viewBox.y + margin,
-          viewBox.y + viewBox.height - margin
-        );
+        newX1 = clamp(newX1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
+        newY1 = clamp(newY1, viewBox.y + margin, viewBox.y + viewBox.height - margin);
 
-        // Actualizar las coordenadas
         x1 = newX1;
         y1 = newY1;
 
-        // Recalcular b
         b = y1 - m * x1;
         if (b >= parseFloat(sliderB.min) && b <= parseFloat(sliderB.max)) {
           sliderB.value = b;
@@ -673,37 +614,31 @@
         e.preventDefault();
       });
 
-      document.addEventListener("touchend", () => {
+      document.addEventListener('touchend', () => {
         isDragging = false;
       });
 
-      // --- Módulo de Ejercicios ---
-      const exerciseQuestion = document.getElementById("exercise-question");
-      const answerMInput = document.getElementById("answer-m");
-      const answerBInput = document.getElementById("answer-b");
-      const checkAnswerButton = document.getElementById("check-answer");
-      const newExerciseButton = document.getElementById("new-exercise");
-      const feedback = document.getElementById("feedback");
-      let currentExercise = {}; // Para almacenar la pregunta y respuesta actual
+      const exerciseQuestion = document.getElementById('exercise-question');
+      const answerMInput = document.getElementById('answer-m');
+      const answerBInput = document.getElementById('answer-b');
+      const checkAnswerButton = document.getElementById('check-answer');
+      const newExerciseButton = document.getElementById('new-exercise');
+      const feedback = document.getElementById('feedback');
+      let currentExercise = {}; 
 
-      // --- Lógica de Ejercicios ---
       function generateExercise() {
-        // Ocultar ecuaciones en cada nuevo ejercicio
-        document.getElementById("equations-exercise").style.display = "none";
+        document.getElementById('equations-exercise').style.display = 'none';
+        feedback.textContent = ''; 
+        answerMInput.value = '';
+        answerBInput.value = '';
+        feedback.className = ''; 
 
-        feedback.textContent = ""; // Limpiar feedback anterior
-        answerMInput.value = "";
-        answerBInput.value = "";
-        feedback.className = ""; // Reset class
-
-        const type = Math.floor(Math.random() * 2); // 0: dos puntos, 1: ecuación dada
+        const type = Math.floor(Math.random() * 2); 
 
         if (type === 0) {
-          // Dados dos puntos, encontrar m y b
-          const p1x = Math.round((Math.random() * 10 - 5) * 2) / 2; // Números.5 o enteros entre -5 y 5
+          const p1x = Math.round((Math.random() * 10 - 5) * 2) / 2; 
           let p2x = Math.round((Math.random() * 10 - 5) * 2) / 2;
           while (p2x === p1x) {
-            // Asegurar que x no sean iguales (evita pendiente indefinida)
             p2x = Math.round((Math.random() * 10 - 5) * 2) / 2;
           }
           const p1y = Math.round((Math.random() * 10 - 5) * 2) / 2;
@@ -712,186 +647,143 @@
           const correctM = (p2y - p1y) / (p2x - p1x);
           const correctB = p1y - correctM * p1x;
 
-          exerciseQuestion.textContent = `Encuentra la pendiente (m) y el intercepto (b) de la recta que pasa por los puntos (${{p1x}}, ${{p1y}}) y (${{p2x}}, ${{p2y}}).`;
+          // AQUÍ SE HAN CORREGIDO LAS LLAVES
+          exerciseQuestion.textContent = `Encuentra la pendiente (m) y el intercepto (b) de la recta que pasa por los puntos (${p1x}, ${p1y}) y (${p2x}, ${p2y}).`;
           currentExercise = {
             type: 0,
             m: correctM,
             b: correctB,
             p1x: p1x,
-            p1y: p1y,
+            p1y: p1y
           };
-
-          // No actualizamos la recta hasta que se pulse "Comprobar Respuesta"
         } else {
-          // Dada una ecuación, identificar m y b
-          const correctM = Math.round((Math.random() * 8 - 4) * 2) / 2; // Pendiente entre -4 y 4
-          const correctB = Math.round((Math.random() * 10 - 5) * 2) / 2; // Intercepto entre -5 y 5
-          const bSign = correctB >= 0 ? "+" : "-";
+          const correctM = Math.round((Math.random() * 8 - 4) * 2) / 2; 
+          const correctB = Math.round((Math.random() * 10 - 5) * 2) / 2; 
+          const bSign = correctB >= 0 ? '+' : '-';
           const absB = Math.abs(correctB);
 
-          exerciseQuestion.textContent = `Identifica la pendiente (m) y el intercepto (b) de la ecuación: y = ${{correctM}}x ${{bSign}} ${{absB}}`;
+          // AQUÍ SE HAN CORREGIDO LAS LLAVES
+          exerciseQuestion.textContent = `Identifica la pendiente (m) y el intercepto (b) de la ecuación: y = ${correctM}x ${bSign} ${absB}`;
           currentExercise = {
             type: 1,
             m: correctM,
-            b: correctB,
+            b: correctB
           };
         }
       }
 
-      checkAnswerButton.addEventListener("click", () => {
+      checkAnswerButton.addEventListener('click', () => {
         const userAnswerM = parseFloat(answerMInput.value);
         const userAnswerB = parseFloat(answerBInput.value);
-        const tolerance = 0.01; // Pequeña tolerancia para comparación de flotantes
+        const tolerance = 0.01; 
 
         if (isNaN(userAnswerM) || isNaN(userAnswerB)) {
-          feedback.textContent =
-            "Por favor, introduce valores numéricos para m y b.";
-          feedback.className = "incorrect";
+          feedback.textContent = 'Por favor, introduce valores numéricos para m y b.';
+          feedback.className = 'incorrect';
           return;
         }
 
-        // Mostrar ecuaciones y actualizar gráfica
-        document.getElementById("equations-exercise").style.display = "block";
+        document.getElementById('equations-exercise').style.display = 'block';
 
-        // Actualizar la recta en el gráfico para mostrar la solución
         m = currentExercise.m;
         b = currentExercise.b;
 
-        // Usar un punto de la recta para el triángulo de pendiente
         if (currentExercise.type === 0) {
           x1 = currentExercise.p1x;
           y1 = currentExercise.p1y;
         } else {
-          x1 = 2; // Punto arbitrario en x
-          y1 = m * x1 + b; // Calcular y correspondiente
+          x1 = 2; 
+          y1 = m * x1 + b; 
         }
 
-        // Asegurar que el punto esté dentro de los límites
         const margin = 0.5;
         x1 = clamp(x1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
         y1 = clamp(y1, viewBox.y + margin, viewBox.y + viewBox.height - margin);
 
         improvedUpdateLineAndEquations();
 
-        if (
-          Math.abs(userAnswerM - currentExercise.m) < tolerance &&
-          Math.abs(userAnswerB - currentExercise.b) < tolerance
-        ) {
-          feedback.textContent = "¡Correcto!";
-          feedback.className = "correct";
+        if (Math.abs(userAnswerM - currentExercise.m) < tolerance && Math.abs(userAnswerB - currentExercise.b) < tolerance) {
+          feedback.textContent = '¡Correcto!';
+          feedback.className = 'correct';
           showSuccessAnimation();
         } else {
-          feedback.textContent = `Incorrecto. La respuesta correcta es m = ${currentExercise.m.toFixed(
-            2
-          )}, b = ${currentExercise.b.toFixed(2)}.`;
-          feedback.className = "incorrect";
+          // AQUÍ SE HAN CORREGIDO LAS LLAVES
+          feedback.textContent = `Incorrecto. La respuesta correcta es m = ${currentExercise.m.toFixed(2)}, b = ${currentExercise.b.toFixed(2)}.`;
+          feedback.className = 'incorrect';
           addVisualHint();
         }
       });
 
-      newExerciseButton.addEventListener("click", generateExercise);
+      newExerciseButton.addEventListener('click', generateExercise);
 
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          // Desactivar todas las pestañas y contenidos
-          tabs.forEach((t) => t.classList.remove("active"));
-          tabContents.forEach((c) => c.classList.remove("active"));
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
 
-          // Activar la pestaña actual y su contenido
-          tab.classList.add("active");
-          const tabName = tab.getAttribute("data-tab");
-          const tabContent = document.getElementById(`${{tabName}}-tab`);
-          tabContent.classList.add("active");
+          tab.classList.add('active');
+          const tabName = tab.getAttribute('data-tab');
+          // AQUÍ SE HAN CORREGIDO LAS LLAVES
+          const tabContent = document.getElementById(`${tabName}-tab`);
+          tabContent.classList.add('active');
 
-          // Si cambiamos a "exercise", generamos un nuevo ejercicio y ocultamos ecuaciones
-          if (tabName === "exercise") {
-            document.getElementById("equations-exercise").style.display =
-              "none";
+          if (tabName === 'exercise') {
+            document.getElementById('equations-exercise').style.display = 'none';
             generateExercise();
           } else {
-            // Si volvemos a "practice", restauramos los controles interactivos
             improvedUpdateLineAndEquations();
           }
         });
       });
 
-      // Mejorar el manejo de ejercicios
       function resetExerciseState() {
-        // Ocultar el triángulo inicialmente en modo ejercicio
         showSlopeTriangleCheckbox.checked = false;
-        document.getElementById("equations-exercise").style.display = "none";
-        feedback.textContent = "";
-        feedback.className = "";
-        answerMInput.value = "";
-        answerBInput.value = "";
+        document.getElementById('equations-exercise').style.display = 'none';
+        feedback.textContent = '';
+        feedback.className = '';
+        answerMInput.value = '';
+        answerBInput.value = '';
       }
 
-      // Mejorar el manejo de respuestas correctas
       function showSuccessAnimation() {
-        // Añadir una pequeña animación cuando la respuesta es correcta
-        if (feedback.className === "correct") {
-          // Parpadeo verde en el triángulo
-          amplifiedTriangle.style.fillOpacity = "0.6";
+        if (feedback.className === 'correct') {
+          amplifiedTriangle.style.fillOpacity = '0.6';
           setTimeout(() => {
-            amplifiedTriangle.style.fillOpacity = "0.2";
+            amplifiedTriangle.style.fillOpacity = '0.2';
           }, 500);
-
-          // Mostrar triangulo si está oculto
           showSlopeTriangleCheckbox.checked = true;
           improvedUpdateLineAndEquations();
         }
       }
 
-      // Añadir función para ayuda visual en pendientes difíciles
       function addVisualHint() {
-        // Si después de un segundo intento incorrecto, añadir ayuda visual
-        if (
-          feedback.className === "incorrect" &&
-          feedback.textContent.includes("Incorrecto")
-        ) {
+        if (feedback.className === 'incorrect' && feedback.textContent.includes('Incorrecto')) {
           showSlopeTriangleCheckbox.checked = true;
-          triangleScaleFactor = 3; // Escala grande para mejor visualización
+          triangleScaleFactor = 3; 
           triangleScale.value = triangleScaleFactor;
           triangleScaleValue.textContent = triangleScaleFactor.toFixed(1);
           improvedUpdateLineAndEquations();
         }
       }
 
-      // Mejorar la experiencia para usuarios móviles
       function setupMobileOptimizations() {
-        // Detectar si es dispositivo táctil
-        const isTouchDevice =
-          "ontouchstart" in window || navigator.maxTouchPoints;
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints;
 
         if (isTouchDevice) {
-          // Hacer elementos más grandes para facilitar interacción táctil
-          draggablePoint.style.width = "18px";
-          draggablePoint.style.height = "18px";
+          draggablePoint.style.width = '18px';
+          draggablePoint.style.height = '18px';
 
-          // Ajustar escala de texto para mejor visualización en móviles
-          const textElements = document.querySelectorAll(
-            ".slope-text, .amplified-text"
-          );
-          textElements.forEach((el) => {
-            const currentSize = parseFloat(
-              el.getAttribute("font-size") || "0.8"
-            );
-            el.setAttribute("font-size", (currentSize * 1.5).toString());
+          const textElements = document.querySelectorAll('.slope-text, .amplified-text');
+          textElements.forEach(el => {
+            const currentSize = parseFloat(el.getAttribute('font-size') || '0.8');
+            el.setAttribute('font-size', (currentSize * 1.5).toString());
           });
         }
       }
 
-      // Mejorar la visualización del triángulo cuando las pendientes son muy pronunciadas
       function adjustTriangleForSteepSlopes() {
-        // Si la pendiente es muy pronunciada, ajustar escala automáticamente
         if (Math.abs(m) > 3) {
-          // Escala sugerida basada en la pendiente
-          const suggestedScale = Math.min(
-            5,
-            Math.max(1, Math.ceil(Math.abs(m) / 2))
-          );
-
-          // Solo actualizar si es diferente a la escala actual
+          const suggestedScale = Math.min(5, Math.max(1, Math.ceil(Math.abs(m) / 2)));
           if (suggestedScale !== triangleScaleFactor) {
             triangleScaleFactor = suggestedScale;
             triangleScale.value = suggestedScale;
@@ -900,140 +792,104 @@
         }
       }
 
-      // Añadir ajuste automático cuando cambia la pendiente
-      sliderM.addEventListener("change", adjustTriangleForSteepSlopes);
+      sliderM.addEventListener('change', adjustTriangleForSteepSlopes);
 
       function enhancedInitializeApp() {
-        // Inicializar coordenadas
         initializeGraphCoordinates();
-
-        // Actualizar rangos de los sliders
         updateSlidersRange();
-
-        // Restringir punto inicial a una posición segura en el centro del gráfico
-        // Usar valores del centro del viewBox en lugar de los valores iniciales
-        x1 = 0; // Centrar en x=0
-        y1 = 0; // Centrar en y=0
-
-        // O usar valores restringidos que garanticen estar dentro del viewBox
-        // const margin = 2; // Margen mayor para mayor seguridad
-        // x1 = clamp(x1, viewBox.x + margin, viewBox.x + viewBox.width - margin);
-        // y1 = clamp(y1, viewBox.y + margin, viewBox.y + viewBox.height - margin);
-
-        // Recalcular b para asegurar que la recta pase por el punto
+        x1 = 0; 
+        y1 = 0; 
         b = y1 - m * x1;
-
-        // Actualizar inputs con los nuevos valores seguros
         inputX1.value = x1.toFixed(1);
         inputY1.value = y1.toFixed(1);
         sliderB.value = b;
-
-        // Ahora posicionar el punto rojo después de tener las coordenadas correctas
         improvedUpdateLineAndEquations();
-
-        // Inicializar ejercicios
         generateExercise();
-
-        // Configurar optimizaciones para dispositivos móviles
         setupMobileOptimizations();
       }
 
-      // Ajustar sistema de coordenadas cuando cambia el tamaño de la ventana
-      window.addEventListener("resize", function () {
-        // Recalcular coordenadas
+      window.addEventListener('resize', function () {
         initializeGraphCoordinates();
-        // Añadir un pequeño retraso para asegurar que el contenedor está listo
         setTimeout(() => {
-          // Actualizar rangos de los sliders y posicionar punto
           updateSlidersRange();
           improvedUpdateLineAndEquations();
         }, 100);
-
-        // Actualizar rangos de los sliders
         updateSlidersRange();
-
-        // Actualizar visualización
         improvedUpdateLineAndEquations();
       });
 
-      // Reemplazar el evento DOMContentLoaded existente
-      document.addEventListener("DOMContentLoaded", enhancedInitializeApp);
-    </script></p>
-<!-- Agregar en el HTML, justo antes del cierre de </body> -->
-<p></p>
-<!-- Ventana modal -->
-<div id="instruction-modal" class="modal">
-<div class="modal-content"><span class="close">×</span>
-<h2>Instrucciones</h2>
-<p>Esta aplicación te permite explorar la relación entre las dos formas de expresar la ecuación de una recta:</p>
-<ul>
-<li><strong>Forma pendiente-intercepto:</strong> y = mx + b</li>
-<li><strong>Forma punto-pendiente:</strong> (y - y₁) = m(x - x₁)</li>
-</ul>
-<p>Puedes:</p>
-<ul>
-<li>Modificar la pendiente (m) y el intercepto (b) con los deslizadores</li>
-<li>Arrastrar el punto rojo para cambiar el punto (x₁, y₁)</li>
-<li>Ver el triángulo de pendiente que muestra gráficamente la relación Δy/Δx</li>
-<li>Practicar con ejercicios en la pestaña "Ejercitar"</li>
-</ul>
-<button id="close-modal-btn">Entendido</button></div>
-</div>
-<!-- Estilos para la ventana modal --><!-- Script para controlar la ventana modal -->
-<p><script>
-      // Agregar esto al final del script existente
-
+      document.addEventListener('DOMContentLoaded', enhancedInitializeApp);
+    </script>
+    
+    <!-- Ventana modal -->
+    <div id="instruction-modal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+      <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
+        <span class="close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2>Instrucciones</h2>
+        <p>Esta aplicación te permite explorar la relación entre las dos formas de expresar la ecuación de una recta:</p>
+        <ul>
+          <li><strong>Forma pendiente-intercepto:</strong> y = mx + b</li>
+          <li><strong>Forma punto-pendiente:</strong> (y - y₁) = m(x - x₁)</li>
+        </ul>
+        <p>Puedes:</p>
+        <ul>
+          <li>Modificar la pendiente (m) y el intercepto (b) con los deslizadores</li>
+          <li>Arrastrar el punto rojo para cambiar el punto (x₁, y₁)</li>
+          <li>Ver el triángulo de pendiente que muestra gráficamente la relación Δy/Δx</li>
+          <li>Practicar con ejercicios en la pestaña "Ejercitar"</li>
+        </ul>
+        <button id="close-modal-btn" style="padding: 10px; background-color: #bbd8a3; border: none; border-radius: 5px; cursor: pointer;">Entendido</button>
+      </div>
+    </div>
+    
+    <script>
       // Referencia a la ventana modal
-      const modal = document.getElementById("instruction-modal");
-      const closeBtn = document.getElementsByClassName("close")[0];
-      const closeModalBtn = document.getElementById("close-modal-btn");
+      const modal = document.getElementById('instruction-modal');
+      const closeBtn = document.getElementsByClassName('close')[0];
+      const closeModalBtn = document.getElementById('close-modal-btn');
 
       // Mostrar la ventana modal al cargar la página
-      window.addEventListener("load", function () {
-        // Verificar si es la primera visita (usando localStorage)
-        if (!localStorage.getItem("hasVisitedBefore")) {
-          modal.style.display = "block";
-          localStorage.setItem("hasVisitedBefore", "true");
+      window.addEventListener('load', function () {
+        if (!localStorage.getItem('hasVisitedBefore')) {
+          modal.style.display = 'block';
+          localStorage.setItem('hasVisitedBefore', 'true');
         }
       });
 
-      // Cerrar la ventana modal al hacer clic en la X
       closeBtn.onclick = function () {
-        modal.style.display = "none";
+        modal.style.display = 'none';
       };
 
-      // Cerrar la ventana modal al hacer clic en el botón "Entendido"
       closeModalBtn.onclick = function () {
-        modal.style.display = "none";
+        modal.style.display = 'none';
       };
 
-      // Cerrar la ventana modal al hacer clic fuera de ella
       window.onclick = function (event) {
         if (event.target == modal) {
-          modal.style.display = "none";
+          modal.style.display = 'none';
         }
       };
 
-      // Añadir un botón de ayuda en la interfaz para mostrar las instrucciones de nuevo
       function addHelpButton() {
-        const helpButton = document.createElement("button");
-        helpButton.innerHTML = "Ayuda";
-        helpButton.style.position = "absolute";
-        helpButton.style.top = "20px";
-        helpButton.style.right = "20px";
-        helpButton.style.padding = "5px 10px";
-        helpButton.style.backgroundColor = "#F0F1C5";
-        helpButton.style.border = "1px solid #ccc";
-        helpButton.style.borderRadius = "4px";
-        helpButton.style.cursor = "pointer";
+        const helpButton = document.createElement('button');
+        helpButton.innerHTML = 'Ayuda';
+        helpButton.style.position = 'absolute';
+        helpButton.style.top = '20px';
+        helpButton.style.right = '20px';
+        helpButton.style.padding = '5px 10px';
+        helpButton.style.backgroundColor = '#F0F1C5';
+        helpButton.style.border = '1px solid #ccc';
+        helpButton.style.borderRadius = '4px';
+        helpButton.style.cursor = 'pointer';
 
         helpButton.onclick = function () {
-          modal.style.display = "block";
+          modal.style.display = 'block';
         };
 
         document.body.appendChild(helpButton);
       }
 
-      // Llamar a la función para añadir el botón de ayuda
       addHelpButton();
-    </script></p></body></html>
+    </script>
+  </body>
+</html>

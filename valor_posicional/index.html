@@ -510,39 +510,42 @@
           document.getElementById(`tab-content-${tabIndex}`).classList.add('active');
         }
 
-        // Generar un número aleatorio
-        function generateRandomNumber() {
-          const min = 1;
-          const max = 999999999;
-          const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-          currentNumber = randomNum.toString().padStart(9, '0');
+ // Generar un número aleatorio
+function generateRandomNumber() {
+  const min = 1;
+  const max = 999999999;
+  const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+  currentNumber = randomNum.toString().padStart(9, '0');
 
-          // Actualizar la visualización del número
-          const container = document.getElementById('number-container');
-          container.innerHTML = '';
+  // Actualizar la visualización del número
+  const container = document.getElementById('number-container');
+  container.innerHTML = '';
 
-          for (let i = 0; i < currentNumber.length; i++) {
-            const digitBox = document.createElement('div');
-            digitBox.className = 'digit-box';
-            digitBox.textContent = currentNumber[i];
-            digitBox.setAttribute('data-index', i);
-            digitBox.setAttribute('data-digit', currentNumber[i]);
-            digitBox.setAttribute('onclick', `selectDigit(${i})`);
+  for (let i = 0; i < currentNumber.length; i++) {
+    const digitBox = document.createElement('div');
+    digitBox.className = 'digit-box';
+    digitBox.textContent = currentNumber[i];
+    digitBox.setAttribute('data-index', i);
+    digitBox.setAttribute('data-digit', currentNumber[i]);
+    digitBox.setAttribute('onclick', `selectDigit(${i})`);
 
-            const posLabel = document.createElement('div');
-            posLabel.className = 'position-label';
-            posLabel.textContent = positions[positions.length - 1 - i].name;
+    const posLabel = document.createElement('div');
+    posLabel.className = 'position-label';
+    posLabel.textContent = positions[positions.length - 1 - i].name;
 
-            digitBox.appendChild(posLabel);
-            container.appendChild(digitBox);
-          }
+    digitBox.appendChild(posLabel);
+    container.appendChild(digitBox);
+  }
 
-          // Restablecer el resultado
-          document.getElementById('position-result').innerHTML = '<div class="result-message">Selecciona un dígito del número</div><div class="value-info" id="value-info"></div>';
+  // Restablecer el resultado
+  document.getElementById('position-result').innerHTML = '<div class="result-message">Selecciona un dígito del número</div><div class="value-info" id="value-info"></div>';
 
-          // Actualizar la pantalla de encontrar dígito
-          updateFindDigitDisplay();
-        }
+  // Actualizar la pantalla de encontrar dígito
+  updateFindDigitDisplay();
+
+  // 👇 AGREGA ESTA LÍNEA 👇
+  generateNewQuestion();
+}
 
         // Seleccionar un dígito
         function selectDigit(index) {
